@@ -1,0 +1,15 @@
+export const TECNOLOGIAS: string[] = [
+  "WordPress",
+  "Hostinger",
+  "GoHighLevel",
+  "Meta",
+  "Google",
+  "WhatsApp",
+  "OpenAI",
+  "Claude",
+  "Gemini",
+  "n8n",
+  "Supabase",
+  "Google Analytics",
+  "Canva",
+];
