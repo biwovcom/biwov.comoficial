@@ -103,3 +103,30 @@ alter table diagnostico_respuestas enable row level security;
 drop policy if exists "equipo autenticado - todo" on diagnostico_respuestas;
 create policy "equipo autenticado - todo" on diagnostico_respuestas
   for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+-- =========================================================
+-- ANÁLISIS CON IA (historial de versiones por prospecto)
+-- =========================================================
+create table if not exists analisis_ia (
+  id uuid primary key default gen_random_uuid(),
+  prospecto_id uuid not null references prospectos(id) on delete cascade,
+  version int not null default 1,
+
+  generado_por_ia jsonb not null,   -- salida cruda de la IA, nunca se edita (auditoría)
+  contenido_editado jsonb not null, -- copia editable que se usa de ahí en adelante
+  modelo text not null,
+
+  creado_en timestamptz not null default now(),
+  editado_en timestamptz,
+  editado_por uuid references auth.users(id),
+
+  estado text not null default 'borrador' check (estado in ('borrador','aprobado'))
+);
+
+create index if not exists idx_analisis_prospecto on analisis_ia(prospecto_id, version desc);
+
+alter table analisis_ia enable row level security;
+
+drop policy if exists "equipo autenticado - todo" on analisis_ia;
+create policy "equipo autenticado - todo" on analisis_ia
+  for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');

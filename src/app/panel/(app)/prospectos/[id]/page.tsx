@@ -20,7 +20,7 @@ interface FiltroRespuestaFila {
 const PROXIMOS_PASOS = [
   { label: "Filtro rápido", ruta: "filtro" },
   { label: "Diagnóstico", ruta: "diagnostico" },
-  { label: "Análisis con IA", ruta: null },
+  { label: "Análisis con IA", ruta: "analisis" },
   { label: "Propuesta", ruta: null },
 ];
 
