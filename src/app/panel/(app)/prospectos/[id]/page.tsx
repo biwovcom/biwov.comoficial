@@ -9,6 +9,8 @@ import { monedaDesdePais } from "@/lib/panel/paises";
 import { CopyLinkButton } from "@/components/panel/CopyLinkButton";
 import { MensajeSugeridoWhatsApp } from "@/components/panel/MensajeSugeridoWhatsApp";
 import { EliminarProspectoButton } from "@/components/panel/EliminarProspectoButton";
+import { CopiarParaIABoton } from "@/components/panel/CopiarParaIABoton";
+import type { RespuestasDiagnosticoLargo } from "@/lib/panel/diagnosticoLargo";
 
 interface FiltroRespuestaFila {
   respuestas: RespuestasFiltro;
@@ -51,9 +53,9 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
 
   const { data: diagnostico } = await supabase
     .from("diagnostico_respuestas")
-    .select("completado")
+    .select("completado, respuestas")
     .eq("prospecto_id", id)
-    .maybeSingle<{ completado: boolean }>();
+    .maybeSingle<{ completado: boolean; respuestas: RespuestasDiagnosticoLargo }>();
 
   return (
     <div>
@@ -154,6 +156,17 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
               ),
             )}
           </ul>
+          {diagnostico && (
+            <div className="mt-4 border-t border-border-glass pt-4">
+              <CopiarParaIABoton
+                nombreProspecto={prospecto.nombre}
+                empresa={prospecto.empresa}
+                tipoNegocio={prospecto.tipo_negocio}
+                resumenFiltro={resumenFiltro ?? []}
+                respuestasDiagnostico={diagnostico.respuestas}
+              />
+            </div>
+          )}
         </GlassCard>
       </div>
 
