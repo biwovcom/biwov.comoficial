@@ -4,7 +4,6 @@ import type { Semaforo } from "./prospectos";
 export type Objetivo = "sin-resultados" | "no-calificados" | "sin-presencia" | "otro";
 export type Importancia = "muy-importante" | "importante-no-urgente" | "poco-importante";
 export type Meta = "mas-clientes" | "favorito-industria" | "proceso-automatizado" | "otro";
-export type EstimacionPresupuesto = "probablemente-si" | "probablemente-no";
 export type YaVende = "cada-mes" | "irregular" | "empezando";
 export type ComoLlegan = "recomendados" | "redes" | "publicidad" | "local" | "casi-no-llegan";
 export type Urgencia = "ya" | "1-3-meses" | "solo-averiguo";
@@ -19,9 +18,7 @@ export interface RespuestasFiltro {
   metaOtro?: string;
   yaVende?: YaVende;
   comoLlegan?: ComoLlegan;
-  presupuesto?: string; // id de RANGOS_PRESUPUESTO[moneda], o "aun-no-se"
-  /** Solo aplica cuando presupuesto === "aun-no-se": tu criterio sobre si probablemente alcanza. */
-  presupuestoEstimado?: EstimacionPresupuesto;
+  presupuesto?: string; // id de RANGOS_PRESUPUESTO[moneda]
   urgencia?: Urgencia;
 }
 
@@ -65,6 +62,34 @@ export const OPCIONES_URGENCIA: { id: Urgencia; label: string }[] = [
   { id: "solo-averiguo", label: "Solo averiguo" },
 ];
 
+/** Fragmentos para encajar en "ahora mismo estás batallando con que no tienes ___". */
+const FRASES_DESAFIO: Record<Objetivo, string> = {
+  "sin-resultados": "buenos resultados con tu contenido",
+  "no-calificados": "clientes calificados llegando por tus redes",
+  "sin-presencia": "presencia digital",
+  otro: "",
+};
+
+/** Fragmentos para encajar en "tu objetivo es ___". */
+const FRASES_META: Record<Meta, string> = {
+  "mas-clientes": "recibir más clientes",
+  "favorito-industria": "ser el favorito en tu industria",
+  "proceso-automatizado": "tener un proceso automatizado",
+  otro: "",
+};
+
+/** Frase lista para el mensaje de WhatsApp/guion de audio. */
+export function fraseDesafio(r: RespuestasFiltro): string {
+  if (r.objetivo === "otro") return r.objetivoOtro?.trim() || "algunos desafíos en tu negocio";
+  return r.objetivo ? FRASES_DESAFIO[r.objetivo] : "algunos desafíos en tu negocio";
+}
+
+/** Frase lista para el mensaje de WhatsApp/guion de audio. */
+export function fraseMeta(r: RespuestasFiltro): string {
+  if (r.meta === "otro") return r.metaOtro?.trim() || "hacer crecer tu negocio";
+  return r.meta ? FRASES_META[r.meta] : "hacer crecer tu negocio";
+}
+
 export interface RespuestaLegible {
   pregunta: string;
   respuesta: string;
@@ -75,10 +100,7 @@ export function resumenRespuestasFiltro(r: RespuestasFiltro, moneda: Moneda): Re
   const buscar = <T extends string>(opciones: { id: T; label: string }[], id: T | undefined) =>
     opciones.find((o) => o.id === id)?.label ?? "—";
 
-  const rangoPresupuesto =
-    r.presupuesto === "aun-no-se"
-      ? `Aún no sé${r.presupuestoEstimado ? ` (${r.presupuestoEstimado === "probablemente-si" ? "probablemente sí alcanza" : "probablemente no alcanza"})` : ""}`
-      : (RANGOS_PRESUPUESTO[moneda].find((x) => x.id === r.presupuesto)?.etiqueta ?? "—");
+  const rangoPresupuesto = RANGOS_PRESUPUESTO[moneda].find((x) => x.id === r.presupuesto)?.etiqueta ?? "—";
 
   return [
     {
@@ -115,20 +137,11 @@ export interface ResultadoFiltro {
  * Reglas de negocio definidas por Kathe:
  * 🟢 Caliente: ya vende (cada mes o irregular) + presupuesto suficiente + lo necesita ya o en 1-3 meses.
  * 🔴 No califica: presupuesto insuficiente + solo averigua, o está empezando sin presupuesto suficiente.
- * 🟡 Tibio: todo lo demás, incluido "Aún no sé" el presupuesto sin estimación.
- *
- * Cuando el prospecto responde "Aún no sé", Kathe puede marcar su propia
- * estimación (presupuestoEstimado); si no la marca, se trata como
- * insuficiente/incierto por defecto (no califica automáticamente para 🟢).
+ * 🟡 Tibio: todo lo demás.
  */
 export function calcularSemaforo(r: RespuestasFiltro, moneda: Moneda): ResultadoFiltro {
-  let presupuestoSuficiente = false;
-  if (r.presupuesto && r.presupuesto !== "aun-no-se") {
-    const rango = RANGOS_PRESUPUESTO[moneda].find((x) => x.id === r.presupuesto);
-    presupuestoSuficiente = Boolean(rango?.calificaComoSuficiente);
-  } else if (r.presupuesto === "aun-no-se" && r.presupuestoEstimado) {
-    presupuestoSuficiente = r.presupuestoEstimado === "probablemente-si";
-  }
+  const rango = RANGOS_PRESUPUESTO[moneda].find((x) => x.id === r.presupuesto);
+  const presupuestoSuficiente = Boolean(rango?.calificaComoSuficiente);
 
   const yaVendeActivo = r.yaVende === "cada-mes" || r.yaVende === "irregular";
   const estaEmpezando = r.yaVende === "empezando";

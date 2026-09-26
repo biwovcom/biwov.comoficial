@@ -52,20 +52,15 @@ const inputClass =
 /**
  * Las 7 preguntas del diagnóstico inicial, reutilizadas tanto en la versión
  * interna (Kathe la llena) como en la pública (la llena el prospecto).
- * En la versión pública se oculta la pregunta de estimación de presupuesto
- * ("según lo que hablaste con él") porque ahí no hay nadie estimando por el
- * prospecto — él mismo responde directamente.
  */
 export function PreguntasFiltro({
   respuestas,
   update,
   moneda,
-  esPublico = false,
 }: {
   respuestas: RespuestasFiltro;
   update: (patch: Partial<RespuestasFiltro>) => void;
   moneda: Moneda;
-  esPublico?: boolean;
 }) {
   return (
     <>
@@ -159,30 +154,10 @@ export function PreguntasFiltro({
             key={r.id}
             label={r.etiqueta}
             selected={respuestas.presupuesto === r.id}
-            onClick={() => update({ presupuesto: r.id, presupuestoEstimado: undefined })}
+            onClick={() => update({ presupuesto: r.id })}
           />
         ))}
-        <OptionCard
-          label="Aún no sé"
-          selected={respuestas.presupuesto === "aun-no-se"}
-          onClick={() => update({ presupuesto: "aun-no-se" })}
-        />
       </Pregunta>
-
-      {!esPublico && respuestas.presupuesto === "aun-no-se" && (
-        <Pregunta titulo="El prospecto no sabe su presupuesto. Según lo que hablaste con él, ¿tú crees que alcanza?">
-          <OptionCard
-            label="Probablemente sí alcanza"
-            selected={respuestas.presupuestoEstimado === "probablemente-si"}
-            onClick={() => update({ presupuestoEstimado: "probablemente-si" })}
-          />
-          <OptionCard
-            label="Probablemente no alcanza"
-            selected={respuestas.presupuestoEstimado === "probablemente-no"}
-            onClick={() => update({ presupuestoEstimado: "probablemente-no" })}
-          />
-        </Pregunta>
-      )}
     </>
   );
 }

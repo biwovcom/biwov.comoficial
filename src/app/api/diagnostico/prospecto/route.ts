@@ -12,8 +12,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Supabase no está configurado" }, { status: 500 });
   }
 
-  const body: { nombre: string; empresa?: string; whatsapp: string; email: string; pais?: string } =
-    await request.json();
+  const body: {
+    nombre: string;
+    empresa?: string;
+    tipoNegocio?: string;
+    whatsapp: string;
+    email: string;
+    pais?: string;
+  } = await request.json();
 
   if (!body.nombre?.trim() || !body.whatsapp?.trim() || !body.email?.trim()) {
     return NextResponse.json({ error: "Nombre, WhatsApp y correo son obligatorios" }, { status: 400 });
@@ -24,6 +30,7 @@ export async function POST(request: Request) {
     .insert({
       nombre: body.nombre.trim(),
       empresa: body.empresa?.trim() || null,
+      tipo_negocio: body.tipoNegocio?.trim() || null,
       whatsapp: body.whatsapp.trim(),
       email: body.email.trim(),
       pais: body.pais?.trim() || null,

@@ -57,7 +57,7 @@ export function DiagnosticoPublicoForm({
 
   return (
     <GlassCard className="space-y-6 p-8">
-      <PreguntasFiltro respuestas={respuestas} update={update} moneda={moneda} esPublico />
+      <PreguntasFiltro respuestas={respuestas} update={update} moneda={moneda} />
 
       {error && <p className="text-sm text-red-400">{error}</p>}
 

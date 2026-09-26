@@ -7,6 +7,7 @@ import { NOMBRES_PASO, type Prospecto } from "@/lib/panel/prospectos";
 import { resumenRespuestasFiltro, type RespuestasFiltro } from "@/lib/panel/filtroRapido";
 import { monedaDesdePais } from "@/lib/panel/paises";
 import { CopyLinkButton } from "@/components/panel/CopyLinkButton";
+import { MensajeSugeridoWhatsApp } from "@/components/panel/MensajeSugeridoWhatsApp";
 
 interface FiltroRespuestaFila {
   respuestas: RespuestasFiltro;
@@ -17,7 +18,7 @@ interface FiltroRespuestaFila {
 
 const PROXIMOS_PASOS = [
   { label: "Filtro rápido", ruta: "filtro" },
-  { label: "Diagnóstico", ruta: null },
+  { label: "Diagnóstico", ruta: "diagnostico" },
   { label: "Análisis con IA", ruta: null },
   { label: "Propuesta", ruta: null },
 ];
@@ -46,6 +47,12 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
   const resumenFiltro = filtro
     ? resumenRespuestasFiltro(filtro.respuestas, monedaDesdePais(prospecto.pais))
     : null;
+
+  const { data: diagnostico } = await supabase
+    .from("diagnostico_respuestas")
+    .select("completado")
+    .eq("prospecto_id", id)
+    .maybeSingle<{ completado: boolean }>();
 
   return (
     <div>
@@ -79,6 +86,10 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
             <div className="flex justify-between gap-4">
               <dt className="text-text-secondary">Negocio</dt>
               <dd className="text-white">{prospecto.empresa ?? "—"}</dd>
+            </div>
+            <div className="flex justify-between gap-4">
+              <dt className="text-text-secondary">Tipo de negocio</dt>
+              <dd className="text-white">{prospecto.tipo_negocio ?? "—"}</dd>
             </div>
             <div className="flex justify-between gap-4">
               <dt className="text-text-secondary">WhatsApp</dt>
@@ -120,7 +131,13 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
                   >
                     {paso.label}
                     <span className="text-xs text-accent">
-                      {paso.ruta === "filtro" && resumenFiltro ? "Ver de nuevo →" : "Abrir →"}
+                      {paso.ruta === "filtro" && resumenFiltro
+                        ? "Ver de nuevo →"
+                        : paso.ruta === "diagnostico" && diagnostico
+                          ? diagnostico.completado
+                            ? "Ver de nuevo →"
+                            : "Continuar →"
+                          : "Abrir →"}
                     </span>
                   </Link>
                 </li>
@@ -158,6 +175,17 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
               </div>
             ))}
           </dl>
+
+          <div className="mt-6 border-t border-border-glass pt-6">
+            <MensajeSugeridoWhatsApp
+              semaforo={filtro.semaforo}
+              nombre={prospecto.nombre}
+              whatsapp={prospecto.whatsapp}
+              empresa={prospecto.empresa}
+              tipoNegocio={prospecto.tipo_negocio}
+              respuestasFiltro={filtro.respuestas}
+            />
+          </div>
         </GlassCard>
       )}
     </div>

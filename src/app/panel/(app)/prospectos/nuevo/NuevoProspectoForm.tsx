@@ -69,11 +69,21 @@ export function NuevoProspectoForm() {
         </div>
 
         <div>
-          <Label htmlFor="empresa">Negocio</Label>
+          <Label htmlFor="empresa">Nombre del negocio</Label>
           <Input
             id="empresa"
             value={form.empresa ?? ""}
             onChange={(e) => update({ empresa: e.target.value })}
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="tipoNegocio">Tipo de negocio</Label>
+          <Input
+            id="tipoNegocio"
+            placeholder="Ej: belleza, abogados, restaurante..."
+            value={form.tipoNegocio ?? ""}
+            onChange={(e) => update({ tipoNegocio: e.target.value })}
           />
         </div>
 

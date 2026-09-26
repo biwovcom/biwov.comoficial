@@ -37,6 +37,8 @@ export default async function FiltroPage({ params }: { params: Promise<{ id: str
           prospectoId={prospecto.id}
           nombre={prospecto.nombre}
           whatsapp={prospecto.whatsapp}
+          empresa={prospecto.empresa}
+          tipoNegocio={prospecto.tipo_negocio}
           moneda={monedaDesdePais(prospecto.pais)}
         />
       </div>

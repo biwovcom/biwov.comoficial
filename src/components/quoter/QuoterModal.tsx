@@ -16,12 +16,20 @@ import { PAISES, monedaDesdePais } from "@/lib/panel/paises";
 interface Contacto {
   nombre: string;
   empresa: string;
+  tipoNegocio: string;
   whatsapp: string;
   email: string;
   pais: string;
 }
 
-const CONTACTO_INICIAL: Contacto = { nombre: "", empresa: "", whatsapp: "", email: "", pais: "" };
+const CONTACTO_INICIAL: Contacto = {
+  nombre: "",
+  empresa: "",
+  tipoNegocio: "",
+  whatsapp: "",
+  email: "",
+  pais: "",
+};
 
 type Vista = "contacto" | "filtro" | "enviado";
 
@@ -148,11 +156,20 @@ export function QuoterModal() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="qm-empresa">Nombre de tu empresa</Label>
+                    <Label htmlFor="qm-empresa">Nombre de tu negocio</Label>
                     <Input
                       id="qm-empresa"
                       value={contacto.empresa}
                       onChange={(e) => setContacto((c) => ({ ...c, empresa: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="qm-tipo-negocio">Tipo de negocio</Label>
+                    <Input
+                      id="qm-tipo-negocio"
+                      placeholder="Ej: belleza, abogados, restaurante..."
+                      value={contacto.tipoNegocio}
+                      onChange={(e) => setContacto((c) => ({ ...c, tipoNegocio: e.target.value }))}
                     />
                   </div>
                   <div>
@@ -213,7 +230,6 @@ export function QuoterModal() {
                     respuestas={respuestas}
                     update={(patch) => setRespuestas((prev) => ({ ...prev, ...patch }))}
                     moneda={moneda}
-                    esPublico
                   />
                 </div>
 

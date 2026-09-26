@@ -25,6 +25,7 @@ create table if not exists prospectos (
 
   nombre text not null,
   empresa text,
+  tipo_negocio text,
   whatsapp text not null,
   email text,
   pais text,
@@ -37,6 +38,9 @@ create table if not exists prospectos (
   semaforo text
     check (semaforo in ('verde','amarillo','rojo'))
 );
+
+-- Por si la tabla ya existía de una fase anterior sin esta columna.
+alter table prospectos add column if not exists tipo_negocio text;
 
 drop trigger if exists prospectos_set_updated_at on prospectos;
 create trigger prospectos_set_updated_at
@@ -78,4 +82,24 @@ alter table filtro_respuestas enable row level security;
 
 drop policy if exists "equipo autenticado - todo" on filtro_respuestas;
 create policy "equipo autenticado - todo" on filtro_respuestas
+  for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+-- =========================================================
+-- DIAGNÓSTICO LARGO (1 por prospecto, se autoguarda / sobreescribe)
+-- =========================================================
+create table if not exists diagnostico_respuestas (
+  id uuid primary key default gen_random_uuid(),
+  prospecto_id uuid not null unique references prospectos(id) on delete cascade,
+
+  respuestas jsonb not null default '{}'::jsonb,
+  bloques_completados text[] not null default '{}',
+  completado boolean not null default false,
+
+  ultima_actualizacion timestamptz not null default now()
+);
+
+alter table diagnostico_respuestas enable row level security;
+
+drop policy if exists "equipo autenticado - todo" on diagnostico_respuestas;
+create policy "equipo autenticado - todo" on diagnostico_respuestas
   for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');

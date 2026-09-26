@@ -6,23 +6,24 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { PreguntasFiltro } from "@/components/panel/PreguntasFiltro";
+import { MensajeSugeridoWhatsApp } from "@/components/panel/MensajeSugeridoWhatsApp";
 import { respuestasCompletas, type RespuestasFiltro } from "@/lib/panel/filtroRapido";
-import { MENSAJES_WHATSAPP, type Moneda } from "@/lib/panel/panelConfig";
+import type { Moneda } from "@/lib/panel/panelConfig";
 import type { Semaforo } from "@/lib/panel/prospectos";
-
-function soloDigitos(whatsapp: string): string {
-  return whatsapp.replace(/[^\d]/g, "");
-}
 
 export function FiltroWizard({
   prospectoId,
   nombre,
   whatsapp,
+  empresa,
+  tipoNegocio,
   moneda,
 }: {
   prospectoId: string;
   nombre: string;
   whatsapp: string;
+  empresa?: string | null;
+  tipoNegocio?: string | null;
   moneda: Moneda;
 }) {
   const router = useRouter();
@@ -30,7 +31,6 @@ export function FiltroWizard({
   const [resultado, setResultado] = useState<{ semaforo: Semaforo; razon: string } | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [copiado, setCopiado] = useState(false);
 
   const update = (patch: Partial<RespuestasFiltro>) =>
     setRespuestas((prev) => ({ ...prev, ...patch }));
@@ -58,10 +58,7 @@ export function FiltroWizard({
   };
 
   if (resultado) {
-    const nombrePila = nombre.split(" ")[0];
-    const mensaje = MENSAJES_WHATSAPP[resultado.semaforo]({ nombrePila });
     const emoji = resultado.semaforo === "verde" ? "🟢" : resultado.semaforo === "amarillo" ? "🟡" : "🔴";
-    const waUrl = `https://wa.me/${soloDigitos(whatsapp)}?text=${encodeURIComponent(mensaje)}`;
 
     return (
       <GlassCard className="max-w-xl p-8">
@@ -78,29 +75,14 @@ export function FiltroWizard({
         <p className="mt-2 text-sm text-text-secondary">{resultado.razon}</p>
 
         <div className="mt-6">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-secondary">
-            Mensaje sugerido para WhatsApp
-          </p>
-          <div className="whitespace-pre-wrap rounded-xl bg-white/[0.03] p-4 text-sm text-white/90">
-            {mensaje}
-          </div>
-        </div>
-
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-          <Button
-            variant="secondary"
-            size="lg"
-            onClick={async () => {
-              await navigator.clipboard.writeText(mensaje);
-              setCopiado(true);
-              setTimeout(() => setCopiado(false), 2000);
-            }}
-          >
-            {copiado ? "¡Copiado!" : "Copiar mensaje"}
-          </Button>
-          <a href={waUrl} target="_blank" rel="noopener noreferrer">
-            <Button size="lg">Abrir WhatsApp</Button>
-          </a>
+          <MensajeSugeridoWhatsApp
+            semaforo={resultado.semaforo}
+            nombre={nombre}
+            whatsapp={whatsapp}
+            empresa={empresa}
+            tipoNegocio={tipoNegocio}
+            respuestasFiltro={respuestas}
+          />
         </div>
 
         <button

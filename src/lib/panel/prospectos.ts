@@ -24,6 +24,7 @@ export interface Prospecto {
   created_at: string;
   nombre: string;
   empresa: string | null;
+  tipo_negocio: string | null;
   whatsapp: string;
   email: string | null;
   pais: string | null;
@@ -37,6 +38,7 @@ export interface Prospecto {
 export interface NuevoProspectoInput {
   nombre: string;
   empresa?: string;
+  tipoNegocio?: string;
   whatsapp: string;
   email?: string;
   pais?: string;
