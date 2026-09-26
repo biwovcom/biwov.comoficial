@@ -112,9 +112,12 @@ create table if not exists analisis_ia (
   prospecto_id uuid not null references prospectos(id) on delete cascade,
   version int not null default 1,
 
-  generado_por_ia jsonb not null,   -- salida cruda de la IA, nunca se edita (auditoría)
-  contenido_editado jsonb not null, -- copia editable que se usa de ahí en adelante
-  modelo text not null,
+  origen text not null default 'ia' check (origen in ('ia','manual')),
+
+  generado_por_ia jsonb,   -- salida cruda de la IA automática, nunca se edita (auditoría)
+  contenido_editado jsonb, -- copia editable de la salida estructurada de la IA automática
+  texto_manual text,       -- pegado a mano desde claude.ai u otro lado, cuando origen = 'manual'
+  modelo text,
 
   creado_en timestamptz not null default now(),
   editado_en timestamptz,
@@ -122,6 +125,13 @@ create table if not exists analisis_ia (
 
   estado text not null default 'borrador' check (estado in ('borrador','aprobado'))
 );
+
+-- Por si la tabla ya existía de antes con estas columnas como NOT NULL.
+alter table analisis_ia alter column generado_por_ia drop not null;
+alter table analisis_ia alter column contenido_editado drop not null;
+alter table analisis_ia alter column modelo drop not null;
+alter table analisis_ia add column if not exists origen text not null default 'ia' check (origen in ('ia','manual'));
+alter table analisis_ia add column if not exists texto_manual text;
 
 create index if not exists idx_analisis_prospecto on analisis_ia(prospecto_id, version desc);
 

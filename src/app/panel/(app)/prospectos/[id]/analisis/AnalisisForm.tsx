@@ -10,9 +10,11 @@ import { PAQUETES_INFO, type AnalisisIA } from "@/lib/panel/ia/schema";
 interface FilaAnalisis {
   id: string;
   version: number;
-  generado_por_ia: AnalisisIA;
-  contenido_editado: AnalisisIA;
-  modelo: string;
+  origen: "ia" | "manual";
+  generado_por_ia: AnalisisIA | null;
+  contenido_editado: AnalisisIA | null;
+  texto_manual: string | null;
+  modelo: string | null;
   estado: "borrador" | "aprobado";
   creado_en: string;
 }
@@ -107,6 +109,7 @@ export function AnalisisForm({
 }) {
   const [analisisFila, setAnalisisFila] = useState<FilaAnalisis | null>(analisisInicial);
   const [contenido, setContenido] = useState<AnalisisIA | null>(analisisInicial?.contenido_editado ?? null);
+  const [textoManual, setTextoManual] = useState(analisisInicial?.texto_manual ?? "");
   const [generando, setGenerando] = useState(false);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -132,15 +135,39 @@ export function AnalisisForm({
     }
   };
 
+  const guardarManualNuevo = async () => {
+    if (!textoManual.trim()) return;
+    setGuardando(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/panel/analisis", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prospectoId, textoManual }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data?.error ?? "No se pudo guardar el análisis.");
+        return;
+      }
+      setAnalisisFila(data.analisis);
+    } finally {
+      setGuardando(false);
+    }
+  };
+
   const guardar = async (aprobar = false) => {
-    if (!analisisFila || !contenido) return;
+    if (!analisisFila) return;
     setGuardando(true);
     setError(null);
     try {
       const res = await fetch("/api/panel/analisis", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ analisisId: analisisFila.id, contenidoEditado: contenido, aprobar }),
+        body:
+          analisisFila.origen === "manual"
+            ? JSON.stringify({ analisisId: analisisFila.id, textoManual, aprobar })
+            : JSON.stringify({ analisisId: analisisFila.id, contenidoEditado: contenido, aprobar }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => null);
@@ -166,18 +193,78 @@ export function AnalisisForm({
     );
   }
 
-  if (!contenido) {
+  if (!analisisFila) {
     return (
-      <GlassCard className="max-w-xl p-6">
-        <p className="mb-4 text-sm text-text-secondary">
-          Todavía no se ha generado un análisis para este prospecto.
-        </p>
-        {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
-        <Button size="lg" onClick={generar} disabled={generando}>
-          {generando ? "Analizando (puede tardar unos segundos)..." : "Generar análisis con IA"}
-        </Button>
-      </GlassCard>
+      <div className="max-w-xl space-y-5">
+        <GlassCard className="p-6">
+          <p className="mb-4 text-sm text-text-secondary">
+            Todavía no se ha generado un análisis para este prospecto.
+          </p>
+          <Button size="lg" onClick={generar} disabled={generando}>
+            {generando ? "Analizando (puede tardar unos segundos)..." : "Generar análisis con IA"}
+          </Button>
+        </GlassCard>
+
+        <div className="flex items-center gap-3 text-xs text-text-secondary">
+          <div className="h-px flex-1 bg-border-glass" />O<div className="h-px flex-1 bg-border-glass" />
+        </div>
+
+        <GlassCard className="p-6">
+          <p className="mb-1 text-sm font-semibold text-white">Pegar análisis hecho en claude.ai</p>
+          <p className="mb-4 text-xs text-text-secondary">
+            Usa el botón &ldquo;Copiar todo para analizar en claude.ai&rdquo; de la ficha del
+            prospecto, pégalo allá, y luego pega aquí la respuesta que te dio.
+          </p>
+          <textarea
+            rows={10}
+            className="w-full resize-y rounded-xl border border-border-glass bg-white/[0.03] px-4 py-3 text-sm text-white placeholder:text-text-secondary/50 outline-none focus:border-accent"
+            placeholder="Pega aquí el análisis completo que te dio claude.ai..."
+            value={textoManual}
+            onChange={(e) => setTextoManual(e.target.value)}
+          />
+          <Button size="lg" className="mt-4 w-full" onClick={guardarManualNuevo} disabled={guardando || !textoManual.trim()}>
+            {guardando ? "Guardando..." : "Guardar análisis pegado"}
+          </Button>
+        </GlassCard>
+
+        {error && <p className="text-sm text-red-400">{error}</p>}
+      </div>
     );
+  }
+
+  if (analisisFila.origen === "manual") {
+    return (
+      <div className="max-w-3xl space-y-5">
+        <Badge variant={analisisFila.estado === "aprobado" ? "verde" : "neutral"}>
+          {analisisFila.estado === "aprobado" ? "Aprobado" : "Borrador"} — versión {analisisFila.version} (pegado a mano)
+        </Badge>
+
+        <GlassCard className="p-5">
+          <p className="mb-2 text-sm font-semibold text-white">Análisis</p>
+          <textarea
+            rows={16}
+            className="w-full resize-y rounded-xl border border-border-glass bg-white/[0.03] px-4 py-3 text-sm text-white outline-none focus:border-accent"
+            value={textoManual}
+            onChange={(e) => setTextoManual(e.target.value)}
+          />
+        </GlassCard>
+
+        {error && <p className="text-sm text-red-400">{error}</p>}
+
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <Button variant="secondary" size="lg" onClick={() => guardar(false)} disabled={guardando}>
+            {guardando ? "Guardando..." : "Guardar cambios"}
+          </Button>
+          <Button size="lg" onClick={() => guardar(true)} disabled={guardando}>
+            {guardando ? "Guardando..." : "Aprobar análisis"}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!contenido) {
+    return null;
   }
 
   return (
