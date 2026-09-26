@@ -23,7 +23,13 @@ export const PAISES: PaisConZona[] = [
   { pais: "Otro", zonaHoraria: "Por confirmar" },
 ];
 
-/** COP para Colombia, USD para el resto del mercado hispanohablante. */
+/**
+ * COP para Colombia, USD para el resto del mercado hispanohablante.
+ * Sin país (aún no seleccionado o no informado), se asume Colombia — es el
+ * mercado principal de biwov — para no calcular mal el semáforo por falta
+ * de dato.
+ */
 export function monedaDesdePais(pais: string | null | undefined): Moneda {
-  return pais === "Colombia" ? "COP" : "USD";
+  if (!pais || pais === "Colombia") return "COP";
+  return "USD";
 }

@@ -86,11 +86,7 @@ export function NeedsPaths() {
                             </span>
                           ))}
                         </div>
-                        <Button
-                          size="md"
-                          className="w-full"
-                          onClick={() => open(camino.id)}
-                        >
+                        <Button size="md" className="w-full" onClick={() => open()}>
                           Hacer mi diagnóstico gratis
                         </Button>
                       </div>
