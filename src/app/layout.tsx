@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import { QuoterProvider } from "@/components/quoter/QuoterProvider";
-import { QuoterModal } from "@/components/quoter/QuoterModal";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
+import { SiteChrome } from "@/components/layout/SiteChrome";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -47,10 +45,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="es" className={`${poppins.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col bg-bg-base">
         <QuoterProvider>
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
-          <QuoterModal />
+          <SiteChrome>{children}</SiteChrome>
         </QuoterProvider>
       </body>
     </html>
