@@ -8,6 +8,7 @@ import { resumenRespuestasFiltro, type RespuestasFiltro } from "@/lib/panel/filt
 import { monedaDesdePais } from "@/lib/panel/paises";
 import { CopyLinkButton } from "@/components/panel/CopyLinkButton";
 import { MensajeSugeridoWhatsApp } from "@/components/panel/MensajeSugeridoWhatsApp";
+import { EliminarProspectoButton } from "@/components/panel/EliminarProspectoButton";
 
 interface FiltroRespuestaFila {
   respuestas: RespuestasFiltro;
@@ -70,11 +71,12 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
         )}
       </div>
 
-      <div className="mt-4">
+      <div className="mt-4 flex flex-wrap gap-3">
         <CopyLinkButton
           path={`/diagnostico/${prospecto.id}`}
           label="Copiar link del diagnóstico para compartir"
         />
+        <EliminarProspectoButton prospectoId={prospecto.id} nombre={prospecto.nombre} />
       </div>
 
       <div className="mt-8 grid gap-6 md:grid-cols-2">

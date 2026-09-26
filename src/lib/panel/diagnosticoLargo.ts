@@ -13,12 +13,7 @@ export const BLOQUES_DIAGNOSTICO: BloqueDiagnostico[] = [
   {
     id: "historia",
     titulo: "Historia del negocio",
-    preguntasGuia: [
-      "¿Cuándo empezó?",
-      "¿Por qué lo creó y con qué fin?",
-      "¿Cuál ha sido el momento más difícil?",
-      "¿Cuál ha sido el momento más bonito?",
-    ],
+    preguntasGuia: ["¿Cuándo empezó?", "¿Por qué lo creó y con qué fin?"],
   },
   {
     id: "lo-que-vende",
