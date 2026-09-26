@@ -1,6 +1,7 @@
 export type PasoActual =
   | "nuevo"
   | "filtro"
+  | "llamada"
   | "diagnostico"
   | "analisis"
   | "propuesta_enviada"
@@ -12,6 +13,7 @@ export type Semaforo = "verde" | "amarillo" | "rojo";
 export const NOMBRES_PASO: Record<PasoActual, string> = {
   nuevo: "Nuevo",
   filtro: "Filtro rápido",
+  llamada: "Llamada agendada",
   diagnostico: "Diagnóstico",
   analisis: "Análisis IA",
   propuesta_enviada: "Propuesta enviada",
@@ -31,6 +33,8 @@ export interface Prospecto {
   ciudad: string | null;
   canal_origen: string | null;
   notas: string | null;
+  link_redes_prospecto: string | null;
+  que_quiere_resolver: string | null;
   paso_actual: PasoActual;
   semaforo: Semaforo | null;
 }

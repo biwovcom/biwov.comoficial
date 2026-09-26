@@ -21,7 +21,8 @@ interface FiltroRespuestaFila {
 
 const PROXIMOS_PASOS = [
   { label: "Filtro rápido", ruta: "filtro" },
-  { label: "Diagnóstico", ruta: "diagnostico" },
+  { label: "Preparar llamada (10 preguntas clave)", ruta: "llamada" },
+  { label: "Diagnóstico profundo (onboarding, después de la venta)", ruta: "diagnostico" },
   { label: "Análisis con IA", ruta: "analisis" },
   { label: "Propuesta", ruta: null },
 ];
@@ -56,6 +57,12 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
     .select("completado, respuestas")
     .eq("prospecto_id", id)
     .maybeSingle<{ completado: boolean; respuestas: RespuestasDiagnosticoLargo }>();
+
+  const { data: llamada } = await supabase
+    .from("llamada_respuestas")
+    .select("completado")
+    .eq("prospecto_id", id)
+    .maybeSingle<{ completado: boolean }>();
 
   return (
     <div>
@@ -113,7 +120,19 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
               <dt className="text-text-secondary">Origen</dt>
               <dd className="text-white">{prospecto.canal_origen ?? "—"}</dd>
             </div>
+            {prospecto.link_redes_prospecto && (
+              <div className="flex justify-between gap-4">
+                <dt className="text-text-secondary">Instagram / web</dt>
+                <dd className="truncate text-white">{prospecto.link_redes_prospecto}</dd>
+              </div>
+            )}
           </dl>
+          {prospecto.que_quiere_resolver && (
+            <p className="mt-4 rounded-xl bg-accent/5 p-3 text-sm text-text-secondary">
+              <span className="font-medium text-white">Quiere resolver:</span>{" "}
+              {prospecto.que_quiere_resolver}
+            </p>
+          )}
           {prospecto.notas && (
             <p className="mt-4 rounded-xl bg-white/[0.03] p-3 text-sm text-text-secondary">
               {prospecto.notas}
@@ -137,11 +156,15 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
                     <span className="text-xs text-accent">
                       {paso.ruta === "filtro" && resumenFiltro
                         ? "Ver de nuevo →"
-                        : paso.ruta === "diagnostico" && diagnostico
-                          ? diagnostico.completado
+                        : paso.ruta === "llamada" && llamada
+                          ? llamada.completado
                             ? "Ver de nuevo →"
                             : "Continuar →"
-                          : "Abrir →"}
+                          : paso.ruta === "diagnostico" && diagnostico
+                            ? diagnostico.completado
+                              ? "Ver de nuevo →"
+                              : "Continuar →"
+                            : "Abrir →"}
                     </span>
                   </Link>
                 </li>

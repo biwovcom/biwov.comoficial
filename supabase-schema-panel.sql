@@ -34,13 +34,23 @@ create table if not exists prospectos (
   notas text,
 
   paso_actual text not null default 'nuevo'
-    check (paso_actual in ('nuevo','filtro','diagnostico','analisis','propuesta_enviada','ganado','perdido')),
+    check (paso_actual in ('nuevo','filtro','llamada','diagnostico','analisis','propuesta_enviada','ganado','perdido')),
   semaforo text
-    check (semaforo in ('verde','amarillo','rojo'))
+    check (semaforo in ('verde','amarillo','rojo')),
+
+  link_redes_prospecto text,
+  que_quiere_resolver text
 );
 
--- Por si la tabla ya existía de una fase anterior sin esta columna.
+-- Por si la tabla ya existía de una fase anterior sin estas columnas.
 alter table prospectos add column if not exists tipo_negocio text;
+alter table prospectos add column if not exists link_redes_prospecto text;
+alter table prospectos add column if not exists que_quiere_resolver text;
+
+-- Por si la tabla ya existía con el check antiguo (sin 'llamada' como paso válido).
+alter table prospectos drop constraint if exists prospectos_paso_actual_check;
+alter table prospectos add constraint prospectos_paso_actual_check
+  check (paso_actual in ('nuevo','filtro','llamada','diagnostico','analisis','propuesta_enviada','ganado','perdido'));
 
 drop trigger if exists prospectos_set_updated_at on prospectos;
 create trigger prospectos_set_updated_at
@@ -139,4 +149,23 @@ alter table analisis_ia enable row level security;
 
 drop policy if exists "equipo autenticado - todo" on analisis_ia;
 create policy "equipo autenticado - todo" on analisis_ia
+  for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+-- =========================================================
+-- PREPARACIÓN DE LA LLAMADA (10 preguntas clave, 1 por prospecto)
+-- =========================================================
+create table if not exists llamada_respuestas (
+  id uuid primary key default gen_random_uuid(),
+  prospecto_id uuid not null unique references prospectos(id) on delete cascade,
+
+  respuestas jsonb not null default '{}'::jsonb,
+  completado boolean not null default false,
+
+  ultima_actualizacion timestamptz not null default now()
+);
+
+alter table llamada_respuestas enable row level security;
+
+drop policy if exists "equipo autenticado - todo" on llamada_respuestas;
+create policy "equipo autenticado - todo" on llamada_respuestas
   for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
