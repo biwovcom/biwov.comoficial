@@ -4,6 +4,23 @@ export interface BloqueDiagnostico {
   preguntasGuia: string[];
 }
 
+export interface CampoRedSocial {
+  id: string;
+  label: string;
+  placeholder: string;
+}
+
+/** Campos de una sola línea, no bloques de texto — para ubicar los perfiles reales del negocio. */
+export const CAMPOS_REDES_SOCIALES: CampoRedSocial[] = [
+  { id: "facebook", label: "Facebook", placeholder: "facebook.com/tu-negocio o @usuario" },
+  { id: "instagram", label: "Instagram", placeholder: "@usuario" },
+  { id: "linkedin", label: "LinkedIn", placeholder: "linkedin.com/company/tu-negocio" },
+  { id: "tiktok", label: "TikTok", placeholder: "@usuario" },
+  { id: "youtube", label: "YouTube", placeholder: "youtube.com/@tu-canal" },
+  { id: "google", label: "Google (perfil de negocio / Maps)", placeholder: "Nombre exacto en Google" },
+  { id: "otra", label: "Otra red", placeholder: "Cuál y su usuario/link" },
+];
+
 /**
  * Un bloque = un cuadro de texto con dictado por voz. En vez de una pregunta
  * por campo, se agrupan por tema (así se toma nota igual que en una llamada
@@ -57,26 +74,34 @@ export const BLOQUES_DIAGNOSTICO: BloqueDiagnostico[] = [
   },
   {
     id: "marketing-actual",
-    titulo: "Marketing actual",
+    titulo: "Marketing actual (captación)",
     preguntasGuia: [
-      "Redes y seguidores",
-      "¿Cómo hace el contenido hoy y cómo lo ve?",
-      "¿Por dónde le llegan los clientes?",
-      "¿Ha hecho pauta? ¿Con qué resultado?",
-      "¿Qué cree que frenó su crecimiento?",
-      "¿Qué tan importante ve el marketing digital?",
+      "¿Por dónde llegan hoy los clientes: contactos que ya lo conocen, contenido, mensajes en frío o pauta?",
+      "¿Cuál de esas vías trae los mejores clientes y cuál no está usando?",
+      "¿Tiene algo gratis o de bajo costo que atraiga interesados (un regalo, una guía, un diagnóstico)?",
+      "¿Cuántos interesados nuevos entran al mes?",
     ],
   },
   {
     id: "seguimiento-leads",
-    titulo: "Seguimiento de leads",
+    titulo: "Seguimiento de leads (conversión)",
     preguntasGuia: [
-      "¿Cuántas personas le escriben al mes? ¿Cuántas compran?",
-      "¿Quién responde y en cuánto tiempo?",
-      "¿Qué pasa con los mensajes de noche o fin de semana?",
-      "¿Dónde guarda los datos?",
-      "¿Hace seguimiento a los que no compran? ¿Tiene mensajes preparados?",
-      "¿Usa alguna herramienta? ¿Qué hace con los clientes que ya compraron?",
+      "De cada 100 interesados, ¿cuántos hablan con él o su equipo?",
+      "De esos, ¿cuántos compran?",
+      "¿En cuánto tiempo responde a un interesado nuevo?",
+      "¿Cuántas veces hace seguimiento antes de rendirse?",
+      "¿Quién vende? ¿Tiene un guion o improvisa?",
+    ],
+  },
+  {
+    id: "retencion",
+    titulo: "Retención y fidelización (dinero después de la venta)",
+    preguntasGuia: [
+      "¿Qué le ofrece al cliente después de que compra? (algo más grande, algo complementario)",
+      "¿Tiene algo que el cliente pague cada mes?",
+      "Si alguien dice que no por precio, ¿tiene alguna alternativa de venta?",
+      "¿Cuántos clientes vuelven a comprar y cuántos lo recomiendan?",
+      "¿Por qué se van los clientes que se van?",
     ],
   },
   {
@@ -100,14 +125,26 @@ export const BLOQUES_DIAGNOSTICO: BloqueDiagnostico[] = [
     ],
   },
   {
-    id: "valor",
-    titulo: "Valor",
+    id: "capacidad-escalar",
+    titulo: "Capacidad de escalar (operación)",
     preguntasGuia: [
-      "Resultado soñado de su cliente",
-      "¿Cuánto tarda en ver resultados?",
-      "¿Qué esfuerzo le toca hacer a él?",
-      "¿Qué miedo tiene de comprar?",
-      "¿Podría ofrecer una garantía?",
+      "Si mañana le llegara el doble de clientes, ¿qué se rompería primero?",
+      "¿Qué tareas dependen solo de él?",
+      "¿Qué haría con más tiempo libre?",
+      "¿Tiene procesos escritos o todo está en su cabeza?",
+      "¿Su equipo puede atender sin que él esté presente?",
+    ],
+  },
+  {
+    id: "valor",
+    titulo: "Valor de la oferta",
+    preguntasGuia: [
+      "¿Cuál es el resultado soñado de su cliente? ¿Lo dice su oferta de forma clara?",
+      "¿Qué tan seguro está el cliente de que lo va a lograr con él? ¿Qué pruebas le da?",
+      "¿Cuánto tarda en ver el primer resultado?",
+      "¿Cuánto esfuerzo le cuesta al cliente? ¿Qué parte podría hacer él por su cliente?",
+      "¿Por qué alguien no le compra? Lista de todas las objeciones.",
+      "¿Su oferta se compara por precio con la competencia, o es tan distinta que no se puede comparar?",
     ],
   },
 ];

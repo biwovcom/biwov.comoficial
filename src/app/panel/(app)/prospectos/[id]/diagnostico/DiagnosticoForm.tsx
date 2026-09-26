@@ -4,8 +4,17 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
+import { Input, Label } from "@/components/ui/Input";
 import { CampoConMicrofono } from "@/components/panel/CampoConMicrofono";
-import { BLOQUES_DIAGNOSTICO, type RespuestasDiagnosticoLargo } from "@/lib/panel/diagnosticoLargo";
+import {
+  BLOQUES_DIAGNOSTICO,
+  CAMPOS_REDES_SOCIALES,
+  type RespuestasDiagnosticoLargo,
+} from "@/lib/panel/diagnosticoLargo";
+
+function idCampoRed(campoId: string) {
+  return `red_${campoId}`;
+}
 
 type EstadoGuardado = "guardado" | "guardando" | "sin-guardar" | "error";
 
@@ -81,6 +90,26 @@ export function DiagnosticoForm({
           {etiquetaEstado[estado]}
         </span>
       </div>
+
+      <GlassCard className="p-5">
+        <p className="mb-1 text-sm font-semibold text-white">Redes sociales del negocio</p>
+        <p className="mb-4 text-xs text-text-secondary">
+          Cómo aparece o se llama en cada plataforma, para poder ubicar sus perfiles reales.
+        </p>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {CAMPOS_REDES_SOCIALES.map((campo) => (
+            <div key={campo.id}>
+              <Label htmlFor={idCampoRed(campo.id)}>{campo.label}</Label>
+              <Input
+                id={idCampoRed(campo.id)}
+                placeholder={campo.placeholder}
+                value={respuestas[idCampoRed(campo.id)] ?? ""}
+                onChange={(e) => actualizarBloque(idCampoRed(campo.id), e.target.value)}
+              />
+            </div>
+          ))}
+        </div>
+      </GlassCard>
 
       {BLOQUES_DIAGNOSTICO.map((bloque) => (
         <CampoConMicrofono
