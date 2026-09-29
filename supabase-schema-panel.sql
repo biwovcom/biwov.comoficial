@@ -334,3 +334,33 @@ alter table cotizador_paquetes enable row level security;
 drop policy if exists "equipo autenticado - todo" on cotizador_paquetes;
 create policy "equipo autenticado - todo" on cotizador_paquetes
   for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+-- Envío al cliente: precio en USD (null = se calcula con la TRM) y links de pago.
+alter table cotizador_paquetes add column if not exists precio_usd numeric;
+alter table cotizador_paquetes add column if not exists link_pago_cop text;
+alter table cotizador_paquetes add column if not exists link_pago_usd text;
+
+-- =========================================================
+-- ACEPTACIONES DE COTIZACIONES (el cliente acepta en /cotizacion/[id])
+-- Se insertan desde el servidor con service role; el equipo las lee en el panel.
+-- =========================================================
+create table if not exists cotizador_aceptaciones (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  paquete_id uuid references cotizador_paquetes(id) on delete set null,
+  nombre text not null,
+  email text,
+  whatsapp text,
+  empresa text,
+  moneda text not null check (moneda in ('COP','USD')),
+  monto numeric not null,
+  snapshot jsonb not null default '{}'::jsonb -- lo que el cliente vio y aceptó
+);
+
+create index if not exists idx_aceptaciones_paquete on cotizador_aceptaciones(paquete_id, created_at desc);
+
+alter table cotizador_aceptaciones enable row level security;
+
+drop policy if exists "equipo autenticado - todo" on cotizador_aceptaciones;
+create policy "equipo autenticado - todo" on cotizador_aceptaciones
+  for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');

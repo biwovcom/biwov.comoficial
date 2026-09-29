@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   CONFIG_DEFAULT,
+  type Aceptacion,
   type CostoProveedor,
   type CotizadorConfig,
   type Paquete,
@@ -12,6 +13,7 @@ export interface DatosCotizador {
   costos: CostoProveedor[];
   tarifas: TarifaBase[];
   paquetes: Paquete[];
+  aceptaciones: Aceptacion[];
 }
 
 /**
@@ -24,7 +26,7 @@ export async function cargarCotizador(
   supabase: SupabaseClient,
   conPaquetes: boolean,
 ): Promise<{ datos: DatosCotizador } | { error: string }> {
-  const [configRes, costosRes, tarifasRes, paquetesRes] = await Promise.all([
+  const [configRes, costosRes, tarifasRes, paquetesRes, aceptacionesRes] = await Promise.all([
     supabase.from("cotizador_config").select("*").eq("id", 1).maybeSingle<CotizadorConfig>(),
     supabase
       .from("cotizador_costos")
@@ -46,9 +48,17 @@ export async function cargarCotizador(
           .order("created_at", { ascending: true })
           .returns<Paquete[]>()
       : Promise.resolve({ data: [] as Paquete[], error: null }),
+    conPaquetes
+      ? supabase
+          .from("cotizador_aceptaciones")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .returns<Aceptacion[]>()
+      : Promise.resolve({ data: [] as Aceptacion[], error: null }),
   ]);
 
-  const error = configRes.error ?? costosRes.error ?? tarifasRes.error ?? paquetesRes.error;
+  const error =
+    configRes.error ?? costosRes.error ?? tarifasRes.error ?? paquetesRes.error ?? aceptacionesRes.error;
   if (error) return { error: error.message };
 
   const config: CotizadorConfig = configRes.data
@@ -74,8 +84,12 @@ export async function cargarCotizador(
       paquetes: (paquetesRes.data ?? []).map((p) => ({
         ...p,
         precio_final: p.precio_final === null ? null : Number(p.precio_final),
+        precio_usd: p.precio_usd == null ? null : Number(p.precio_usd),
+        link_pago_cop: p.link_pago_cop ?? null,
+        link_pago_usd: p.link_pago_usd ?? null,
         items: p.items ?? [],
       })),
+      aceptaciones: (aceptacionesRes.data ?? []).map((a) => ({ ...a, monto: Number(a.monto) })),
     },
   };
 }

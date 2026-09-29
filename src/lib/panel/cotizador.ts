@@ -58,7 +58,40 @@ export interface Paquete {
   items: ItemPaquete[];
   /** null = se cobra la suma de los ítems, sin descuento. */
   precio_final: number | null;
+  /** null = se calcula con la TRM. */
+  precio_usd: number | null;
+  /** Links de pago (Bold, Wompi, Mercado Pago, PayPal…) a los que se envía al cliente al aceptar. */
+  link_pago_cop: string | null;
+  link_pago_usd: string | null;
   orden: number;
+}
+
+export interface Aceptacion {
+  id: string;
+  created_at: string;
+  paquete_id: string;
+  nombre: string;
+  email: string | null;
+  whatsapp: string | null;
+  empresa: string | null;
+  moneda: Moneda;
+  monto: number;
+}
+
+export function precioUSDPaquete(paquete: Paquete, precioFinalCOP: number, trm: number): number {
+  if (paquete.precio_usd !== null) return paquete.precio_usd;
+  return trm > 0 ? Math.round(precioFinalCOP / trm) : 0;
+}
+
+/** Solo acepta links https, para no redirigir al cliente a cualquier cosa. */
+export function linkPagoValido(link: string | null): string | null {
+  if (!link) return null;
+  try {
+    const url = new URL(link.trim());
+    return url.protocol === "https:" ? url.toString() : null;
+  } catch {
+    return null;
+  }
 }
 
 export const CONFIG_DEFAULT: CotizadorConfig = {
