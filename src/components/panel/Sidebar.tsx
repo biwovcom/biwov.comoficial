@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { Users2, UserPlus } from "lucide-react";
+import { Calculator, Users2, UserPlus } from "lucide-react";
 import { LogoutButton } from "./LogoutButton";
 
 const LINKS = [
   { href: "/panel/prospectos", label: "Prospectos", icon: Users2 },
   { href: "/panel/prospectos/nuevo", label: "Nuevo prospecto", icon: UserPlus },
+  { href: "/panel/cotizaciones", label: "Cotizaciones", icon: Calculator },
 ];
 
 export function Sidebar() {
