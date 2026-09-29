@@ -12,7 +12,7 @@ export type CanalLlegada =
   | "pauta-paga"
   | "otro";
 export type PrioridadEquipo = "muy-alto" | "medio" | "bajo";
-export type CuandoEmpezar = "inmediatamente" | "proximas-semanas" | "solo-cotizando";
+export type CuandoEmpezar = "inmediatamente" | "proximas-semanas" | "proximos-meses";
 
 export interface RespuestasFiltro {
   objetivo?: Objetivo;
@@ -73,8 +73,8 @@ export const OPCIONES_PRIORIDAD_EQUIPO: { id: PrioridadEquipo; label: string }[]
 
 export const OPCIONES_CUANDO_EMPEZAR: { id: CuandoEmpezar; label: string }[] = [
   { id: "inmediatamente", label: "Inmediatamente (estamos listos para arrancar ya)" },
-  { id: "proximas-semanas", label: "En el transcurso de las próximas semanas / primeros meses" },
-  { id: "solo-cotizando", label: "Solo estoy cotizando o planificando a largo plazo" },
+  { id: "proximas-semanas", label: "En las próximas semanas" },
+  { id: "proximos-meses", label: "En los próximos meses" },
 ];
 
 /** Fragmentos para encajar en "ahora mismo estás batallando con que no tienes ___". */
@@ -184,7 +184,7 @@ export function calcularSemaforo(r: RespuestasFiltro, moneda: Moneda): Resultado
   const yaVendeActivo = r.cumplimientoVentas === "cumple-constante" || r.cumplimientoVentas === "inestable";
   const estaPorDebajo = r.cumplimientoVentas === "por-debajo";
   const esUrgente = r.cuandoEmpezar === "inmediatamente" || r.cuandoEmpezar === "proximas-semanas";
-  const soloCotizando = r.cuandoEmpezar === "solo-cotizando";
+  const quiereEmpezarEnMeses = r.cuandoEmpezar === "proximos-meses";
 
   if (yaVendeActivo && presupuestoSuficiente && esUrgente) {
     return {
@@ -193,12 +193,12 @@ export function calcularSemaforo(r: RespuestasFiltro, moneda: Moneda): Resultado
     };
   }
 
-  if ((!presupuestoSuficiente && soloCotizando) || (estaPorDebajo && !presupuestoSuficiente)) {
+  if ((!presupuestoSuficiente && quiereEmpezarEnMeses) || (estaPorDebajo && !presupuestoSuficiente)) {
     return {
       semaforo: "rojo",
       razon: estaPorDebajo
         ? "Está muy por debajo de sus metas de ventas y su presupuesto todavía no alcanza para el plan más económico."
-        : "Su presupuesto no alcanza para el plan más económico y solo está cotizando, sin urgencia.",
+        : "Su presupuesto no alcanza para el plan más económico y quiere empezar hasta dentro de unos meses, sin urgencia.",
     };
   }
 
