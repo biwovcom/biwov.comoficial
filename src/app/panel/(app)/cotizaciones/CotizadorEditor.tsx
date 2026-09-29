@@ -1,9 +1,18 @@
 "use client";
 
-import { Fragment, useEffect, useMemo, useRef, useState, type InputHTMLAttributes } from "react";
-import { ChevronDown, ChevronRight, Plus, Trash2 } from "lucide-react";
+import { Fragment, useMemo, useState } from "react";
+import { ChevronDown, ChevronRight, Info, Plus, Trash2 } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { cn } from "@/lib/utils";
+import { useAutoguardado } from "@/lib/panel/useAutoguardado";
+import {
+  Campo,
+  EstadoGuardadoTexto,
+  SelectMoneda,
+  colorMargen,
+  nuevaKey,
+  num,
+} from "@/components/panel/cotizador/Campos";
 import {
   aCOP,
   costoComponente,
@@ -15,11 +24,8 @@ import {
   type ComponenteTarifa,
   type CostoProveedor,
   type CotizadorConfig,
-  type Moneda,
   type TarifaBase,
 } from "@/lib/panel/cotizador";
-
-type EstadoGuardado = "idle" | "guardando" | "guardado" | "error";
 
 interface Props {
   configInicial: CotizadorConfig;
@@ -29,47 +35,6 @@ interface Props {
 
 const SIN_GRUPO = "Sin grupo";
 
-function nuevaKey(): string {
-  return Math.random().toString(36).slice(2, 10);
-}
-
-function num(valor: string): number {
-  const n = parseFloat(valor);
-  return Number.isFinite(n) ? n : 0;
-}
-
-function colorMargen(pct: number): string {
-  if (pct < 0) return "text-red-400";
-  if (pct < 30) return "text-amber-300";
-  return "text-emerald-400";
-}
-
-function Campo({ className, ...props }: InputHTMLAttributes<HTMLInputElement>) {
-  return (
-    <input
-      className={cn(
-        "w-full rounded-lg border border-border-glass bg-white/[0.03] px-2.5 py-1.5 text-sm text-white placeholder:text-text-secondary/50 outline-none transition-colors focus:border-accent",
-        props.type === "number" && "text-right tabular-nums",
-        className,
-      )}
-      {...props}
-    />
-  );
-}
-
-function SelectMoneda({ value, onChange }: { value: Moneda; onChange: (m: Moneda) => void }) {
-  return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value as Moneda)}
-      className="rounded-lg border border-border-glass bg-bg-base px-2 py-1.5 text-sm text-white outline-none focus:border-accent"
-    >
-      <option value="COP">COP</option>
-      <option value="USD">USD</option>
-    </select>
-  );
-}
-
 export function CotizadorEditor({ configInicial, costosIniciales, tarifasIniciales }: Props) {
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const [config, setConfig] = useState(configInicial);
@@ -77,44 +42,9 @@ export function CotizadorEditor({ configInicial, costosIniciales, tarifasInicial
   const [tarifas, setTarifas] = useState(tarifasIniciales);
   const [abiertas, setAbiertas] = useState<Set<string>>(new Set());
   const [borradorPct, setBorradorPct] = useState<{ id: string; valor: string } | null>(null);
-  const [estado, setEstado] = useState<EstadoGuardado>("idle");
-  const [mensajeError, setMensajeError] = useState<string | null>(null);
-
-  // ---------- guardado automático (con espera corta para no escribir en cada tecla) ----------
-  const temporizadores = useRef(new Map<string, ReturnType<typeof setTimeout>>());
-  const pendientes = useRef(0);
-
-  useEffect(() => {
-    const mapa = temporizadores.current;
-    return () => mapa.forEach((t) => clearTimeout(t));
-  }, []);
-
-  async function ejecutar(accion: () => PromiseLike<{ error: { message: string } | null }>) {
-    pendientes.current += 1;
-    setEstado("guardando");
-    const { error } = await accion();
-    pendientes.current -= 1;
-    if (error) {
-      setEstado("error");
-      setMensajeError(error.message);
-    } else if (pendientes.current === 0) {
-      setEstado("guardado");
-      setMensajeError(null);
-    }
-  }
-
-  function guardarLuego(clave: string, accion: () => PromiseLike<{ error: { message: string } | null }>) {
-    const previo = temporizadores.current.get(clave);
-    if (previo) clearTimeout(previo);
-    setEstado("guardando");
-    temporizadores.current.set(
-      clave,
-      setTimeout(() => {
-        temporizadores.current.delete(clave);
-        void ejecutar(accion);
-      }, 600),
-    );
-  }
+  const [abiertosProv, setAbiertosProv] = useState<Set<string>>(new Set());
+  const [detallesAbiertos, setDetallesAbiertos] = useState<Set<string>>(new Set());
+  const { estado, mensajeError, setEstado, ejecutar, guardarLuego, fallo } = useAutoguardado();
 
   // ---------- configuración: TRM y mano de obra ----------
   function actualizarConfig(patch: Partial<CotizadorConfig>) {
@@ -136,11 +66,8 @@ export function CotizadorEditor({ configInicial, costosIniciales, tarifasInicial
   const valorHora = costoHora(config);
 
   // ---------- proveedores y costos ----------
-  function actualizarCosto(id: string, patch: Partial<CostoProveedor>) {
-    const siguiente = costos.map((c) => (c.id === id ? { ...c, ...patch } : c));
-    setCostos(siguiente);
-    const fila = siguiente.find((c) => c.id === id)!;
-    guardarLuego(`costo:${id}`, () =>
+  function guardarCosto(fila: CostoProveedor) {
+    guardarLuego(`costo:${fila.id}`, () =>
       supabase
         .from("cotizador_costos")
         .update({
@@ -150,27 +77,66 @@ export function CotizadorEditor({ configInicial, costosIniciales, tarifasInicial
           unidad: fila.unidad,
           moneda: fila.moneda,
           costo: fila.costo,
+          detalle: fila.detalle,
         })
-        .eq("id", id),
+        .eq("id", fila.id),
     );
   }
 
-  async function agregarCosto() {
-    const ultimo = costos[costos.length - 1];
+  function actualizarCosto(id: string, patch: Partial<CostoProveedor>) {
+    const siguiente = costos.map((c) => (c.id === id ? { ...c, ...patch } : c));
+    setCostos(siguiente);
+    guardarCosto(siguiente.find((c) => c.id === id)!);
+  }
+
+  /** Cambia nombre o contacto de un proveedor en todas sus filas a la vez. */
+  function actualizarProveedor(nombre: string, patch: Pick<Partial<CostoProveedor>, "proveedor" | "contacto">) {
+    const siguiente = costos.map((c) => (c.proveedor.trim() === nombre ? { ...c, ...patch } : c));
+    setCostos(siguiente);
+    siguiente.filter((c, i) => costos[i].proveedor.trim() === nombre).forEach(guardarCosto);
+    if (patch.proveedor !== undefined && abiertosProv.has(nombre)) {
+      const abiertos = new Set(abiertosProv);
+      abiertos.delete(nombre);
+      abiertos.add(patch.proveedor.trim());
+      setAbiertosProv(abiertos);
+    }
+  }
+
+  async function agregarCosto(proveedor: string, contacto: string | null) {
     const orden = costos.reduce((max, c) => Math.max(max, c.orden), 0) + 1;
     setEstado("guardando");
     const { data, error } = await supabase
       .from("cotizador_costos")
-      .insert({ proveedor: "", concepto: "", unidad: ultimo?.unidad ?? null, moneda: "COP", costo: 0, orden })
+      .insert({ proveedor, contacto, concepto: "", unidad: null, moneda: "COP", costo: 0, orden })
       .select()
       .single<CostoProveedor>();
     if (error || !data) {
-      setEstado("error");
-      setMensajeError(error?.message ?? "No se pudo agregar la fila.");
+      fallo(error?.message ?? "No se pudo agregar la fila.");
       return;
     }
     setCostos([...costos, { ...data, costo: Number(data.costo) }]);
+    setAbiertosProv(new Set(abiertosProv).add(proveedor.trim()));
     setEstado("guardado");
+  }
+
+  function nuevoProveedor() {
+    const nombre = window.prompt("Nombre del proveedor nuevo (ej: Hostinger):")?.trim();
+    if (!nombre) return;
+    void agregarCosto(nombre, null);
+  }
+
+  function alternarProveedor(nombre: string) {
+    const siguiente = new Set(abiertosProv);
+    if (siguiente.has(nombre)) siguiente.delete(nombre);
+    else siguiente.add(nombre);
+    setAbiertosProv(siguiente);
+  }
+
+  function alternarDetalle(id: string) {
+    const siguiente = new Set(detallesAbiertos);
+    if (siguiente.has(id)) siguiente.delete(id);
+    else siguiente.add(id);
+    setDetallesAbiertos(siguiente);
   }
 
   function tarifasQueUsan(costoId: string): TarifaBase[] {
@@ -211,10 +177,15 @@ export function CotizadorEditor({ configInicial, costosIniciales, tarifasInicial
     }
   }
 
-  const proveedoresConocidos = useMemo(
-    () => Array.from(new Set(costos.map((c) => c.proveedor.trim()).filter(Boolean))).sort(),
-    [costos],
-  );
+  const proveedores = useMemo(() => {
+    const mapa = new Map<string, CostoProveedor[]>();
+    for (const c of costos) {
+      const p = c.proveedor.trim();
+      if (!mapa.has(p)) mapa.set(p, []);
+      mapa.get(p)!.push(c);
+    }
+    return Array.from(mapa.entries());
+  }, [costos]);
 
   // ---------- tarifas base ----------
   function guardarTarifa(t: TarifaBase) {
@@ -268,8 +239,7 @@ export function CotizadorEditor({ configInicial, costosIniciales, tarifasInicial
       .select()
       .single<TarifaBase>();
     if (error || !data) {
-      setEstado("error");
-      setMensajeError(error?.message ?? "No se pudo agregar la tarifa.");
+      fallo(error?.message ?? "No se pudo agregar la tarifa.");
       return;
     }
     setTarifas([...tarifas, { ...data, horas: 0, precio_cliente: 0, componentes: [] }]);
@@ -304,7 +274,7 @@ export function CotizadorEditor({ configInicial, costosIniciales, tarifasInicial
 
   function etiquetaCosto(c: CostoProveedor): string {
     const valor = c.moneda === "USD" ? `US$${c.costo}` : formatoCOP(c.costo);
-    return `${c.proveedor || "Sin proveedor"} — ${c.concepto || "sin concepto"} (${valor}${c.unidad ? " / " + c.unidad : ""})`;
+    return `${c.concepto || "sin concepto"} (${valor}${c.unidad ? " / " + c.unidad : ""})`;
   }
 
   // ---------- render ----------
@@ -318,16 +288,7 @@ export function CotizadorEditor({ configInicial, costosIniciales, tarifasInicial
             instante. Con estas tarifas vas a armar los paquetes.
           </p>
         </div>
-        <span
-          className={cn(
-            "text-xs",
-            estado === "error" ? "text-red-400" : estado === "guardado" ? "text-emerald-400" : "text-text-secondary",
-          )}
-        >
-          {estado === "guardando" && "Guardando…"}
-          {estado === "guardado" && "✓ Guardado"}
-          {estado === "error" && `No se pudo guardar: ${mensajeError}`}
-        </span>
+        <EstadoGuardadoTexto estado={estado} error={mensajeError} />
       </header>
 
       {/* ===================== TRM + MANO DE OBRA ===================== */}
@@ -404,110 +365,183 @@ export function CotizadorEditor({ configInicial, costosIniciales, tarifasInicial
           <div>
             <h2 className="text-lg font-semibold text-white">Proveedores y costos</h2>
             <p className="mt-1 text-sm text-text-secondary">
-              Solo lo que te cobran a ti. Si cambias un costo aquí, se actualizan todas las tarifas que lo usan.
+              Solo lo que te cobran a ti. Abre cada proveedor (▸) para ver y editar sus costos; con{" "}
+              <Info size={12} className="inline" /> ves qué incluye cada plan. Si cambias un costo, se actualizan
+              todas las tarifas y paquetes que lo usan.
             </p>
           </div>
           <button
             type="button"
-            onClick={agregarCosto}
+            onClick={nuevoProveedor}
             className="flex items-center gap-2 rounded-full border border-border-glass bg-white/[0.03] px-4 py-2 text-sm text-white hover:border-accent/40"
           >
-            <Plus size={16} /> Agregar costo
+            <Plus size={16} /> Nuevo proveedor
           </button>
         </div>
 
-        <datalist id="lista-proveedores">
-          {proveedoresConocidos.map((p) => (
-            <option key={p} value={p} />
-          ))}
-        </datalist>
+        <div className="mt-4 space-y-2">
+          {proveedores.length === 0 && (
+            <div className="rounded-2xl border border-dashed border-border-glass p-8 text-center text-sm text-text-secondary">
+              Todavía no hay proveedores. Pulsa &quot;Nuevo proveedor&quot;.
+            </div>
+          )}
+          {proveedores.map(([nombre, filas]) => {
+            const abierto = abiertosProv.has(nombre);
+            const valoresCOP = filas.map((c) => aCOP(c.costo, c.moneda, config.trm));
+            const minimo = Math.min(...valoresCOP);
+            const maximo = Math.max(...valoresCOP);
+            return (
+              <div key={nombre || "__sin_nombre"} className="rounded-2xl border border-border-glass bg-white/[0.02]">
+                <div className="flex flex-wrap items-center gap-3 px-3 py-2.5">
+                  <button
+                    type="button"
+                    onClick={() => alternarProveedor(nombre)}
+                    className="rounded-lg p-1 text-text-secondary hover:text-white"
+                    title={abierto ? "Cerrar" : "Ver costos"}
+                  >
+                    {abierto ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                  </button>
+                  <Campo
+                    key={`nombre-${nombre}`}
+                    className="max-w-xs font-semibold"
+                    placeholder="Nombre del proveedor"
+                    defaultValue={nombre}
+                    onBlur={(e) => {
+                      const nuevo = e.target.value.trim();
+                      if (nuevo !== nombre) actualizarProveedor(nombre, { proveedor: nuevo });
+                    }}
+                  />
+                  <Campo
+                    key={`contacto-${nombre}`}
+                    className="max-w-[220px]"
+                    placeholder="Teléfono / correo"
+                    defaultValue={filas[0]?.contacto ?? ""}
+                    onBlur={(e) => {
+                      const contacto = e.target.value.trim() || null;
+                      if (contacto !== (filas[0]?.contacto ?? null)) actualizarProveedor(nombre, { contacto });
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => alternarProveedor(nombre)}
+                    className="ml-auto text-right text-xs text-text-secondary hover:text-white"
+                  >
+                    {filas.length} concepto{filas.length === 1 ? "" : "s"}
+                    <span className="block tabular-nums">
+                      {minimo === maximo ? formatoCOP(minimo) : `${formatoCOP(minimo)} – ${formatoCOP(maximo)}`}
+                    </span>
+                  </button>
+                </div>
 
-        <div className="mt-4 overflow-x-auto rounded-2xl border border-border-glass">
-          <table className="w-full min-w-[980px] text-left text-sm">
-            <thead className="bg-white/[0.04] text-xs uppercase tracking-wide text-text-secondary">
-              <tr>
-                <th className="px-3 py-3">Proveedor</th>
-                <th className="px-3 py-3">Contacto</th>
-                <th className="px-3 py-3">Concepto</th>
-                <th className="px-3 py-3">Unidad</th>
-                <th className="px-3 py-3">Moneda</th>
-                <th className="px-3 py-3 text-right">Costo</th>
-                <th className="px-3 py-3 text-right">En COP</th>
-                <th className="px-3 py-3 text-right">Usado en</th>
-                <th className="px-3 py-3" />
-              </tr>
-            </thead>
-            <tbody>
-              {costos.length === 0 && (
-                <tr className="border-t border-border-glass">
-                  <td colSpan={9} className="px-3 py-8 text-center text-text-secondary">
-                    Todavía no hay costos. Pulsa &quot;Agregar costo&quot;.
-                  </td>
-                </tr>
-              )}
-              {costos.map((c) => (
-                <tr key={c.id} className="border-t border-border-glass">
-                  <td className="px-3 py-2">
-                    <Campo
-                      list="lista-proveedores"
-                      placeholder="Ej: Hostinger"
-                      value={c.proveedor}
-                      onChange={(e) => actualizarCosto(c.id, { proveedor: e.target.value })}
-                    />
-                  </td>
-                  <td className="px-3 py-2">
-                    <Campo
-                      placeholder="Teléfono / correo"
-                      value={c.contacto ?? ""}
-                      onChange={(e) => actualizarCosto(c.id, { contacto: e.target.value || null })}
-                    />
-                  </td>
-                  <td className="px-3 py-2">
-                    <Campo
-                      placeholder="Ej: Hosting anual"
-                      value={c.concepto}
-                      onChange={(e) => actualizarCosto(c.id, { concepto: e.target.value })}
-                    />
-                  </td>
-                  <td className="w-28 px-3 py-2">
-                    <Campo
-                      placeholder="pieza, mes…"
-                      value={c.unidad ?? ""}
-                      onChange={(e) => actualizarCosto(c.id, { unidad: e.target.value || null })}
-                    />
-                  </td>
-                  <td className="px-3 py-2">
-                    <SelectMoneda value={c.moneda} onChange={(moneda) => actualizarCosto(c.id, { moneda })} />
-                  </td>
-                  <td className="w-36 px-3 py-2">
-                    <Campo
-                      type="number"
-                      min={0}
-                      step={c.moneda === "USD" ? 1 : 1000}
-                      value={c.costo}
-                      onChange={(e) => actualizarCosto(c.id, { costo: num(e.target.value) })}
-                    />
-                  </td>
-                  <td className="px-3 py-2 text-right tabular-nums text-text-secondary">
-                    {formatoCOP(aCOP(c.costo, c.moneda, config.trm))}
-                  </td>
-                  <td className="px-3 py-2 text-right text-text-secondary">
-                    {tarifasQueUsan(c.id).length} tarifa(s)
-                  </td>
-                  <td className="px-3 py-2">
-                    <button
-                      type="button"
-                      onClick={() => eliminarCosto(c)}
-                      className="rounded-lg p-1.5 text-text-secondary hover:bg-red-500/10 hover:text-red-400"
-                      title="Eliminar"
-                    >
-                      <Trash2 size={15} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                {abierto && (
+                  <div className="overflow-x-auto border-t border-border-glass">
+                    <table className="w-full min-w-[860px] text-left text-sm">
+                      <thead className="text-xs uppercase tracking-wide text-text-secondary">
+                        <tr>
+                          <th className="px-3 py-2">Concepto / plan</th>
+                          <th className="px-3 py-2">Unidad</th>
+                          <th className="px-3 py-2">Moneda</th>
+                          <th className="px-3 py-2 text-right">Costo</th>
+                          <th className="px-3 py-2 text-right">En COP</th>
+                          <th className="px-3 py-2 text-right">Usado en</th>
+                          <th className="px-3 py-2" />
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filas.map((c) => {
+                          const conDetalle = detallesAbiertos.has(c.id);
+                          return (
+                            <Fragment key={c.id}>
+                              <tr className="border-t border-border-glass">
+                                <td className="min-w-[300px] px-3 py-2">
+                                  <Campo
+                                    placeholder="Ej: Hosting anual"
+                                    value={c.concepto}
+                                    onChange={(e) => actualizarCosto(c.id, { concepto: e.target.value })}
+                                  />
+                                </td>
+                                <td className="w-28 px-3 py-2">
+                                  <Campo
+                                    placeholder="pieza, mes…"
+                                    value={c.unidad ?? ""}
+                                    onChange={(e) => actualizarCosto(c.id, { unidad: e.target.value || null })}
+                                  />
+                                </td>
+                                <td className="px-3 py-2">
+                                  <SelectMoneda
+                                    value={c.moneda}
+                                    onChange={(moneda) => actualizarCosto(c.id, { moneda })}
+                                  />
+                                </td>
+                                <td className="w-36 px-3 py-2">
+                                  <Campo
+                                    type="number"
+                                    min={0}
+                                    step={c.moneda === "USD" ? 1 : 1000}
+                                    value={c.costo}
+                                    onChange={(e) => actualizarCosto(c.id, { costo: num(e.target.value) })}
+                                  />
+                                </td>
+                                <td className="px-3 py-2 text-right tabular-nums text-text-secondary">
+                                  {formatoCOP(aCOP(c.costo, c.moneda, config.trm))}
+                                </td>
+                                <td className="px-3 py-2 text-right text-text-secondary">
+                                  {tarifasQueUsan(c.id).length} tarifa(s)
+                                </td>
+                                <td className="whitespace-nowrap px-3 py-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => alternarDetalle(c.id)}
+                                    className={cn(
+                                      "rounded-lg p-1.5 hover:bg-white/[0.05] hover:text-white",
+                                      c.detalle ? "text-accent" : "text-text-secondary",
+                                    )}
+                                    title="Qué incluye"
+                                  >
+                                    <Info size={15} />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => eliminarCosto(c)}
+                                    className="rounded-lg p-1.5 text-text-secondary hover:bg-red-500/10 hover:text-red-400"
+                                    title="Eliminar"
+                                  >
+                                    <Trash2 size={15} />
+                                  </button>
+                                </td>
+                              </tr>
+                              {conDetalle && (
+                                <tr>
+                                  <td colSpan={7} className="px-3 pb-3">
+                                    <textarea
+                                      rows={Math.max(3, (c.detalle ?? "").split("\n").length)}
+                                      placeholder="Qué incluye, entregables, condiciones…"
+                                      value={c.detalle ?? ""}
+                                      onChange={(e) => actualizarCosto(c.id, { detalle: e.target.value || null })}
+                                      className="w-full resize-y rounded-lg border border-border-glass bg-white/[0.03] px-3 py-2 text-sm leading-relaxed text-white placeholder:text-text-secondary/50 outline-none focus:border-accent"
+                                    />
+                                  </td>
+                                </tr>
+                              )}
+                            </Fragment>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                    <div className="border-t border-border-glass px-3 py-2">
+                      <button
+                        type="button"
+                        onClick={() => agregarCosto(nombre, filas[0]?.contacto ?? null)}
+                        className="flex items-center gap-1.5 rounded-full border border-border-glass px-3 py-1.5 text-xs text-white hover:border-accent/40"
+                      >
+                        <Plus size={13} /> Agregar concepto a {nombre || "este proveedor"}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </section>
 
@@ -720,10 +754,14 @@ export function CotizadorEditor({ configInicial, costosIniciales, tarifasInicial
                                           {!costos.some((x) => x.id === c.costo_id) && (
                                             <option value={c.costo_id}>— Elige un costo de proveedor —</option>
                                           )}
-                                          {costos.map((x) => (
-                                            <option key={x.id} value={x.id}>
-                                              {etiquetaCosto(x)}
-                                            </option>
+                                          {proveedores.map(([prov, filas]) => (
+                                            <optgroup key={prov} label={prov || "Sin proveedor"}>
+                                              {filas.map((x) => (
+                                                <option key={x.id} value={x.id}>
+                                                  {etiquetaCosto(x)}
+                                                </option>
+                                              ))}
+                                            </optgroup>
                                           ))}
                                         </select>
                                       ) : (

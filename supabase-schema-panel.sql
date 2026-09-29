@@ -198,6 +198,9 @@ create table if not exists cotizador_costos (
   orden int not null default 0
 );
 
+-- Qué incluye cada plan / entregables (se agregó después de crear la tabla).
+alter table cotizador_costos add column if not exists detalle text;
+
 create table if not exists cotizador_tarifas (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),
@@ -306,3 +309,28 @@ begin
       jsonb_build_array(
         jsonb_build_object('key','s13','tipo','manual','descripcion','Hosting + dominio (renovación)','moneda','COP','costo',200000,'cantidad',1)), 19);
 end $$;
+
+-- =========================================================
+-- PAQUETES (combinaciones de tarifas base + ítems manuales)
+-- =========================================================
+create table if not exists cotizador_paquetes (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  nombre text not null default '',
+  descripcion text,
+  -- [{key, tipo:'tarifa', tarifa_id, cantidad} | {key, tipo:'manual', descripcion, costo, precio, cantidad}]
+  items jsonb not null default '[]'::jsonb,
+  precio_final numeric, -- null = se cobra la suma de los ítems
+  orden int not null default 0
+);
+
+drop trigger if exists cotizador_paquetes_set_updated_at on cotizador_paquetes;
+create trigger cotizador_paquetes_set_updated_at
+  before update on cotizador_paquetes for each row execute function set_updated_at();
+
+alter table cotizador_paquetes enable row level security;
+
+drop policy if exists "equipo autenticado - todo" on cotizador_paquetes;
+create policy "equipo autenticado - todo" on cotizador_paquetes
+  for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');

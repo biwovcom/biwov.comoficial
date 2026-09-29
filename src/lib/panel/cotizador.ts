@@ -18,6 +18,8 @@ export interface CostoProveedor {
   unidad: string | null;
   moneda: Moneda;
   costo: number;
+  /** Qué incluye el plan / entregables / condiciones. */
+  detalle: string | null;
   orden: number;
 }
 
@@ -38,6 +40,24 @@ export interface TarifaBase {
   horas: number;
   precio_cliente: number;
   componentes: ComponenteTarifa[];
+  orden: number;
+}
+
+/**
+ * Ítem de un paquete: o es un servicio de las tarifas base (su costo y
+ * precio se actualizan solos) o es un ítem manual con costo y precio propios.
+ */
+export type ItemPaquete =
+  | { key: string; tipo: "tarifa"; tarifa_id: string; cantidad: number }
+  | { key: string; tipo: "manual"; descripcion: string; costo: number; precio: number; cantidad: number };
+
+export interface Paquete {
+  id: string;
+  nombre: string;
+  descripcion: string | null;
+  items: ItemPaquete[];
+  /** null = se cobra la suma de los ítems, sin descuento. */
+  precio_final: number | null;
   orden: number;
 }
 
@@ -91,6 +111,60 @@ export function costoComponente(c: ComponenteTarifa, costos: CostoProveedor[], t
   if (c.tipo === "manual") return aCOP(c.costo, c.moneda, trm) * c.cantidad;
   const costo = costos.find((x) => x.id === c.costo_id);
   return costo ? aCOP(costo.costo, costo.moneda, trm) * c.cantidad : 0;
+}
+
+export interface TotalesItem {
+  costo: number;
+  precio: number;
+}
+
+export function totalesItem(
+  item: ItemPaquete,
+  tarifas: TarifaBase[],
+  costos: CostoProveedor[],
+  config: CotizadorConfig,
+): TotalesItem {
+  if (item.tipo === "manual") {
+    return { costo: item.costo * item.cantidad, precio: item.precio * item.cantidad };
+  }
+  const tarifa = tarifas.find((t) => t.id === item.tarifa_id);
+  if (!tarifa) return { costo: 0, precio: 0 };
+  const d = desglosarTarifa(tarifa, costos, config);
+  return { costo: d.costoTotal * item.cantidad, precio: tarifa.precio_cliente * item.cantidad };
+}
+
+export interface TotalesPaquete {
+  costoTotal: number;
+  sumaItems: number;
+  precioFinal: number;
+  descuentoPct: number;
+  margen: number;
+  margenPct: number;
+}
+
+export function calcularPaquete(
+  paquete: Paquete,
+  tarifas: TarifaBase[],
+  costos: CostoProveedor[],
+  config: CotizadorConfig,
+): TotalesPaquete {
+  let costoTotal = 0;
+  let sumaItems = 0;
+  for (const item of paquete.items) {
+    const t = totalesItem(item, tarifas, costos, config);
+    costoTotal += t.costo;
+    sumaItems += t.precio;
+  }
+  const precioFinal = paquete.precio_final ?? sumaItems;
+  const margen = precioFinal - costoTotal;
+  return {
+    costoTotal,
+    sumaItems,
+    precioFinal,
+    descuentoPct: sumaItems > 0 ? ((sumaItems - precioFinal) / sumaItems) * 100 : 0,
+    margen,
+    margenPct: precioFinal > 0 ? (margen / precioFinal) * 100 : 0,
+  };
 }
 
 /** Precio que deja exactamente el margen % pedido (margen sobre precio de venta). */
