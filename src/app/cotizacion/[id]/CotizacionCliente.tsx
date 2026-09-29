@@ -7,8 +7,29 @@ import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
 import { cn } from "@/lib/utils";
 import type { CotizacionPublica } from "@/lib/panel/cotizacionPublica";
+import type { ItemVisible } from "@/lib/panel/cotizador";
 
 type Moneda = "COP" | "USD";
+
+function ListaItems({ items, anidada = false }: { items: ItemVisible[]; anidada?: boolean }) {
+  return (
+    <ul className={cn("space-y-2", anidada ? "mt-2 border-l border-border-glass pl-4" : "mt-3")}>
+      {items.map((item, i) => (
+        <li key={i} className={cn("text-sm", anidada ? "text-text-secondary" : "text-white")}>
+          <span className="flex items-start gap-3">
+            <Check size={anidada ? 14 : 16} className="mt-0.5 shrink-0 text-accent" />
+            <span>
+              {item.cantidad !== 1 && <b>{item.cantidad} × </b>}
+              <span className={cn(item.incluye.length > 0 && "font-semibold")}>{item.nombre}</span>
+              {item.unidad && item.cantidad !== 1 && <span className="text-text-secondary"> ({item.unidad})</span>}
+            </span>
+          </span>
+          {item.incluye.length > 0 && <ListaItems items={item.incluye} anidada />}
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 function formato(n: number, moneda: Moneda): string {
   return moneda === "USD"
@@ -75,20 +96,7 @@ export function CotizacionCliente({ cotizacion }: { cotizacion: CotizacionPublic
       )}
 
       <p className="mt-6 text-xs font-semibold uppercase tracking-wide text-text-secondary">Incluye</p>
-      <ul className="mt-3 space-y-2">
-        {cotizacion.items.map((item, i) => (
-          <li key={i} className="flex items-start gap-3 text-sm text-white">
-            <Check size={16} className="mt-0.5 shrink-0 text-accent" />
-            <span>
-              {item.cantidad !== 1 && <b>{item.cantidad} × </b>}
-              {item.nombre}
-              {item.unidad && item.cantidad !== 1 && (
-                <span className="text-text-secondary"> ({item.unidad})</span>
-              )}
-            </span>
-          </li>
-        ))}
-      </ul>
+      <ListaItems items={cotizacion.items} />
 
       <div className="mt-8 border-t border-border-glass pt-6">
         <div className="flex items-center justify-between gap-4">
@@ -116,7 +124,12 @@ export function CotizacionCliente({ cotizacion }: { cotizacion: CotizacionPublic
         )}
         <p className="mt-1 text-3xl font-semibold tabular-nums text-white">{formato(precios.total, moneda)}</p>
         {ahorro > 0 && (
-          <p className="mt-1 text-sm text-emerald-400">Ahorras {formato(ahorro, moneda)} con este paquete</p>
+          <p className="mt-1 text-sm text-emerald-400">
+            Ahorras {formato(ahorro, moneda)}
+            {cotizacion.descuentoVolumenPct > 0
+              ? ` (${cotizacion.descuentoVolumenPct}% de descuento por combinar ${cotizacion.servicios} servicios)`
+              : " con este paquete"}
+          </p>
         )}
       </div>
 

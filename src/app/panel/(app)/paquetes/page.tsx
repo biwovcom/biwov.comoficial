@@ -23,7 +23,7 @@ export default async function PaquetesPage() {
   const { config, costos, tarifas, paquetes, aceptaciones } = resultado.datos;
   return (
     <PaquetesEditor
-      config={config}
+      configInicial={config}
       costos={costos}
       tarifas={tarifas}
       paquetesIniciales={paquetes}

@@ -364,3 +364,12 @@ alter table cotizador_aceptaciones enable row level security;
 drop policy if exists "equipo autenticado - todo" on cotizador_aceptaciones;
 create policy "equipo autenticado - todo" on cotizador_aceptaciones
   for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+-- COMBINAR PAQUETES + DESCUENTO POR CANTIDAD
+-- Descuento automático por cantidad de servicios en un paquete (tramos editables desde el panel).
+alter table cotizador_config add column if not exists descuentos_volumen jsonb not null
+  default '[{"min":2,"pct":5},{"min":3,"pct":10},{"min":4,"pct":15}]'::jsonb;
+
+-- Cada paquete decide si aplica ese descuento. Los paquetes que ya existían quedan
+-- en false para que su precio no cambie solo; los nuevos se crean con true.
+alter table cotizador_paquetes add column if not exists aplicar_descuento boolean not null default false;

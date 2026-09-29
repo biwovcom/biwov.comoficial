@@ -68,6 +68,9 @@ export async function cargarCotizador(
         salario_deseado: Number(configRes.data.salario_deseado),
         costos_fijos_mes: Number(configRes.data.costos_fijos_mes),
         horas_facturables_mes: Number(configRes.data.horas_facturables_mes),
+        descuentos_volumen: Array.isArray(configRes.data.descuentos_volumen)
+          ? configRes.data.descuentos_volumen.map((t) => ({ min: Number(t.min), pct: Number(t.pct) }))
+          : CONFIG_DEFAULT.descuentos_volumen,
       }
     : CONFIG_DEFAULT;
 
@@ -87,6 +90,7 @@ export async function cargarCotizador(
         precio_usd: p.precio_usd == null ? null : Number(p.precio_usd),
         link_pago_cop: p.link_pago_cop ?? null,
         link_pago_usd: p.link_pago_usd ?? null,
+        aplicar_descuento: p.aplicar_descuento ?? false,
         items: p.items ?? [],
       })),
       aceptaciones: (aceptacionesRes.data ?? []).map((a) => ({ ...a, monto: Number(a.monto) })),

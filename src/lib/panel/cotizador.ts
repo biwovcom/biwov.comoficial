@@ -7,6 +7,14 @@ export interface CotizadorConfig {
   salario_deseado: number;
   costos_fijos_mes: number;
   horas_facturables_mes: number;
+  /** Descuento automático por cantidad de servicios en un paquete. */
+  descuentos_volumen: TramoDescuento[];
+}
+
+/** "Desde `min` servicios, `pct`% de descuento". */
+export interface TramoDescuento {
+  min: number;
+  pct: number;
 }
 
 /** Lo que un proveedor le cobra a biwov_ por un concepto. */
@@ -44,11 +52,13 @@ export interface TarifaBase {
 }
 
 /**
- * Ítem de un paquete: o es un servicio de las tarifas base (su costo y
- * precio se actualizan solos) o es un ítem manual con costo y precio propios.
+ * Ítem de un paquete: un servicio de las tarifas base, otro paquete completo
+ * (para combinar, ej. Landing + CRM) o un ítem manual con costo y precio
+ * propios. Tarifas y paquetes se actualizan solos si cambian.
  */
 export type ItemPaquete =
   | { key: string; tipo: "tarifa"; tarifa_id: string; cantidad: number }
+  | { key: string; tipo: "paquete"; paquete_id: string; cantidad: number }
   | { key: string; tipo: "manual"; descripcion: string; costo: number; precio: number; cantidad: number };
 
 export interface Paquete {
@@ -63,7 +73,17 @@ export interface Paquete {
   /** Links de pago (Bold, Wompi, Mercado Pago, PayPal…) a los que se envía al cliente al aceptar. */
   link_pago_cop: string | null;
   link_pago_usd: string | null;
+  /** Aplica el descuento por cantidad de servicios de la configuración. */
+  aplicar_descuento: boolean;
   orden: number;
+}
+
+/** Todo lo necesario para calcular un paquete (incluidos los paquetes que contiene). */
+export interface ContextoCotizador {
+  config: CotizadorConfig;
+  costos: CostoProveedor[];
+  tarifas: TarifaBase[];
+  paquetes: Paquete[];
 }
 
 export interface Aceptacion {
@@ -100,6 +120,11 @@ export const CONFIG_DEFAULT: CotizadorConfig = {
   salario_deseado: 2000000,
   costos_fijos_mes: 200000,
   horas_facturables_mes: 40,
+  descuentos_volumen: [
+    { min: 2, pct: 5 },
+    { min: 3, pct: 10 },
+    { min: 4, pct: 15 },
+  ],
 };
 
 export function aCOP(valor: number, moneda: Moneda, trm: number): number {
@@ -153,23 +178,60 @@ export interface TotalesItem {
 
 export function totalesItem(
   item: ItemPaquete,
-  tarifas: TarifaBase[],
-  costos: CostoProveedor[],
-  config: CotizadorConfig,
+  ctx: ContextoCotizador,
+  visitados: Set<string> = new Set(),
 ): TotalesItem {
   if (item.tipo === "manual") {
     return { costo: item.costo * item.cantidad, precio: item.precio * item.cantidad };
   }
-  const tarifa = tarifas.find((t) => t.id === item.tarifa_id);
+  if (item.tipo === "paquete") {
+    const sub = ctx.paquetes.find((p) => p.id === item.paquete_id);
+    if (!sub || visitados.has(sub.id)) return { costo: 0, precio: 0 };
+    const t = calcularPaquete(sub, ctx, visitados);
+    return { costo: t.costoTotal * item.cantidad, precio: t.precioFinal * item.cantidad };
+  }
+  const tarifa = ctx.tarifas.find((t) => t.id === item.tarifa_id);
   if (!tarifa) return { costo: 0, precio: 0 };
-  const d = desglosarTarifa(tarifa, costos, config);
+  const d = desglosarTarifa(tarifa, ctx.costos, ctx.config);
   return { costo: d.costoTotal * item.cantidad, precio: tarifa.precio_cliente * item.cantidad };
+}
+
+/** Cada línea del paquete cuenta como un servicio (un paquete incluido cuenta como uno). */
+export function contarServicios(paquete: Paquete): number {
+  return paquete.items.filter((i) => i.cantidad > 0).length;
+}
+
+/** El mayor % de los tramos que la cantidad de servicios alcanza. */
+export function descuentoPorVolumen(tramos: TramoDescuento[], servicios: number): number {
+  return tramos.reduce((mejor, t) => (servicios >= t.min && t.pct > mejor ? t.pct : mejor), 0);
+}
+
+/** ¿`paqueteId` contiene (directa o indirectamente) a `buscadoId`? Evita combinaciones circulares. */
+export function contienePaquete(
+  paqueteId: string,
+  buscadoId: string,
+  paquetes: Paquete[],
+  visitados: Set<string> = new Set(),
+): boolean {
+  if (paqueteId === buscadoId) return true;
+  if (visitados.has(paqueteId)) return false;
+  visitados.add(paqueteId);
+  const p = paquetes.find((x) => x.id === paqueteId);
+  if (!p) return false;
+  return p.items.some(
+    (i) => i.tipo === "paquete" && contienePaquete(i.paquete_id, buscadoId, paquetes, visitados),
+  );
 }
 
 export interface TotalesPaquete {
   costoTotal: number;
+  /** Suma de los ítems antes de cualquier descuento. */
   sumaItems: number;
+  servicios: number;
+  /** % de descuento por cantidad de servicios (0 si no aplica o si hay precio manual). */
+  descuentoVolumenPct: number;
   precioFinal: number;
+  /** Descuento total real frente a la suma (automático o manual). */
   descuentoPct: number;
   margen: number;
   margenPct: number;
@@ -177,27 +239,66 @@ export interface TotalesPaquete {
 
 export function calcularPaquete(
   paquete: Paquete,
-  tarifas: TarifaBase[],
-  costos: CostoProveedor[],
-  config: CotizadorConfig,
+  ctx: ContextoCotizador,
+  visitados: Set<string> = new Set(),
 ): TotalesPaquete {
+  const conEste = new Set(visitados).add(paquete.id);
   let costoTotal = 0;
   let sumaItems = 0;
   for (const item of paquete.items) {
-    const t = totalesItem(item, tarifas, costos, config);
+    const t = totalesItem(item, ctx, conEste);
     costoTotal += t.costo;
     sumaItems += t.precio;
   }
-  const precioFinal = paquete.precio_final ?? sumaItems;
+  const servicios = contarServicios(paquete);
+  const descuentoVolumenPct =
+    paquete.precio_final === null && paquete.aplicar_descuento
+      ? descuentoPorVolumen(ctx.config.descuentos_volumen, servicios)
+      : 0;
+  const precioFinal =
+    paquete.precio_final ??
+    (descuentoVolumenPct > 0 ? Math.round((sumaItems * (1 - descuentoVolumenPct / 100)) / 1000) * 1000 : sumaItems);
   const margen = precioFinal - costoTotal;
   return {
     costoTotal,
     sumaItems,
+    servicios,
+    descuentoVolumenPct,
     precioFinal,
     descuentoPct: sumaItems > 0 ? ((sumaItems - precioFinal) / sumaItems) * 100 : 0,
     margen,
     margenPct: precioFinal > 0 ? (margen / precioFinal) * 100 : 0,
   };
+}
+
+export interface ItemVisible {
+  nombre: string;
+  cantidad: number;
+  unidad: string | null;
+  /** Si el ítem es un paquete combinado: lo que ese paquete incluye. */
+  incluye: ItemVisible[];
+}
+
+/** Lo que el cliente ve de cada ítem (sin costos). Los paquetes combinados se despliegan. */
+export function itemsVisibles(
+  paquete: Paquete,
+  ctx: ContextoCotizador,
+  visitados: Set<string> = new Set(),
+): ItemVisible[] {
+  const conEste = new Set(visitados).add(paquete.id);
+  return paquete.items.flatMap((i): ItemVisible[] => {
+    if (i.tipo === "manual") {
+      const nombre = i.descripcion.trim();
+      return nombre ? [{ nombre, cantidad: i.cantidad, unidad: null, incluye: [] }] : [];
+    }
+    if (i.tipo === "paquete") {
+      const sub = ctx.paquetes.find((p) => p.id === i.paquete_id);
+      if (!sub || conEste.has(sub.id)) return [];
+      return [{ nombre: sub.nombre || "Paquete", cantidad: i.cantidad, unidad: null, incluye: itemsVisibles(sub, ctx, conEste) }];
+    }
+    const t = ctx.tarifas.find((x) => x.id === i.tarifa_id);
+    return t ? [{ nombre: t.servicio, cantidad: i.cantidad, unidad: t.unidad, incluye: [] }] : [];
+  });
 }
 
 /** Precio que deja exactamente el margen % pedido (margen sobre precio de venta). */

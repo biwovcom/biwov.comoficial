@@ -9,20 +9,25 @@ import { useAutoguardado } from "@/lib/panel/useAutoguardado";
 import { Campo, EstadoGuardadoTexto, colorMargen, nuevaKey, num } from "@/components/panel/cotizador/Campos";
 import {
   calcularPaquete,
+  contienePaquete,
   formatoCOP,
+  itemsVisibles,
   precioParaMargen,
   precioUSDPaquete,
   totalesItem,
   type Aceptacion,
   type CostoProveedor,
+  type ContextoCotizador,
   type CotizadorConfig,
   type ItemPaquete,
+  type ItemVisible,
   type Paquete,
   type TarifaBase,
+  type TramoDescuento,
 } from "@/lib/panel/cotizador";
 
 interface Props {
-  config: CotizadorConfig;
+  configInicial: CotizadorConfig;
   costos: CostoProveedor[];
   tarifas: TarifaBase[];
   paquetesIniciales: Paquete[];
@@ -40,9 +45,11 @@ function normalizar(texto: string): string {
   return texto.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 }
 
-export function PaquetesEditor({ config, costos, tarifas, paquetesIniciales, aceptaciones }: Props) {
+export function PaquetesEditor({ configInicial, costos, tarifas, paquetesIniciales, aceptaciones }: Props) {
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
+  const [config, setConfig] = useState(configInicial);
   const [paquetes, setPaquetes] = useState(paquetesIniciales);
+  const [verTramos, setVerTramos] = useState(false);
   const [seleccionado, setSeleccionado] = useState<string | null>(paquetesIniciales[0]?.id ?? null);
   const [busqueda, setBusqueda] = useState("");
   const [borradorPct, setBorradorPct] = useState<string | null>(null);
@@ -66,6 +73,7 @@ export function PaquetesEditor({ config, costos, tarifas, paquetesIniciales, ace
   }, [paquetes, busqueda]);
 
   const p = paquetes.find((x) => x.id === seleccionado) ?? null;
+  const ctx: ContextoCotizador = { config, costos, tarifas, paquetes };
 
   // ---------- guardado ----------
   function actualizarPaquete(id: string, patch: Partial<Paquete>) {
@@ -83,6 +91,7 @@ export function PaquetesEditor({ config, costos, tarifas, paquetesIniciales, ace
           precio_usd: fila.precio_usd,
           link_pago_cop: fila.link_pago_cop,
           link_pago_usd: fila.link_pago_usd,
+          aplicar_descuento: fila.aplicar_descuento,
         })
         .eq("id", id),
     );
@@ -95,11 +104,19 @@ export function PaquetesEditor({ config, costos, tarifas, paquetesIniciales, ace
   }
 
   function agregarItem(paq: Paquete, tipo: ItemPaquete["tipo"]) {
+    const combinables = paquetesCombinables(paq);
     const nuevo: ItemPaquete =
       tipo === "tarifa"
         ? { key: nuevaKey(), tipo, tarifa_id: tarifas[0]?.id ?? "", cantidad: 1 }
-        : { key: nuevaKey(), tipo, descripcion: "", costo: 0, precio: 0, cantidad: 1 };
+        : tipo === "paquete"
+          ? { key: nuevaKey(), tipo, paquete_id: combinables[0]?.id ?? "", cantidad: 1 }
+          : { key: nuevaKey(), tipo, descripcion: "", costo: 0, precio: 0, cantidad: 1 };
     actualizarPaquete(paq.id, { items: [...paq.items, nuevo] });
+  }
+
+  /** Paquetes que se pueden meter dentro de `paq` sin crear un círculo (A dentro de B dentro de A). */
+  function paquetesCombinables(paq: Paquete): Paquete[] {
+    return paquetes.filter((x) => !contienePaquete(x.id, paq.id, paquetes));
   }
 
   function quitarItem(paq: Paquete, key: string) {
@@ -119,6 +136,7 @@ export function PaquetesEditor({ config, costos, tarifas, paquetesIniciales, ace
         precio_usd: base?.precio_usd ?? null,
         link_pago_cop: null,
         link_pago_usd: null,
+        aplicar_descuento: base?.aplicar_descuento ?? true,
         orden,
       })
       .select()
@@ -133,6 +151,7 @@ export function PaquetesEditor({ config, costos, tarifas, paquetesIniciales, ace
         ...data,
         precio_final: data.precio_final === null ? null : Number(data.precio_final),
         precio_usd: data.precio_usd == null ? null : Number(data.precio_usd),
+        aplicar_descuento: data.aplicar_descuento ?? true,
         items: data.items ?? [],
       },
     ]);
@@ -155,27 +174,38 @@ export function PaquetesEditor({ config, costos, tarifas, paquetesIniciales, ace
   }
 
   function textoWhatsApp(paq: Paquete): string {
-    const tot = calcularPaquete(paq, tarifas, costos, config);
+    const tot = calcularPaquete(paq, ctx);
     const usd = precioUSDPaquete(paq, tot.precioFinal, config.trm);
-    const lineas = paq.items.flatMap((i) => {
-      const nombre =
-        i.tipo === "manual" ? i.descripcion.trim() : tarifas.find((t) => t.id === i.tarifa_id)?.servicio ?? "";
-      if (!nombre) return [];
-      return [`• ${i.cantidad !== 1 ? `${i.cantidad} × ` : ""}${nombre}`];
-    });
+    const lineas = (items: ItemVisible[], sangria: string): string[] =>
+      items.flatMap((i) => [
+        `${sangria}• ${i.cantidad !== 1 ? `${i.cantidad} × ` : ""}${i.incluye.length ? `*${i.nombre}*` : i.nombre}`,
+        ...lineas(i.incluye, sangria + "   "),
+      ]);
     return [
       `¡Hola! 👋 Te comparto la propuesta *${paq.nombre || "biwov_"}*:`,
       paq.descripcion ? `\n${paq.descripcion}` : "",
       "",
       "*Incluye:*",
-      ...lineas,
+      ...lineas(itemsVisibles(paq, ctx), ""),
       "",
+      tot.descuentoPct > 0 ? `Valor por separado: ~${formatoCOP(tot.sumaItems)}~` : "",
       `*Inversión:* ${formatoCOP(tot.precioFinal)} COP (o ${formatoUSDExacto(usd)} USD)`,
+      tot.descuentoVolumenPct > 0
+        ? `🎁 Incluye ${tot.descuentoVolumenPct}% de descuento por combinar ${tot.servicios} servicios.`
+        : "",
       "",
       `Puedes verla y aceptarla aquí 👉 ${linkCotizacion(paq)}`,
     ]
       .filter((l, i, arr) => !(l === "" && arr[i - 1] === ""))
       .join("\n");
+  }
+
+  // ---------- descuento por cantidad de servicios (configuración global) ----------
+  function actualizarTramos(tramos: TramoDescuento[]) {
+    setConfig({ ...config, descuentos_volumen: tramos });
+    guardarLuego("tramos", () =>
+      supabase.from("cotizador_config").update({ descuentos_volumen: tramos }).eq("id", 1),
+    );
   }
 
   async function copiar(texto: string, cual: string) {
@@ -231,7 +261,7 @@ export function PaquetesEditor({ config, costos, tarifas, paquetesIniciales, ace
               </p>
             )}
             {filtrados.map((x) => {
-              const tot = calcularPaquete(x, tarifas, costos, config);
+              const tot = calcularPaquete(x, ctx);
               const aceptadas = aceptaciones.filter((a) => a.paquete_id === x.id).length;
               return (
                 <button
@@ -257,6 +287,88 @@ export function PaquetesEditor({ config, costos, tarifas, paquetesIniciales, ace
               );
             })}
           </div>
+
+          {/* ---------- tramos de descuento por cantidad ---------- */}
+          <div className="rounded-2xl border border-border-glass bg-white/[0.02] p-3">
+            <button
+              type="button"
+              onClick={() => setVerTramos(!verTramos)}
+              className="flex w-full items-center justify-between text-left text-xs font-semibold uppercase tracking-wide text-text-secondary hover:text-white"
+            >
+              Descuento por cantidad
+              <span className="normal-case tracking-normal">{verTramos ? "cerrar" : "editar"}</span>
+            </button>
+            {!verTramos ? (
+              <p className="mt-2 text-xs text-text-secondary">
+                {config.descuentos_volumen.length === 0
+                  ? "Sin descuentos configurados."
+                  : [...config.descuentos_volumen]
+                      .sort((a, b) => a.min - b.min)
+                      .map((t) => `${t.min}+ servicios: ${t.pct}%`)
+                      .join(" · ")}
+              </p>
+            ) : (
+              <div className="mt-3 space-y-2">
+                {config.descuentos_volumen.map((t, idx) => (
+                  <div key={idx} className="flex items-center gap-1.5 text-xs text-text-secondary">
+                    Desde
+                    <Campo
+                      type="number"
+                      min={1}
+                      step={1}
+                      className="w-14"
+                      value={t.min}
+                      onChange={(e) =>
+                        actualizarTramos(
+                          config.descuentos_volumen.map((x, j) => (j === idx ? { ...x, min: num(e.target.value) } : x)),
+                        )
+                      }
+                    />
+                    servicios
+                    <Campo
+                      type="number"
+                      min={0}
+                      max={90}
+                      step={1}
+                      className="w-14"
+                      value={t.pct}
+                      onChange={(e) =>
+                        actualizarTramos(
+                          config.descuentos_volumen.map((x, j) => (j === idx ? { ...x, pct: num(e.target.value) } : x)),
+                        )
+                      }
+                    />
+                    %
+                    <button
+                      type="button"
+                      onClick={() => actualizarTramos(config.descuentos_volumen.filter((_, j) => j !== idx))}
+                      className="ml-auto rounded p-1 hover:text-red-400"
+                      title="Quitar tramo"
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const ultimo = config.descuentos_volumen[config.descuentos_volumen.length - 1];
+                    actualizarTramos([
+                      ...config.descuentos_volumen,
+                      { min: (ultimo?.min ?? 1) + 1, pct: (ultimo?.pct ?? 0) + 5 },
+                    ]);
+                  }}
+                  className="flex items-center gap-1 text-xs text-accent hover:underline"
+                >
+                  <Plus size={12} /> Agregar tramo
+                </button>
+                <p className="text-[11px] text-text-secondary/70">
+                  Aplica a todos los paquetes que tengan activado el descuento. Cada línea del paquete cuenta como un
+                  servicio (un paquete combinado cuenta como uno).
+                </p>
+              </div>
+            )}
+          </div>
         </aside>
 
         {/* ===================== EDITOR ===================== */}
@@ -268,7 +380,7 @@ export function PaquetesEditor({ config, costos, tarifas, paquetesIniciales, ace
           </div>
         ) : (
           (() => {
-            const tot = calcularPaquete(p, tarifas, costos, config);
+            const tot = calcularPaquete(p, ctx);
             const usd = precioUSDPaquete(p, tot.precioFinal, config.trm);
             const pctMostrado = borradorPct ?? (Math.round(tot.margenPct * 10) / 10).toString();
             const aceptadasP = aceptaciones.filter((a) => a.paquete_id === p.id);
@@ -316,7 +428,7 @@ export function PaquetesEditor({ config, costos, tarifas, paquetesIniciales, ace
                       <p className="text-xs text-text-secondary">Agrega servicios con los botones de abajo.</p>
                     )}
                     {p.items.map((i) => {
-                      const t = totalesItem(i, tarifas, costos, config);
+                      const t = totalesItem(i, ctx);
                       return (
                         <div key={i.key} className="flex flex-wrap items-center gap-2">
                           {i.tipo === "tarifa" ? (
@@ -337,6 +449,21 @@ export function PaquetesEditor({ config, costos, tarifas, paquetesIniciales, ace
                                     </option>
                                   ))}
                                 </optgroup>
+                              ))}
+                            </select>
+                          ) : i.tipo === "paquete" ? (
+                            <select
+                              value={i.paquete_id}
+                              onChange={(e) => actualizarItem(p, i.key, { paquete_id: e.target.value })}
+                              className="min-w-[240px] flex-1 rounded-lg border border-accent/40 bg-bg-base px-2.5 py-1.5 text-sm text-white outline-none focus:border-accent"
+                            >
+                              {!paquetesCombinables(p).some((x) => x.id === i.paquete_id) && (
+                                <option value={i.paquete_id}>— Paquete eliminado: elige otro —</option>
+                              )}
+                              {paquetesCombinables(p).map((x) => (
+                                <option key={x.id} value={x.id}>
+                                  📦 {x.nombre || "Sin nombre"} — {formatoCOP(calcularPaquete(x, ctx).precioFinal)}
+                                </option>
                               ))}
                             </select>
                           ) : (
@@ -406,6 +533,15 @@ export function PaquetesEditor({ config, costos, tarifas, paquetesIniciales, ace
                     </button>
                     <button
                       type="button"
+                      onClick={() => agregarItem(p, "paquete")}
+                      disabled={paquetesCombinables(p).length === 0}
+                      className="flex items-center gap-1.5 rounded-full border border-accent/40 px-3 py-1.5 text-xs text-white hover:border-accent disabled:opacity-40"
+                      title="Combina un paquete que ya armaste (ej: Landing + CRM)"
+                    >
+                      <Plus size={13} /> Otro paquete
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => agregarItem(p, "manual")}
                       className="flex items-center gap-1.5 rounded-full border border-border-glass px-3 py-1.5 text-xs text-white hover:border-accent/40"
                     >
@@ -424,6 +560,24 @@ export function PaquetesEditor({ config, costos, tarifas, paquetesIniciales, ace
                         <span>Tu costo total (proveedores + tu hora)</span>
                         <span className="tabular-nums">{formatoCOP(tot.costoTotal)}</span>
                       </div>
+                      <label className="flex items-center justify-between gap-2 text-text-secondary">
+                        <span className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={p.aplicar_descuento}
+                            onChange={(e) => actualizarPaquete(p.id, { aplicar_descuento: e.target.checked })}
+                            className="accent-[var(--accent)]"
+                          />
+                          Descuento por {tot.servicios} servicio{tot.servicios === 1 ? "" : "s"}
+                        </span>
+                        <span className="tabular-nums text-emerald-400">
+                          {p.precio_final !== null
+                            ? "precio manual"
+                            : p.aplicar_descuento
+                              ? `${tot.descuentoVolumenPct}%`
+                              : "no aplica"}
+                        </span>
+                      </label>
                       <div className="flex justify-between text-text-secondary">
                         <span>Descuento vs. suma</span>
                         <span className={cn("tabular-nums", tot.descuentoPct < 0 && "text-emerald-400")}>
@@ -448,9 +602,9 @@ export function PaquetesEditor({ config, costos, tarifas, paquetesIniciales, ace
                             type="button"
                             onClick={() => actualizarPaquete(p.id, { precio_final: null })}
                             className="flex items-center gap-1 text-[11px] text-text-secondary hover:text-white"
-                            title="Volver a cobrar la suma exacta de los servicios"
+                            title="Volver al precio automático (suma menos el descuento por cantidad)"
                           >
-                            <RotateCcw size={11} /> usar la suma
+                            <RotateCcw size={11} /> precio automático
                           </button>
                         )}
                       </div>
