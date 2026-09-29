@@ -163,7 +163,7 @@ export function PreguntasFiltro({
       </Pregunta>
 
       <Pregunta
-        titulo={`Para diseñar una estrategia que se ajuste exactamente a lo que tu negocio necesita (y evitar proponerte algo que se salga de tus posibilidades), ¿con qué presupuesto mensual aproximado te sientes cómoda invirtiendo en tu marketing y pauta publicitaria? (${moneda})`}
+        titulo={`Para recomendarte algo que de verdad se ajuste a tu negocio, ¿cuánto podrías invertir al mes en marketing, sin contar la pauta publicitaria? (${moneda})`}
       >
         {RANGOS_PRESUPUESTO[moneda].map((r) => (
           <OptionCard

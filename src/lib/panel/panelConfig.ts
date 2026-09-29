@@ -14,10 +14,10 @@ export interface RangoPresupuestoPanel {
  */
 export const RANGOS_PRESUPUESTO: Record<Moneda, RangoPresupuestoPanel[]> = {
   COP: [
-    { id: "menos-1m", etiqueta: "Menos de $1.000.000/mes", calificaComoSuficiente: false },
-    { id: "1m-3m", etiqueta: "Entre $1.000.000 y $3.000.000/mes", calificaComoSuficiente: true },
-    { id: "3m-5m", etiqueta: "Entre $3.000.000 y $5.000.000/mes", calificaComoSuficiente: true },
-    { id: "mas-5m", etiqueta: "Más de $5.000.000/mes", calificaComoSuficiente: true },
+    { id: "menos-1m", etiqueta: "Menos de $1.000.000", calificaComoSuficiente: false },
+    { id: "1m-2m", etiqueta: "Entre $1.000.000 y $2.000.000", calificaComoSuficiente: true },
+    { id: "2m-3m", etiqueta: "Entre $2.000.000 y $3.000.000", calificaComoSuficiente: true },
+    { id: "4m-5m", etiqueta: "Entre $4.000.000 a $5.000.000", calificaComoSuficiente: true },
   ],
   USD: [
     { id: "menos-300", etiqueta: "Menos de $300/mes", calificaComoSuficiente: false },
