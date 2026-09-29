@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Input, Label } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
+import { PhoneInput } from "@/components/ui/PhoneInput";
 import { PreguntasFiltro } from "@/components/panel/PreguntasFiltro";
 import { respuestasCompletas, type RespuestasFiltro } from "@/lib/panel/filtroRapido";
 import { PAISES, monedaDesdePais } from "@/lib/panel/paises";
@@ -20,6 +21,7 @@ interface Contacto {
   whatsapp: string;
   email: string;
   pais: string;
+  ciudad: string;
 }
 
 const CONTACTO_INICIAL: Contacto = {
@@ -29,6 +31,7 @@ const CONTACTO_INICIAL: Contacto = {
   whatsapp: "",
   email: "",
   pais: "",
+  ciudad: "",
 };
 
 type Vista = "contacto" | "filtro" | "enviado";
@@ -37,6 +40,8 @@ export function QuoterModal() {
   const { isOpen, close } = useQuoter();
   const [vista, setVista] = useState<Vista>("contacto");
   const [contacto, setContacto] = useState<Contacto>(CONTACTO_INICIAL);
+  const [codigoPais, setCodigoPais] = useState("+57");
+  const [numero, setNumero] = useState("");
   const [respuestas, setRespuestas] = useState<RespuestasFiltro>({});
   const [prospectoId, setProspectoId] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
@@ -45,6 +50,8 @@ export function QuoterModal() {
   const reset = () => {
     setVista("contacto");
     setContacto(CONTACTO_INICIAL);
+    setCodigoPais("+57");
+    setNumero("");
     setRespuestas({});
     setProspectoId(null);
     setError(null);
@@ -55,7 +62,7 @@ export function QuoterModal() {
     setTimeout(reset, 300);
   };
 
-  const contactoValido = Boolean(contacto.nombre && contacto.whatsapp && contacto.email);
+  const contactoValido = Boolean(contacto.nombre && numero.trim() && contacto.email);
   const moneda = monedaDesdePais(contacto.pais);
 
   const continuarDesdeContacto = async () => {
@@ -70,7 +77,7 @@ export function QuoterModal() {
       const res = await fetch("/api/diagnostico/prospecto", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(contacto),
+        body: JSON.stringify({ ...contacto, whatsapp: `${codigoPais} ${numero.trim()}` }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => null);
@@ -172,27 +179,38 @@ export function QuoterModal() {
                       onChange={(e) => setContacto((c) => ({ ...c, tipoNegocio: e.target.value }))}
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="qm-pais">País</Label>
-                    <Select
-                      id="qm-pais"
-                      value={contacto.pais}
-                      onChange={(e) => setContacto((c) => ({ ...c, pais: e.target.value }))}
-                    >
-                      <option value="">Selecciona un país</option>
-                      {PAISES.map((p) => (
-                        <option key={p.pais} value={p.pais}>
-                          {p.pais}
-                        </option>
-                      ))}
-                    </Select>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <Label htmlFor="qm-pais">País</Label>
+                      <Select
+                        id="qm-pais"
+                        value={contacto.pais}
+                        onChange={(e) => setContacto((c) => ({ ...c, pais: e.target.value }))}
+                      >
+                        <option value="">Selecciona un país</option>
+                        {PAISES.map((p) => (
+                          <option key={p.pais} value={p.pais}>
+                            {p.pais}
+                          </option>
+                        ))}
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="qm-ciudad">Ciudad</Label>
+                      <Input
+                        id="qm-ciudad"
+                        value={contacto.ciudad}
+                        onChange={(e) => setContacto((c) => ({ ...c, ciudad: e.target.value }))}
+                      />
+                    </div>
                   </div>
                   <div>
-                    <Label htmlFor="qm-whatsapp">WhatsApp (con indicativo)</Label>
-                    <Input
-                      id="qm-whatsapp"
-                      value={contacto.whatsapp}
-                      onChange={(e) => setContacto((c) => ({ ...c, whatsapp: e.target.value }))}
+                    <Label htmlFor="qm-whatsapp">WhatsApp</Label>
+                    <PhoneInput
+                      codigo={codigoPais}
+                      numero={numero}
+                      onCodigoChange={setCodigoPais}
+                      onNumeroChange={setNumero}
                     />
                   </div>
                   <div>

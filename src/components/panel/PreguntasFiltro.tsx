@@ -3,11 +3,11 @@
 import { cn } from "@/lib/utils";
 import {
   OPCIONES_OBJETIVO,
-  OPCIONES_IMPORTANCIA,
   OPCIONES_META,
-  OPCIONES_YA_VENDE,
-  OPCIONES_COMO_LLEGAN,
-  OPCIONES_URGENCIA,
+  OPCIONES_CUMPLIMIENTO_VENTAS,
+  OPCIONES_CANAL_LLEGADA,
+  OPCIONES_PRIORIDAD_EQUIPO,
+  OPCIONES_CUANDO_EMPEZAR,
   type RespuestasFiltro,
 } from "@/lib/panel/filtroRapido";
 import { RANGOS_PRESUPUESTO, type Moneda } from "@/lib/panel/panelConfig";
@@ -62,9 +62,17 @@ export function PreguntasFiltro({
   update: (patch: Partial<RespuestasFiltro>) => void;
   moneda: Moneda;
 }) {
+  const canales = respuestas.canalLlegada ?? [];
+
+  const alternarCanal = (id: (typeof OPCIONES_CANAL_LLEGADA)[number]["id"]) => {
+    const yaEsta = canales.includes(id);
+    const nuevos = yaEsta ? canales.filter((c) => c !== id) : [...canales, id];
+    update({ canalLlegada: nuevos });
+  };
+
   return (
     <>
-      <Pregunta titulo="¿Cuáles son los desafíos que enfrenta tu negocio actualmente?">
+      <Pregunta titulo="¿Cuáles son los desafíos que enfrenta tu empresa actualmente?">
         {OPCIONES_OBJETIVO.map((o) => (
           <OptionCard
             key={o.id}
@@ -102,52 +110,60 @@ export function PreguntasFiltro({
         />
       )}
 
-      <Pregunta titulo="¿Qué tan importante es para ti que tu negocio venda más?">
-        {OPCIONES_IMPORTANCIA.map((o) => (
+      <Pregunta titulo="¿Sientes que tu negocio está cumpliendo de forma consistente con sus metas mensuales de ventas?">
+        {OPCIONES_CUMPLIMIENTO_VENTAS.map((o) => (
           <OptionCard
             key={o.id}
             label={o.label}
-            selected={respuestas.importancia === o.id}
-            onClick={() => update({ importancia: o.id })}
+            selected={respuestas.cumplimientoVentas === o.id}
+            onClick={() => update({ cumplimientoVentas: o.id })}
           />
         ))}
       </Pregunta>
 
-      <Pregunta titulo="¿Tu negocio ya vende?">
-        {OPCIONES_YA_VENDE.map((o) => (
+      <Pregunta titulo="Actualmente, ¿por dónde llegan la mayoría de tus clientes nuevos? (Puedes marcar varias opciones)">
+        {OPCIONES_CANAL_LLEGADA.map((o) => (
           <OptionCard
             key={o.id}
             label={o.label}
-            selected={respuestas.yaVende === o.id}
-            onClick={() => update({ yaVende: o.id })}
+            selected={canales.includes(o.id)}
+            onClick={() => alternarCanal(o.id)}
+          />
+        ))}
+      </Pregunta>
+      {canales.includes("otro") && (
+        <input
+          className={inputClass}
+          placeholder="¿Cuál?"
+          value={respuestas.canalLlegadaOtro ?? ""}
+          onChange={(e) => update({ canalLlegadaOtro: e.target.value })}
+        />
+      )}
+
+      <Pregunta titulo="Para ti, ¿qué tan prioritario es contar con un equipo que te mantenga con total visibilidad de las estadísticas, lidere el crecimiento con valor agregado y te dé control estratégico de tu negocio?">
+        {OPCIONES_PRIORIDAD_EQUIPO.map((o) => (
+          <OptionCard
+            key={o.id}
+            label={o.label}
+            selected={respuestas.prioridadEquipo === o.id}
+            onClick={() => update({ prioridadEquipo: o.id })}
           />
         ))}
       </Pregunta>
 
-      <Pregunta titulo="¿Cómo te llegan los clientes?">
-        {OPCIONES_COMO_LLEGAN.map((o) => (
+      <Pregunta titulo="Si encontraras la estrategia adecuada para tu negocio, ¿cuándo te gustaría comenzar a implementarla?">
+        {OPCIONES_CUANDO_EMPEZAR.map((o) => (
           <OptionCard
             key={o.id}
             label={o.label}
-            selected={respuestas.comoLlegan === o.id}
-            onClick={() => update({ comoLlegan: o.id })}
-          />
-        ))}
-      </Pregunta>
-
-      <Pregunta titulo="¿Para cuándo te gustaría empezar a resolver esto?">
-        {OPCIONES_URGENCIA.map((o) => (
-          <OptionCard
-            key={o.id}
-            label={o.label}
-            selected={respuestas.urgencia === o.id}
-            onClick={() => update({ urgencia: o.id })}
+            selected={respuestas.cuandoEmpezar === o.id}
+            onClick={() => update({ cuandoEmpezar: o.id })}
           />
         ))}
       </Pregunta>
 
       <Pregunta
-        titulo={`Si podemos garantizarte más ventas para tu negocio, ¿qué presupuesto tendrías para invertir ahora mismo? (${moneda})`}
+        titulo={`Para diseñar una estrategia que se ajuste exactamente a lo que tu negocio necesita (y evitar proponerte algo que se salga de tus posibilidades), ¿con qué presupuesto mensual aproximado te sientes cómoda invirtiendo en tu marketing y pauta publicitaria? (${moneda})`}
       >
         {RANGOS_PRESUPUESTO[moneda].map((r) => (
           <OptionCard

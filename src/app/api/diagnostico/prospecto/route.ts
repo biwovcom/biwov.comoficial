@@ -19,6 +19,7 @@ export async function POST(request: Request) {
     whatsapp: string;
     email: string;
     pais?: string;
+    ciudad?: string;
   } = await request.json();
 
   if (!body.nombre?.trim() || !body.whatsapp?.trim() || !body.email?.trim()) {
@@ -34,6 +35,7 @@ export async function POST(request: Request) {
       whatsapp: body.whatsapp.trim(),
       email: body.email.trim(),
       pais: body.pais?.trim() || null,
+      ciudad: body.ciudad?.trim() || null,
       canal_origen: "pagina-web",
     })
     .select("id")

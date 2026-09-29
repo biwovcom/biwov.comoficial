@@ -6,6 +6,7 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
+import { PhoneInput } from "@/components/ui/PhoneInput";
 import { PAISES } from "@/lib/panel/paises";
 import type { NuevoProspectoInput } from "@/lib/panel/prospectos";
 
@@ -20,6 +21,8 @@ const CANALES_ORIGEN = [
 export function NuevoProspectoForm() {
   const router = useRouter();
   const [form, setForm] = useState<NuevoProspectoInput>({ nombre: "", whatsapp: "" });
+  const [codigoPais, setCodigoPais] = useState("+57");
+  const [numero, setNumero] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [guardando, setGuardando] = useState(false);
 
@@ -30,17 +33,19 @@ export function NuevoProspectoForm() {
 
   const guardar = async (e: FormEvent) => {
     e.preventDefault();
-    if (!form.nombre.trim() || !form.whatsapp.trim()) {
+    if (!form.nombre.trim() || !numero.trim()) {
       setError("Nombre y WhatsApp son obligatorios.");
       return;
     }
     setError(null);
     setGuardando(true);
 
+    const datos = { ...form, whatsapp: `${codigoPais} ${numero.trim()}` };
+
     const res = await fetch("/api/panel/prospectos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify(datos),
     });
 
     setGuardando(false);
@@ -118,12 +123,11 @@ export function NuevoProspectoForm() {
 
         <div>
           <Label htmlFor="whatsapp">WhatsApp *</Label>
-          <Input
-            id="whatsapp"
-            required
-            placeholder="+57 300 000 0000"
-            value={form.whatsapp}
-            onChange={(e) => update({ whatsapp: e.target.value })}
+          <PhoneInput
+            codigo={codigoPais}
+            numero={numero}
+            onCodigoChange={setCodigoPais}
+            onNumeroChange={setNumero}
           />
         </div>
 

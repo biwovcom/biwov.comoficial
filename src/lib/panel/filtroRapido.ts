@@ -2,24 +2,32 @@ import { RANGOS_PRESUPUESTO, type Moneda } from "./panelConfig";
 import type { Semaforo } from "./prospectos";
 
 export type Objetivo = "sin-resultados" | "no-calificados" | "sin-presencia" | "otro";
-export type Importancia = "muy-importante" | "importante-no-urgente" | "poco-importante";
 export type Meta = "mas-clientes" | "favorito-industria" | "proceso-automatizado" | "otro";
-export type YaVende = "cada-mes" | "irregular" | "empezando";
-export type ComoLlegan = "recomendados" | "redes" | "publicidad" | "local" | "casi-no-llegan";
-export type Urgencia = "ya" | "1-3-meses" | "solo-averiguo";
+export type CumplimientoVentas = "cumple-constante" | "inestable" | "por-debajo";
+export type CanalLlegada =
+  | "redes-organicas"
+  | "recomendaciones"
+  | "publicidad-tradicional"
+  | "ugc-influencers"
+  | "pauta-paga"
+  | "otro";
+export type PrioridadEquipo = "muy-alto" | "medio" | "bajo";
+export type CuandoEmpezar = "inmediatamente" | "proximas-semanas" | "solo-cotizando";
 
 export interface RespuestasFiltro {
   objetivo?: Objetivo;
   /** Solo aplica cuando objetivo === "otro". */
   objetivoOtro?: string;
-  importancia?: Importancia;
   meta?: Meta;
   /** Solo aplica cuando meta === "otro". */
   metaOtro?: string;
-  yaVende?: YaVende;
-  comoLlegan?: ComoLlegan;
+  cumplimientoVentas?: CumplimientoVentas;
+  canalLlegada?: CanalLlegada[];
+  /** Solo aplica cuando canalLlegada incluye "otro". */
+  canalLlegadaOtro?: string;
+  prioridadEquipo?: PrioridadEquipo;
+  cuandoEmpezar?: CuandoEmpezar;
   presupuesto?: string; // id de RANGOS_PRESUPUESTO[moneda]
-  urgencia?: Urgencia;
 }
 
 export const OPCIONES_OBJETIVO: { id: Objetivo; label: string }[] = [
@@ -29,12 +37,6 @@ export const OPCIONES_OBJETIVO: { id: Objetivo; label: string }[] = [
   { id: "otro", label: "Otra" },
 ];
 
-export const OPCIONES_IMPORTANCIA: { id: Importancia; label: string }[] = [
-  { id: "muy-importante", label: "Muy importante — es mi prioridad ahora" },
-  { id: "importante-no-urgente", label: "Importante, pero no urgente" },
-  { id: "poco-importante", label: "Poco importante por ahora" },
-];
-
 export const OPCIONES_META: { id: Meta; label: string }[] = [
   { id: "mas-clientes", label: "Recibir más clientes" },
   { id: "favorito-industria", label: "Ser el favorito en mi industria" },
@@ -42,24 +44,37 @@ export const OPCIONES_META: { id: Meta; label: string }[] = [
   { id: "otro", label: "Otro" },
 ];
 
-export const OPCIONES_YA_VENDE: { id: YaVende; label: string }[] = [
-  { id: "cada-mes", label: "Sí, cada mes" },
-  { id: "irregular", label: "Poco o irregular" },
-  { id: "empezando", label: "Estoy empezando" },
+export const OPCIONES_CUMPLIMIENTO_VENTAS: { id: CumplimientoVentas; label: string }[] = [
+  { id: "cumple-constante", label: "Sí, las alcanzamos o superamos constantemente" },
+  { id: "inestable", label: "A veces sí, a veces no (estamos muy inestables)" },
+  { id: "por-debajo", label: "No, la verdad estamos por debajo de lo que necesitamos vender" },
 ];
 
-export const OPCIONES_COMO_LLEGAN: { id: ComoLlegan; label: string }[] = [
-  { id: "recomendados", label: "Recomendados" },
-  { id: "redes", label: "Redes" },
-  { id: "publicidad", label: "Publicidad" },
-  { id: "local", label: "Local físico" },
-  { id: "casi-no-llegan", label: "Casi no llegan" },
+export const OPCIONES_CANAL_LLEGADA: { id: CanalLlegada; label: string }[] = [
+  { id: "redes-organicas", label: "Redes sociales orgánicas (Instagram, TikTok, Facebook, etc.)" },
+  { id: "recomendaciones", label: "Recomendaciones / Voz a voz" },
+  { id: "publicidad-tradicional", label: "Publicidad tradicional (vallas, volantes, pendones, etc.)" },
+  { id: "ugc-influencers", label: "Estrategia con Creadores de Contenido (UGC) o Influencers" },
+  { id: "pauta-paga", label: "Campañas de pauta paga / Anuncios digitales" },
+  { id: "otro", label: "Otro" },
 ];
 
-export const OPCIONES_URGENCIA: { id: Urgencia; label: string }[] = [
-  { id: "ya", label: "Ya, este mes" },
-  { id: "1-3-meses", label: "En 1 a 3 meses" },
-  { id: "solo-averiguo", label: "Solo averiguo" },
+export const OPCIONES_PRIORIDAD_EQUIPO: { id: PrioridadEquipo; label: string }[] = [
+  {
+    id: "muy-alto",
+    label: "Muy alto: busco un aliado estratégico que lidere los números y la ejecución",
+  },
+  {
+    id: "medio",
+    label: "Medio: me interesa delegar, pero quiero estar muy encima de cada detalle",
+  },
+  { id: "bajo", label: "Bajo: prefiero resolver la operación por mi cuenta" },
+];
+
+export const OPCIONES_CUANDO_EMPEZAR: { id: CuandoEmpezar; label: string }[] = [
+  { id: "inmediatamente", label: "Inmediatamente (estamos listos para arrancar ya)" },
+  { id: "proximas-semanas", label: "En el transcurso de las próximas semanas / primeros meses" },
+  { id: "solo-cotizando", label: "Solo estoy cotizando o planificando a largo plazo" },
 ];
 
 /** Fragmentos para encajar en "ahora mismo estás batallando con que no tienes ___". */
@@ -102,9 +117,13 @@ export function resumenRespuestasFiltro(r: RespuestasFiltro, moneda: Moneda): Re
 
   const rangoPresupuesto = RANGOS_PRESUPUESTO[moneda].find((x) => x.id === r.presupuesto)?.etiqueta ?? "—";
 
+  const canales = (r.canalLlegada ?? []).map((c) =>
+    c === "otro" && r.canalLlegadaOtro ? `Otro: ${r.canalLlegadaOtro}` : buscar(OPCIONES_CANAL_LLEGADA, c),
+  );
+
   return [
     {
-      pregunta: "Desafíos actuales del negocio",
+      pregunta: "Desafíos actuales de la empresa",
       respuesta:
         r.objetivo === "otro" && r.objetivoOtro
           ? `Otra: ${r.objetivoOtro}`
@@ -114,17 +133,36 @@ export function resumenRespuestasFiltro(r: RespuestasFiltro, moneda: Moneda): Re
       pregunta: "Deseo para su negocio (si un genio se lo concediera)",
       respuesta: r.meta === "otro" && r.metaOtro ? `Otro: ${r.metaOtro}` : buscar(OPCIONES_META, r.meta),
     },
-    { pregunta: "Qué tan importante es para él vender más", respuesta: buscar(OPCIONES_IMPORTANCIA, r.importancia) },
-    { pregunta: "¿Ya vende?", respuesta: buscar(OPCIONES_YA_VENDE, r.yaVende) },
-    { pregunta: "¿Cómo le llegan los clientes?", respuesta: buscar(OPCIONES_COMO_LLEGAN, r.comoLlegan) },
-    { pregunta: "¿Para cuándo quiere empezar?", respuesta: buscar(OPCIONES_URGENCIA, r.urgencia) },
-    { pregunta: `Presupuesto para invertir ahora (${moneda})`, respuesta: rangoPresupuesto },
+    {
+      pregunta: "¿Cumple sus metas mensuales de ventas?",
+      respuesta: buscar(OPCIONES_CUMPLIMIENTO_VENTAS, r.cumplimientoVentas),
+    },
+    {
+      pregunta: "¿Por dónde llegan sus clientes nuevos?",
+      respuesta: canales.length > 0 ? canales.join(", ") : "—",
+    },
+    {
+      pregunta: "Prioridad de tener un equipo con visibilidad y control estratégico",
+      respuesta: buscar(OPCIONES_PRIORIDAD_EQUIPO, r.prioridadEquipo),
+    },
+    {
+      pregunta: "¿Cuándo quiere empezar a implementar la estrategia?",
+      respuesta: buscar(OPCIONES_CUANDO_EMPEZAR, r.cuandoEmpezar),
+    },
+    { pregunta: `Presupuesto mensual para invertir (${moneda})`, respuesta: rangoPresupuesto },
   ];
 }
 
 export function respuestasCompletas(r: RespuestasFiltro): boolean {
   return Boolean(
-    r.objetivo && r.importancia && r.meta && r.yaVende && r.comoLlegan && r.presupuesto && r.urgencia,
+    r.objetivo &&
+      r.meta &&
+      r.cumplimientoVentas &&
+      r.canalLlegada &&
+      r.canalLlegada.length > 0 &&
+      r.prioridadEquipo &&
+      r.cuandoEmpezar &&
+      r.presupuesto,
   );
 }
 
@@ -135,32 +173,32 @@ export interface ResultadoFiltro {
 
 /**
  * Reglas de negocio definidas por Kathe:
- * 🟢 Caliente: ya vende (cada mes o irregular) + presupuesto suficiente + lo necesita ya o en 1-3 meses.
- * 🔴 No califica: presupuesto insuficiente + solo averigua, o está empezando sin presupuesto suficiente.
+ * 🟢 Caliente: cumple sus metas de ventas (constante o inestable) + presupuesto suficiente + quiere empezar pronto.
+ * 🔴 No califica: presupuesto insuficiente + solo está cotizando, o está muy por debajo de sus metas sin presupuesto suficiente.
  * 🟡 Tibio: todo lo demás.
  */
 export function calcularSemaforo(r: RespuestasFiltro, moneda: Moneda): ResultadoFiltro {
   const rango = RANGOS_PRESUPUESTO[moneda].find((x) => x.id === r.presupuesto);
   const presupuestoSuficiente = Boolean(rango?.calificaComoSuficiente);
 
-  const yaVendeActivo = r.yaVende === "cada-mes" || r.yaVende === "irregular";
-  const estaEmpezando = r.yaVende === "empezando";
-  const esUrgente = r.urgencia === "ya" || r.urgencia === "1-3-meses";
-  const soloAverigua = r.urgencia === "solo-averiguo";
+  const yaVendeActivo = r.cumplimientoVentas === "cumple-constante" || r.cumplimientoVentas === "inestable";
+  const estaPorDebajo = r.cumplimientoVentas === "por-debajo";
+  const esUrgente = r.cuandoEmpezar === "inmediatamente" || r.cuandoEmpezar === "proximas-semanas";
+  const soloCotizando = r.cuandoEmpezar === "solo-cotizando";
 
   if (yaVendeActivo && presupuestoSuficiente && esUrgente) {
     return {
       semaforo: "verde",
-      razon: "Ya vende, tiene presupuesto suficiente y lo necesita pronto.",
+      razon: "Cumple sus metas de ventas, tiene presupuesto suficiente y quiere empezar pronto.",
     };
   }
 
-  if ((!presupuestoSuficiente && soloAverigua) || (estaEmpezando && !presupuestoSuficiente)) {
+  if ((!presupuestoSuficiente && soloCotizando) || (estaPorDebajo && !presupuestoSuficiente)) {
     return {
       semaforo: "rojo",
-      razon: estaEmpezando
-        ? "Está empezando y su presupuesto todavía no alcanza para el plan más económico."
-        : "Su presupuesto no alcanza para el plan más económico y solo está averiguando, sin urgencia.",
+      razon: estaPorDebajo
+        ? "Está muy por debajo de sus metas de ventas y su presupuesto todavía no alcanza para el plan más económico."
+        : "Su presupuesto no alcanza para el plan más económico y solo está cotizando, sin urgencia.",
     };
   }
 
