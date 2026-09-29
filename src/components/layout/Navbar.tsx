@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import { LockKeyhole } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { useQuoter } from "@/components/quoter/QuoterProvider";
@@ -47,9 +49,19 @@ export function Navbar() {
             </a>
           ))}
         </nav>
-        <Button size="md" onClick={() => open()}>
-          Agenda una asesoría
-        </Button>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/panel/login"
+            aria-label="Panel privado"
+            title="Panel privado"
+            className="text-text-secondary/60 transition-colors hover:text-accent"
+          >
+            <LockKeyhole size={18} />
+          </Link>
+          <Button size="md" onClick={() => open()}>
+            Agenda una asesoría
+          </Button>
+        </div>
       </Container>
     </header>
   );
