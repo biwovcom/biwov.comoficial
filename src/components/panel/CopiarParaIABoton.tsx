@@ -10,12 +10,14 @@ export function CopiarParaIABoton({
   nombreProspecto,
   empresa,
   tipoNegocio,
+  redesSociales,
   resumenFiltro,
   respuestasDiagnostico,
 }: {
   nombreProspecto: string;
   empresa: string | null;
   tipoNegocio: string | null;
+  redesSociales: string | null;
   resumenFiltro: RespuestaLegible[];
   respuestasDiagnostico: RespuestasDiagnosticoLargo;
 }) {
@@ -26,6 +28,7 @@ export function CopiarParaIABoton({
       nombreProspecto,
       empresa,
       tipoNegocio,
+      redesSociales,
       resumenFiltro,
       respuestasDiagnostico,
     });

@@ -17,7 +17,7 @@ import { PAISES, monedaDesdePais } from "@/lib/panel/paises";
 interface Contacto {
   nombre: string;
   empresa: string;
-  tipoNegocio: string;
+  redesSociales: string;
   whatsapp: string;
   email: string;
   pais: string;
@@ -27,7 +27,7 @@ interface Contacto {
 const CONTACTO_INICIAL: Contacto = {
   nombre: "",
   empresa: "",
-  tipoNegocio: "",
+  redesSociales: "",
   whatsapp: "",
   email: "",
   pais: "",
@@ -171,12 +171,16 @@ export function QuoterModal() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="qm-tipo-negocio">Tipo de negocio</Label>
-                    <Input
-                      id="qm-tipo-negocio"
-                      placeholder="Ej: belleza, abogados, restaurante..."
-                      value={contacto.tipoNegocio}
-                      onChange={(e) => setContacto((c) => ({ ...c, tipoNegocio: e.target.value }))}
+                    <Label htmlFor="qm-redes-sociales">¿Cómo aparece en redes sociales?</Label>
+                    <textarea
+                      id="qm-redes-sociales"
+                      rows={2}
+                      placeholder="Ej: Instagram @minegocio, Facebook facebook.com/minegocio, TikTok @minegocio..."
+                      className="w-full rounded-xl border border-border-glass bg-white/[0.03] px-4 py-3 text-white placeholder:text-text-secondary/60 outline-none transition-colors focus:border-accent"
+                      value={contacto.redesSociales}
+                      onChange={(e) =>
+                        setContacto((c) => ({ ...c, redesSociales: e.target.value }))
+                      }
                     />
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2">

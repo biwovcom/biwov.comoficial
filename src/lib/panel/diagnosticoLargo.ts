@@ -4,23 +4,6 @@ export interface BloqueDiagnostico {
   preguntasGuia: string[];
 }
 
-export interface CampoRedSocial {
-  id: string;
-  label: string;
-  placeholder: string;
-}
-
-/** Campos de una sola línea, no bloques de texto — para ubicar los perfiles reales del negocio. */
-export const CAMPOS_REDES_SOCIALES: CampoRedSocial[] = [
-  { id: "facebook", label: "Facebook", placeholder: "facebook.com/tu-negocio o @usuario" },
-  { id: "instagram", label: "Instagram", placeholder: "@usuario" },
-  { id: "linkedin", label: "LinkedIn", placeholder: "linkedin.com/company/tu-negocio" },
-  { id: "tiktok", label: "TikTok", placeholder: "@usuario" },
-  { id: "youtube", label: "YouTube", placeholder: "youtube.com/@tu-canal" },
-  { id: "google", label: "Google (perfil de negocio / Maps)", placeholder: "Nombre exacto en Google" },
-  { id: "otra", label: "Otra red", placeholder: "Cuál y su usuario/link" },
-];
-
 /**
  * Un bloque = un cuadro de texto con dictado por voz. En vez de una pregunta
  * por campo, se agrupan por tema (así se toma nota igual que en una llamada

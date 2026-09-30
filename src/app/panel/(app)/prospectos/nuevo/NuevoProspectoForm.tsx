@@ -83,12 +83,14 @@ export function NuevoProspectoForm() {
         </div>
 
         <div>
-          <Label htmlFor="tipoNegocio">Tipo de negocio</Label>
-          <Input
-            id="tipoNegocio"
-            placeholder="Ej: belleza, abogados, restaurante..."
-            value={form.tipoNegocio ?? ""}
-            onChange={(e) => update({ tipoNegocio: e.target.value })}
+          <Label htmlFor="redesSociales">¿Cómo aparece en redes sociales?</Label>
+          <textarea
+            id="redesSociales"
+            rows={2}
+            placeholder="Ej: Instagram @minegocio, Facebook facebook.com/minegocio, TikTok @minegocio..."
+            className="w-full rounded-xl border border-border-glass bg-white/[0.03] px-4 py-3 text-white placeholder:text-text-secondary/60 outline-none transition-colors focus:border-accent"
+            value={form.redesSociales ?? ""}
+            onChange={(e) => update({ redesSociales: e.target.value })}
           />
         </div>
 

@@ -99,8 +99,10 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
               <dd className="text-white">{prospecto.empresa ?? "—"}</dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-text-secondary">Tipo de negocio</dt>
-              <dd className="text-white">{prospecto.tipo_negocio ?? "—"}</dd>
+              <dt className="text-text-secondary">Redes sociales</dt>
+              <dd className="max-w-[60%] whitespace-pre-line text-right text-white">
+                {prospecto.redes_sociales ?? "—"}
+              </dd>
             </div>
             <div className="flex justify-between gap-4">
               <dt className="text-text-secondary">WhatsApp</dt>
@@ -185,6 +187,7 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
                 nombreProspecto={prospecto.nombre}
                 empresa={prospecto.empresa}
                 tipoNegocio={prospecto.tipo_negocio}
+                redesSociales={prospecto.redes_sociales}
                 resumenFiltro={resumenFiltro ?? []}
                 respuestasDiagnostico={diagnostico.respuestas}
               />

@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     .insert({
       nombre: body.nombre.trim(),
       empresa: body.empresa?.trim() || null,
-      tipo_negocio: body.tipoNegocio?.trim() || null,
+      redes_sociales: body.redesSociales?.trim() || null,
       whatsapp: body.whatsapp.trim(),
       email: body.email?.trim() || null,
       pais: body.pais || null,

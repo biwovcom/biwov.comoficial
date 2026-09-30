@@ -1,4 +1,4 @@
-import { BLOQUES_DIAGNOSTICO, CAMPOS_REDES_SOCIALES } from "@/lib/panel/diagnosticoLargo";
+import { BLOQUES_DIAGNOSTICO } from "@/lib/panel/diagnosticoLargo";
 import type { RespuestaLegible } from "@/lib/panel/filtroRapido";
 import type { RespuestasDiagnosticoLargo } from "@/lib/panel/diagnosticoLargo";
 
@@ -26,30 +26,22 @@ function formatearRespuestasFiltro(resumen: RespuestaLegible[]): string {
 }
 
 function formatearDiagnostico(respuestas: RespuestasDiagnosticoLargo): string {
-  const redes = CAMPOS_REDES_SOCIALES.map((c) => {
-    const valor = respuestas[`red_${c.id}`];
-    return valor ? `- ${c.label}: ${valor}` : null;
-  }).filter(Boolean);
-
-  const bloques = BLOQUES_DIAGNOSTICO.map((b) => {
+  return BLOQUES_DIAGNOSTICO.map((b) => {
     const texto = (respuestas[b.id] ?? "").trim();
     return `### ${b.titulo}\n${texto || "(sin respuesta)"}`;
-  });
-
-  return [
-    redes.length > 0 ? `Redes sociales:\n${redes.join("\n")}` : "Redes sociales: (sin datos)",
-    ...bloques,
-  ].join("\n\n");
+  }).join("\n\n");
 }
 
 export function construirPromptAnalisis(params: {
   nombreProspecto: string;
   empresa: string | null;
   tipoNegocio: string | null;
+  redesSociales: string | null;
   resumenFiltro: RespuestaLegible[];
   respuestasDiagnostico: RespuestasDiagnosticoLargo;
 }) {
   const mensaje = `PROSPECTO: ${params.nombreProspecto}${params.empresa ? ` — ${params.empresa}` : ""}${params.tipoNegocio ? ` (negocio de ${params.tipoNegocio})` : ""}
+Redes sociales: ${params.redesSociales?.trim() || "(sin datos)"}
 
 ## Filtro rápido (resumen)
 ${formatearRespuestasFiltro(params.resumenFiltro)}

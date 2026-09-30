@@ -26,6 +26,7 @@ create table if not exists prospectos (
   nombre text not null,
   empresa text,
   tipo_negocio text,
+  redes_sociales text,
   whatsapp text not null,
   email text,
   pais text,
@@ -44,6 +45,7 @@ create table if not exists prospectos (
 
 -- Por si la tabla ya existía de una fase anterior sin estas columnas.
 alter table prospectos add column if not exists tipo_negocio text;
+alter table prospectos add column if not exists redes_sociales text;
 alter table prospectos add column if not exists link_redes_prospecto text;
 alter table prospectos add column if not exists que_quiere_resolver text;
 

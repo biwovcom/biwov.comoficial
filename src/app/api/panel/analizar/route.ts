@@ -70,6 +70,7 @@ export async function POST(request: Request) {
     nombreProspecto: prospecto.nombre,
     empresa: prospecto.empresa,
     tipoNegocio: prospecto.tipo_negocio,
+    redesSociales: prospecto.redes_sociales,
     resumenFiltro,
     respuestasDiagnostico: diagnostico.respuestas,
   });

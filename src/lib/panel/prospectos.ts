@@ -27,6 +27,7 @@ export interface Prospecto {
   nombre: string;
   empresa: string | null;
   tipo_negocio: string | null;
+  redes_sociales: string | null;
   whatsapp: string;
   email: string | null;
   pais: string | null;
@@ -43,6 +44,7 @@ export interface NuevoProspectoInput {
   nombre: string;
   empresa?: string;
   tipoNegocio?: string;
+  redesSociales?: string;
   whatsapp: string;
   email?: string;
   pais?: string;
