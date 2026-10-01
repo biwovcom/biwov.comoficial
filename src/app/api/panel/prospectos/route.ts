@@ -30,6 +30,8 @@ export async function POST(request: Request) {
       ciudad: body.ciudad?.trim() || null,
       canal_origen: body.canal_origen || null,
       notas: body.notas?.trim() || null,
+      categoria: body.categoria || "contacto",
+      nicho_mercado: body.nichoMercado?.trim() || null,
     })
     .select()
     .single();

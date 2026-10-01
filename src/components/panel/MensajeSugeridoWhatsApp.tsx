@@ -9,11 +9,8 @@ import {
   type RespuestasFiltro,
 } from "@/lib/panel/filtroRapido";
 import { MENSAJES_WHATSAPP, guionAudioVerde } from "@/lib/panel/panelConfig";
+import { linkWhatsApp } from "@/lib/panel/whatsapp";
 import type { Semaforo } from "@/lib/panel/prospectos";
-
-function soloDigitos(whatsapp: string): string {
-  return whatsapp.replace(/[^\d]/g, "");
-}
 
 const PASOS_VERDE = [
   "Envía el mensaje de WhatsApp (botón de abajo)",
@@ -63,7 +60,7 @@ export function MensajeSugeridoWhatsApp({
     fraseDesafio: fraseDesafio(respuestasFiltro),
   };
   const mensaje = MENSAJES_WHATSAPP[semaforo](ctx);
-  const waUrl = `https://wa.me/${soloDigitos(whatsapp)}?text=${encodeURIComponent(mensaje)}`;
+  const waUrl = linkWhatsApp(whatsapp, mensaje);
 
   return (
     <div className="space-y-4">

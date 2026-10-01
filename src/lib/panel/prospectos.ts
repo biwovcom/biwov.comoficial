@@ -10,6 +10,8 @@ export type PasoActual =
 
 export type Semaforo = "verde" | "amarillo" | "rojo";
 
+export type Categoria = "contacto" | "lead" | "prospecto";
+
 export const NOMBRES_PASO: Record<PasoActual, string> = {
   nuevo: "Nuevo",
   filtro: "Filtro rápido",
@@ -19,6 +21,19 @@ export const NOMBRES_PASO: Record<PasoActual, string> = {
   propuesta_enviada: "Propuesta enviada",
   ganado: "Ganado",
   perdido: "Perdido",
+};
+
+export const NOMBRES_CATEGORIA: Record<Categoria, string> = {
+  contacto: "Contacto",
+  lead: "Lead",
+  prospecto: "Prospecto",
+};
+
+/** Reutiliza las variantes de color que ya tiene <Badge>. */
+export const BADGE_VARIANTE_CATEGORIA: Record<Categoria, "neutral" | "amarillo" | "accent"> = {
+  contacto: "neutral",
+  lead: "amarillo",
+  prospecto: "accent",
 };
 
 export interface Prospecto {
@@ -38,6 +53,8 @@ export interface Prospecto {
   que_quiere_resolver: string | null;
   paso_actual: PasoActual;
   semaforo: Semaforo | null;
+  categoria: Categoria | null;
+  nicho_mercado: string | null;
 }
 
 export interface NuevoProspectoInput {
@@ -51,4 +68,6 @@ export interface NuevoProspectoInput {
   ciudad?: string;
   canal_origen?: string;
   notas?: string;
+  categoria?: Categoria;
+  nichoMercado?: string;
 }

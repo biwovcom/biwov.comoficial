@@ -3,13 +3,21 @@ import { notFound } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Badge } from "@/components/ui/Badge";
-import { NOMBRES_PASO, type Prospecto } from "@/lib/panel/prospectos";
+import {
+  BADGE_VARIANTE_CATEGORIA,
+  NOMBRES_CATEGORIA,
+  NOMBRES_PASO,
+  type Prospecto,
+} from "@/lib/panel/prospectos";
 import { resumenRespuestasFiltro, type RespuestasFiltro } from "@/lib/panel/filtroRapido";
 import { monedaDesdePais } from "@/lib/panel/paises";
+import { linkWhatsApp } from "@/lib/panel/whatsapp";
 import { CopyLinkButton } from "@/components/panel/CopyLinkButton";
 import { MensajeSugeridoWhatsApp } from "@/components/panel/MensajeSugeridoWhatsApp";
 import { EliminarProspectoButton } from "@/components/panel/EliminarProspectoButton";
 import { CopiarParaIABoton } from "@/components/panel/CopiarParaIABoton";
+import { RedesSocialesLinks } from "@/components/panel/RedesSocialesLinks";
+import { EditarClasificacion } from "@/components/panel/EditarClasificacion";
 import type { RespuestasDiagnosticoLargo } from "@/lib/panel/diagnosticoLargo";
 
 interface FiltroRespuestaFila {
@@ -72,6 +80,11 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <h1 className="text-2xl font-semibold text-white">{prospecto.nombre}</h1>
+        {prospecto.categoria && (
+          <Badge variant={BADGE_VARIANTE_CATEGORIA[prospecto.categoria]}>
+            {NOMBRES_CATEGORIA[prospecto.categoria]}
+          </Badge>
+        )}
         <Badge>{NOMBRES_PASO[prospecto.paso_actual]}</Badge>
         {prospecto.semaforo && (
           <Badge variant={prospecto.semaforo}>
@@ -99,14 +112,27 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
               <dd className="text-white">{prospecto.empresa ?? "—"}</dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-text-secondary">Redes sociales</dt>
-              <dd className="max-w-[60%] whitespace-pre-line text-right text-white">
-                {prospecto.redes_sociales ?? "—"}
+              <dt className="text-text-secondary">Nicho de mercado</dt>
+              <dd className="text-white">{prospecto.nicho_mercado ?? "—"}</dd>
+            </div>
+            <div className="flex justify-between gap-4">
+              <dt className="shrink-0 text-text-secondary">Redes sociales</dt>
+              <dd className="max-w-[65%] text-right">
+                <RedesSocialesLinks texto={prospecto.redes_sociales} />
               </dd>
             </div>
             <div className="flex justify-between gap-4">
               <dt className="text-text-secondary">WhatsApp</dt>
-              <dd className="text-white">{prospecto.whatsapp}</dd>
+              <dd className="text-white">
+                <a
+                  href={linkWhatsApp(prospecto.whatsapp)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent hover:underline"
+                >
+                  {prospecto.whatsapp}
+                </a>
+              </dd>
             </div>
             <div className="flex justify-between gap-4">
               <dt className="text-text-secondary">Correo</dt>
@@ -140,6 +166,13 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
               {prospecto.notas}
             </p>
           )}
+          <div className="mt-4 border-t border-border-glass pt-4">
+            <EditarClasificacion
+              prospectoId={prospecto.id}
+              categoriaInicial={prospecto.categoria}
+              nichoMercadoInicial={prospecto.nicho_mercado}
+            />
+          </div>
         </GlassCard>
 
         <GlassCard className="p-6">

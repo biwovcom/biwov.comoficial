@@ -8,19 +8,24 @@ import { Input, Label } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { PhoneInput } from "@/components/ui/PhoneInput";
 import { PAISES } from "@/lib/panel/paises";
-import type { NuevoProspectoInput } from "@/lib/panel/prospectos";
+import { NOMBRES_CATEGORIA, type NuevoProspectoInput } from "@/lib/panel/prospectos";
 
 const CANALES_ORIGEN = [
   { id: "instagram", label: "Instagram" },
   { id: "recomendado", label: "Recomendado" },
   { id: "pagina-web", label: "Página web" },
   { id: "publicidad", label: "Publicidad" },
+  { id: "networking", label: "Evento / networking" },
   { id: "otro", label: "Otro" },
 ];
 
 export function NuevoProspectoForm() {
   const router = useRouter();
-  const [form, setForm] = useState<NuevoProspectoInput>({ nombre: "", whatsapp: "" });
+  const [form, setForm] = useState<NuevoProspectoInput>({
+    nombre: "",
+    whatsapp: "",
+    categoria: "contacto",
+  });
   const [codigoPais, setCodigoPais] = useState("+57");
   const [numero, setNumero] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -80,6 +85,32 @@ export function NuevoProspectoForm() {
             value={form.empresa ?? ""}
             onChange={(e) => update({ empresa: e.target.value })}
           />
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <Label htmlFor="categoria">Etiqueta</Label>
+            <Select
+              id="categoria"
+              value={form.categoria ?? "contacto"}
+              onChange={(e) => update({ categoria: e.target.value as NuevoProspectoInput["categoria"] })}
+            >
+              {Object.entries(NOMBRES_CATEGORIA).map(([valor, etiqueta]) => (
+                <option key={valor} value={valor}>
+                  {etiqueta}
+                </option>
+              ))}
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="nichoMercado">Nicho de mercado</Label>
+            <Input
+              id="nichoMercado"
+              placeholder="Ej: inmobiliario, salud, impresión..."
+              value={form.nichoMercado ?? ""}
+              onChange={(e) => update({ nichoMercado: e.target.value })}
+            />
+          </div>
         </div>
 
         <div>
