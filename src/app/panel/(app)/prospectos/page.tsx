@@ -24,6 +24,7 @@ const TABS: { id: Categoria | "todos"; label: string }[] = [
   { id: "contacto", label: "Contactos" },
   { id: "lead", label: "Leads" },
   { id: "prospecto", label: "Prospectos" },
+  { id: "cliente", label: "Clientes" },
 ];
 
 export default async function ProspectosPage({
@@ -41,7 +42,10 @@ export default async function ProspectosPage({
 
   const todos = prospectos ?? [];
   const tabActiva: Categoria | "todos" =
-    categoria === "contacto" || categoria === "lead" || categoria === "prospecto"
+    categoria === "contacto" ||
+    categoria === "lead" ||
+    categoria === "prospecto" ||
+    categoria === "cliente"
       ? categoria
       : "todos";
   const lista = tabActiva === "todos" ? todos : todos.filter((p) => p.categoria === tabActiva);
@@ -50,9 +54,10 @@ export default async function ProspectosPage({
     <div>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-white">Prospectos</h1>
+          <h1 className="text-2xl font-semibold text-white">Embudo</h1>
           <p className="mt-1 text-sm text-text-secondary">
-            {lista.length} registro{lista.length === 1 ? "" : "s"}.
+            {lista.length} registro{lista.length === 1 ? "" : "s"} — filtra por etapa para no
+            mezclar fríos con los que ya son clientes.
           </p>
         </div>
         <Link href="/panel/prospectos/nuevo">

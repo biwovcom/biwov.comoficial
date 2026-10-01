@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Categoria } from "@/lib/panel/prospectos";
 
-const CATEGORIAS_VALIDAS: Categoria[] = ["contacto", "lead", "prospecto"];
+const CATEGORIAS_VALIDAS: Categoria[] = ["contacto", "lead", "prospecto", "cliente"];
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

@@ -10,7 +10,7 @@ export type PasoActual =
 
 export type Semaforo = "verde" | "amarillo" | "rojo";
 
-export type Categoria = "contacto" | "lead" | "prospecto";
+export type Categoria = "contacto" | "lead" | "prospecto" | "cliente";
 
 export const NOMBRES_PASO: Record<PasoActual, string> = {
   nuevo: "Nuevo",
@@ -27,13 +27,15 @@ export const NOMBRES_CATEGORIA: Record<Categoria, string> = {
   contacto: "Contacto",
   lead: "Lead",
   prospecto: "Prospecto",
+  cliente: "Cliente",
 };
 
 /** Reutiliza las variantes de color que ya tiene <Badge>. */
-export const BADGE_VARIANTE_CATEGORIA: Record<Categoria, "neutral" | "amarillo" | "accent"> = {
+export const BADGE_VARIANTE_CATEGORIA: Record<Categoria, "neutral" | "amarillo" | "accent" | "verde"> = {
   contacto: "neutral",
   lead: "amarillo",
   prospecto: "accent",
+  cliente: "verde",
 };
 
 export interface Prospecto {

@@ -40,7 +40,7 @@ create table if not exists prospectos (
     check (semaforo in ('verde','amarillo','rojo')),
 
   categoria text default 'contacto'
-    check (categoria in ('contacto','lead','prospecto')),
+    check (categoria in ('contacto','lead','prospecto','cliente')),
   nicho_mercado text,
 
   link_redes_prospecto text,
@@ -62,17 +62,22 @@ alter table prospectos add constraint prospectos_paso_actual_check
 
 alter table prospectos drop constraint if exists prospectos_categoria_check;
 alter table prospectos add constraint prospectos_categoria_check
-  check (categoria in ('contacto','lead','prospecto'));
+  check (categoria in ('contacto','lead','prospecto','cliente'));
 
--- Etiqueta (contacto/lead/prospecto) de lo que ya existía: a falta de mejor
--- señal, se infiere del avance que ya tiene en el embudo. Es un punto de
--- partida editable desde la ficha de cada prospecto, no una regla fija.
+-- Etiqueta (contacto/lead/prospecto/cliente) de lo que ya existía: a falta de
+-- mejor señal, se infiere del avance que ya tiene en el embudo. Es un punto
+-- de partida editable desde la ficha de cada prospecto, no una regla fija.
 update prospectos set categoria = 'contacto'
   where categoria is null and paso_actual = 'nuevo';
 update prospectos set categoria = 'lead'
   where categoria is null and paso_actual = 'filtro';
 update prospectos set categoria = 'prospecto'
-  where categoria is null and paso_actual in ('llamada','diagnostico','analisis','propuesta_enviada','ganado','perdido');
+  where categoria is null and paso_actual in ('llamada','diagnostico','analisis','propuesta_enviada','perdido');
+update prospectos set categoria = 'cliente'
+  where categoria is null and paso_actual = 'ganado';
+-- Por si ya se habían clasificado antes de existir la etiqueta "cliente".
+update prospectos set categoria = 'cliente'
+  where paso_actual = 'ganado' and categoria = 'prospecto';
 
 drop trigger if exists prospectos_set_updated_at on prospectos;
 create trigger prospectos_set_updated_at
