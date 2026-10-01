@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Table, TableHead, TableBody, Th, Tr, Td } from "@/components/ui/Table";
 import { cn } from "@/lib/utils";
 import { linkWhatsApp } from "@/lib/panel/whatsapp";
+import { FiltroNicho } from "@/components/panel/FiltroNicho";
 import {
   BADGE_VARIANTE_CATEGORIA,
   NOMBRES_CATEGORIA,
@@ -30,9 +31,9 @@ const TABS: { id: Categoria | "todos"; label: string }[] = [
 export default async function ProspectosPage({
   searchParams,
 }: {
-  searchParams: Promise<{ categoria?: string }>;
+  searchParams: Promise<{ categoria?: string; nicho?: string }>;
 }) {
-  const { categoria } = await searchParams;
+  const { categoria, nicho } = await searchParams;
   const supabase = await createSupabaseServerClient();
   const { data: prospectos } = await supabase
     .from("prospectos")
@@ -41,6 +42,10 @@ export default async function ProspectosPage({
     .returns<Prospecto[]>();
 
   const todos = prospectos ?? [];
+  const nichos = Array.from(
+    new Set(todos.map((p) => p.nicho_mercado?.trim()).filter((n): n is string => Boolean(n))),
+  ).sort((a, b) => a.localeCompare(b, "es"));
+
   const tabActiva: Categoria | "todos" =
     categoria === "contacto" ||
     categoria === "lead" ||
@@ -48,7 +53,9 @@ export default async function ProspectosPage({
     categoria === "cliente"
       ? categoria
       : "todos";
-  const lista = tabActiva === "todos" ? todos : todos.filter((p) => p.categoria === tabActiva);
+  const lista = todos
+    .filter((p) => tabActiva === "todos" || p.categoria === tabActiva)
+    .filter((p) => !nicho || p.nicho_mercado === nicho);
 
   return (
     <div>
@@ -65,26 +72,33 @@ export default async function ProspectosPage({
         </Link>
       </div>
 
-      <div className="mt-6 flex flex-wrap gap-2">
-        {TABS.map((tab) => {
-          const cantidad =
-            tab.id === "todos" ? todos.length : todos.filter((p) => p.categoria === tab.id).length;
-          const activa = tab.id === tabActiva;
-          return (
-            <Link
-              key={tab.id}
-              href={tab.id === "todos" ? "/panel/prospectos" : `/panel/prospectos?categoria=${tab.id}`}
-              className={cn(
-                "rounded-full border px-4 py-1.5 text-sm transition-colors",
-                activa
-                  ? "border-accent/40 bg-accent/10 text-accent"
-                  : "border-border-glass bg-white/[0.03] text-text-secondary hover:text-white",
-              )}
-            >
-              {tab.label} ({cantidad})
-            </Link>
-          );
-        })}
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap gap-2">
+          {TABS.map((tab) => {
+            const base = nicho ? todos.filter((p) => p.nicho_mercado === nicho) : todos;
+            const cantidad = tab.id === "todos" ? base.length : base.filter((p) => p.categoria === tab.id).length;
+            const activa = tab.id === tabActiva;
+            const params = new URLSearchParams();
+            if (tab.id !== "todos") params.set("categoria", tab.id);
+            if (nicho) params.set("nicho", nicho);
+            const query = params.toString();
+            return (
+              <Link
+                key={tab.id}
+                href={`/panel/prospectos${query ? `?${query}` : ""}`}
+                className={cn(
+                  "rounded-full border px-4 py-1.5 text-sm transition-colors",
+                  activa
+                    ? "border-accent/40 bg-accent/10 text-accent"
+                    : "border-border-glass bg-white/[0.03] text-text-secondary hover:text-white",
+                )}
+              >
+                {tab.label} ({cantidad})
+              </Link>
+            );
+          })}
+        </div>
+        {nichos.length > 0 && <FiltroNicho nichos={nichos} />}
       </div>
 
       <div className="mt-6">
