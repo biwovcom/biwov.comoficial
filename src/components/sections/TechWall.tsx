@@ -10,7 +10,7 @@ export function TechWall() {
       <Container>
         <SectionHeading
           eyebrow="Motor tecnológico"
-          title="La tecnología que usamos para conectar todo"
+          title="La tecnología que conecta todo"
           description="biwov combina estas herramientas y sus propias automatizaciones para que todo funcione en conjunto."
         />
       </Container>

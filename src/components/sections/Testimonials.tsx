@@ -13,7 +13,7 @@ export function Testimonials() {
       <Container>
         <SectionHeading
           eyebrow="Testimonios"
-          title="Lo que dicen quienes ya transformaron su negocio"
+          title="Lo que dicen nuestros clientes"
           description="Video, texto y fotos: resultados reales de negocios que ya tienen todo conectado."
         />
 

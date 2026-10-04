@@ -13,7 +13,7 @@ export function CaseStudies() {
       <Container>
         <SectionHeading
           eyebrow="Casos de éxito"
-          title="Negocios que ya tienen todo conectado"
+          title="Negocios con todo conectado"
           description="Desde sitios en construcción hasta desarrollo a medida y ventas con automatización: así se ve en la vida real un negocio con todo conectado."
         />
 
