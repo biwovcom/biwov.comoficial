@@ -23,9 +23,7 @@ export default async function CotizacionPublicaPage({ params }: { params: Promis
     <div className="flex min-h-screen justify-center bg-bg-base px-4 py-16">
       <div className="w-full max-w-2xl">
         <div className="mb-8 text-center">
-          <p className="text-2xl font-semibold text-white">
-            biwov<span className="text-accent">_</span>
-          </p>
+          <p className="font-logo text-2xl font-semibold text-white">biwov</p>
           <p className="mt-1 text-sm text-text-secondary">Propuesta comercial</p>
         </div>
         <CotizacionCliente cotizacion={cotizacion} />

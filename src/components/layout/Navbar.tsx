@@ -35,8 +35,8 @@ export function Navbar() {
       )}
     >
       <Container className="flex h-18 items-center justify-between py-4">
-        <a href="#" className="text-xl font-bold tracking-tight text-white">
-          biwov<span className="text-accent">_</span>
+        <a href="#" className="font-logo text-xl font-bold text-white">
+          biwov
         </a>
         <nav className="hidden items-center gap-8 md:flex">
           {LINKS.map((link) => (

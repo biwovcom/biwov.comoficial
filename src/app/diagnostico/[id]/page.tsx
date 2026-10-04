@@ -42,9 +42,7 @@ export default async function DiagnosticoPublicoPage({
     <div className="flex min-h-screen items-center justify-center bg-bg-base px-4 py-16">
       <div className="w-full max-w-2xl">
         <div className="mb-8 text-center">
-          <h1 className="text-2xl font-semibold text-white">
-            biwov<span className="text-accent">_</span>
-          </h1>
+          <h1 className="font-logo text-2xl font-semibold text-white">biwov</h1>
           <p className="mt-2 text-lg text-white">Diagnóstico inicial</p>
           <p className="mt-1 text-sm text-text-secondary">
             Hola {nombrePila}, responde estas preguntas para que podamos entender tu negocio y

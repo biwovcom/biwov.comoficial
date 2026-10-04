@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
+import { WhatsAppFloatButton } from "./WhatsAppFloatButton";
 import { QuoterModal } from "@/components/quoter/QuoterModal";
 import { useQuoter } from "@/components/quoter/QuoterProvider";
 
@@ -43,6 +44,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
       <main className="flex-1">{children}</main>
       <Footer />
       <QuoterModal />
+      <WhatsAppFloatButton />
     </>
   );
 }

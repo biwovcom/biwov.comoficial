@@ -12,8 +12,8 @@ const LINKS = [
 export function Sidebar() {
   return (
     <aside className="flex h-screen w-64 shrink-0 flex-col border-r border-border-glass bg-white/[0.02] p-5">
-      <Link href="/panel/prospectos" className="mb-8 px-2 text-xl font-bold tracking-tight text-white">
-        biwov<span className="text-accent">_</span>
+      <Link href="/panel/prospectos" className="mb-8 px-2 text-xl font-bold text-white">
+        <span className="font-logo">biwov</span>
         <span className="ml-2 text-sm font-normal text-text-secondary">panel</span>
       </Link>
 

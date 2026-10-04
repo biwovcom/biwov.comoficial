@@ -38,7 +38,7 @@ export function LoginForm() {
   return (
     <GlassCard className="w-full max-w-sm p-8">
       <h1 className="text-xl font-semibold text-white">
-        biwov<span className="text-accent">_</span> panel
+        <span className="font-logo">biwov</span> panel
       </h1>
       <p className="mt-1 text-sm text-text-secondary">Acceso privado del equipo.</p>
 
