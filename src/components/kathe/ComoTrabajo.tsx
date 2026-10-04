@@ -3,22 +3,18 @@
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { PASOS_PROCESO } from "@/data/proceso";
+import { COMO_TRABAJO } from "@/data/kathe";
 
-export function Process() {
+export function ComoTrabajo() {
   return (
-    <section id="como-funciona" className="py-24 md:py-32">
+    <section className="py-16 md:py-20">
       <Container>
-        <SectionHeading
-          eyebrow="Nuestro método"
-          title="Así funciona biwov"
-          description="Un proceso claro, de principio a fin, para que todo en tu negocio quede funcionando conectado."
-        />
+        <SectionHeading eyebrow="Mi método" title="Cómo trabajo" />
 
         <div className="relative mx-auto mt-16 max-w-2xl">
           <div className="absolute left-6 top-2 bottom-2 w-px bg-gradient-to-b from-accent/60 via-accent/20 to-transparent" />
           <div className="space-y-10">
-            {PASOS_PROCESO.map((paso, i) => (
+            {COMO_TRABAJO.map((paso, i) => (
               <motion.div
                 key={paso.numero}
                 initial={{ opacity: 0, y: 16 }}
@@ -32,9 +28,7 @@ export function Process() {
                 </div>
                 <div className="pt-1.5">
                   <h3 className="text-lg font-semibold text-white">{paso.titulo}</h3>
-                  <p className="mt-1 max-w-sm text-sm text-text-secondary">
-                    {paso.descripcion}
-                  </p>
+                  <p className="mt-1 max-w-sm text-sm text-text-secondary">{paso.frase}</p>
                 </div>
               </motion.div>
             ))}

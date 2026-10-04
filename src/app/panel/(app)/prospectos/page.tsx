@@ -41,6 +41,19 @@ export default async function ProspectosPage({
     .order("created_at", { ascending: false })
     .returns<Prospecto[]>();
 
+  const { data: filtros } = await supabase
+    .from("filtro_respuestas")
+    .select("prospecto_id, razon, created_at")
+    .order("created_at", { ascending: false })
+    .returns<{ prospecto_id: string; razon: string; created_at: string }[]>();
+
+  const razonPorProspecto = new Map<string, string>();
+  for (const f of filtros ?? []) {
+    if (!razonPorProspecto.has(f.prospecto_id)) {
+      razonPorProspecto.set(f.prospecto_id, f.razon);
+    }
+  }
+
   const todos = prospectos ?? [];
   const nichos = Array.from(
     new Set(todos.map((p) => p.nicho_mercado?.trim()).filter((n): n is string => Boolean(n))),
@@ -111,12 +124,13 @@ export default async function ProspectosPage({
             <Th>WhatsApp</Th>
             <Th>Etiqueta</Th>
             <Th>Semáforo</Th>
+            <Th>Resumen del filtro</Th>
             <Th>Paso</Th>
           </TableHead>
           <TableBody>
             {lista.length === 0 && (
               <Tr>
-                <Td colSpan={8} className="py-8 text-center text-text-secondary">
+                <Td colSpan={9} className="py-8 text-center text-text-secondary">
                   No hay registros en esta categoría.
                 </Td>
               </Tr>
@@ -162,6 +176,11 @@ export default async function ProspectosPage({
                   ) : (
                     "—"
                   )}
+                </Td>
+                <Td className="max-w-[240px]">
+                  <span className="line-clamp-2 text-xs text-text-secondary">
+                    {razonPorProspecto.get(p.id) ?? "—"}
+                  </span>
                 </Td>
                 <Td>
                   <Badge>{NOMBRES_PASO[p.paso_actual]}</Badge>

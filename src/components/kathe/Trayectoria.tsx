@@ -4,20 +4,20 @@ import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { GlassCard } from "@/components/ui/GlassCard";
-import { COMO_AVANZA } from "@/data/comoAvanza";
+import { TRAYECTORIA } from "@/data/kathe";
 
-export function RoadmapStart() {
+export function Trayectoria() {
   return (
-    <section className="py-24 md:py-32">
+    <section className="py-16 md:py-20">
       <Container>
-        <SectionHeading eyebrow="Cómo avanza tu negocio" title="Así se ven tus primeros meses" />
+        <SectionHeading eyebrow="Trayectoria" title="Cómo he llegado hasta aquí" />
 
-        <div className="relative mx-auto mt-16 max-w-3xl">
+        <div className="relative mx-auto mt-14 max-w-2xl">
           <div className="absolute left-6 top-2 bottom-2 w-px bg-gradient-to-b from-accent/60 via-accent/20 to-transparent" />
           <div className="space-y-8">
-            {COMO_AVANZA.map((fase, i) => (
+            {TRAYECTORIA.map((hito, i) => (
               <motion.div
-                key={fase.momento}
+                key={hito.anio}
                 initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
@@ -27,20 +27,15 @@ export function RoadmapStart() {
                 <div className="mt-1 h-3 w-3 shrink-0 translate-x-[18px] rounded-full bg-accent" />
                 <GlassCard className="flex-1 p-6">
                   <span className="text-xs font-semibold uppercase tracking-wide text-accent">
-                    {fase.momento}
+                    {hito.anio}
                   </span>
-                  <h3 className="mt-1 text-lg font-semibold text-white">{fase.titulo}</h3>
-                  <p className="mt-2 text-sm text-text-secondary">{fase.detalle}</p>
+                  <h3 className="mt-1 text-lg font-semibold text-white">{hito.titulo}</h3>
+                  <p className="mt-2 text-sm text-text-secondary">{hito.detalle}</p>
                 </GlassCard>
               </motion.div>
             ))}
           </div>
         </div>
-
-        <p className="mx-auto mt-10 max-w-xl text-center text-xs text-text-secondary">
-          Cada negocio avanza a su ritmo. No prometemos cifras de ventas: prometemos orden,
-          estrategia y trabajo medido.
-        </p>
       </Container>
     </section>
   );

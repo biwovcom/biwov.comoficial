@@ -9,10 +9,11 @@ import { useQuoter } from "@/components/quoter/QuoterProvider";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
-  { href: "#soluciones", label: "Soluciones" },
-  { href: "#como-funciona", label: "Cómo funciona" },
-  { href: "#casos", label: "Casos de éxito" },
-  { href: "#testimonios", label: "Testimonios" },
+  { href: "/#planes", label: "Planes" },
+  { href: "/#como-funciona", label: "Cómo funciona" },
+  { href: "/#casos", label: "Casos de éxito" },
+  { href: "/#testimonios", label: "Testimonios" },
+  { href: "/kathe", label: "Fundadora" },
 ];
 
 export function Navbar() {
@@ -35,9 +36,9 @@ export function Navbar() {
       )}
     >
       <Container className="flex h-18 items-center justify-between py-4">
-        <a href="#" className="font-logo text-xl font-bold text-white">
+        <Link href="/" className="font-logo text-xl font-bold text-white">
           biwov
-        </a>
+        </Link>
         <nav className="hidden items-center gap-8 md:flex">
           {LINKS.map((link) => (
             <a

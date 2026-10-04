@@ -30,8 +30,8 @@ export function Problem() {
       <Container>
         <SectionHeading
           eyebrow="El problema"
-          title="Todo funciona, pero cada uno por su lado."
-          description="Instagram, WhatsApp, Excel, tu página, el CRM, la publicidad: todo funciona por separado, sin hablarse entre sí. El resultado: se te pierden mensajes, respondes tarde y te ves menos profesional de lo que en realidad es tu negocio."
+          title="Publicas y pautas, pero no vendes."
+          description="Casi nunca es falta de esfuerzo. Es que cada parte funciona por su lado: el contenido no tiene un objetivo, la publicidad no llega a la gente correcta y los interesados se pierden en el WhatsApp. Cuando todo se conecta, el esfuerzo empieza a dar resultados."
         />
 
         <div className="mt-16 flex flex-wrap items-center justify-center gap-4">

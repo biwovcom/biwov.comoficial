@@ -1,13 +1,15 @@
 import { Hero } from "@/components/sections/Hero";
 import { Problem } from "@/components/sections/Problem";
-import { EcosystemExplainer } from "@/components/sections/EcosystemExplainer";
+import { ElCamino } from "@/components/sections/ElCamino";
 import { NeedsPaths } from "@/components/sections/NeedsPaths";
+import { ComoTrabajamos } from "@/components/sections/ComoTrabajamos";
 import { Ecosystems } from "@/components/sections/Ecosystems";
+import { Complementos } from "@/components/sections/Complementos";
 import { RoadmapStart } from "@/components/sections/RoadmapStart";
-import { Process } from "@/components/sections/Process";
-import { TechWall } from "@/components/sections/TechWall";
+import { FounderTeaser } from "@/components/sections/FounderTeaser";
 import { CaseStudies } from "@/components/sections/CaseStudies";
 import { Testimonials } from "@/components/sections/Testimonials";
+import { Faq } from "@/components/sections/Faq";
 import { FinalCTA } from "@/components/sections/FinalCTA";
 
 export default function Home() {
@@ -15,14 +17,16 @@ export default function Home() {
     <>
       <Hero />
       <Problem />
-      <EcosystemExplainer />
+      <ElCamino />
       <NeedsPaths />
+      <ComoTrabajamos />
       <Ecosystems />
+      <Complementos />
       <RoadmapStart />
-      <Process />
-      <TechWall />
+      <FounderTeaser />
       <CaseStudies />
       <Testimonials />
+      <Faq />
       <FinalCTA />
     </>
   );

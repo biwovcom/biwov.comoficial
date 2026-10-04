@@ -88,3 +88,72 @@ body {
 .animate-pulse-glow {
   animation: pulse-glow 2.2s ease-in-out infinite;
 }
+
+/* Versión imprimible de /kathe: hoja de vida en blanco, sin chrome del
+   sitio ni animaciones a medio aparecer (whileInView depende del scroll,
+   que no existe al imprimir). */
+@media print {
+  header,
+  footer,
+  a[aria-label="Escríbenos por WhatsApp"] {
+    display: none !important;
+  }
+
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  #kathe-print {
+    background: #ffffff !important;
+    color: #111827 !important;
+  }
+
+  #kathe-print [style*="opacity"] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  #kathe-print section {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+    break-inside: avoid;
+  }
+
+  #kathe-print .bg-gradient-brand,
+  #kathe-print [class*="blur-"],
+  #kathe-print [class*="bg-accent/"] {
+    background: none !important;
+    box-shadow: none !important;
+  }
+
+  #kathe-print button,
+  #kathe-print a[class*="rounded-full"] {
+    display: none !important;
+  }
+
+  #kathe-print h1,
+  #kathe-print h2,
+  #kathe-print h3,
+  #kathe-print p,
+  #kathe-print span,
+  #kathe-print dt,
+  #kathe-print dd {
+    color: #111827 !important;
+    text-shadow: none !important;
+  }
+
+  #kathe-print [class*="text-secondary"] {
+    color: #4b5563 !important;
+  }
+
+  #kathe-print [class*="border-"] {
+    border-color: #d1d5db !important;
+  }
+
+  #kathe-print img {
+    filter: none !important;
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+  }
+}

@@ -21,30 +21,28 @@ export function Hero() {
           className="mx-auto max-w-3xl text-center"
         >
           <span className="mb-6 inline-block rounded-full border border-border-glass bg-white/[0.03] px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-accent">
-            Todo conectado, para vender más
+            Transformación digital, no marketing tradicional
           </span>
           <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-5xl md:text-6xl">
-            Vende más sin hacerlo todo tú.
+            Desde que te ven hasta que pagan.
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-text-secondary md:text-lg">
-            Conectamos tus redes, tu WhatsApp, tus ventas y la inteligencia
-            artificial, para que todo funcione junto y tengas más tiempo
-            libre.
+            Te damos la estrategia, las guías y la publicidad para que tu
+            negocio atraiga clientes con orden, sin que tengas que estar en
+            todo.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button size="lg" onClick={() => open()}>
-              Agenda una asesoría
+              Haz tu diagnóstico gratis
             </Button>
             <Button
               size="lg"
               variant="secondary"
               onClick={() =>
-                document
-                  .getElementById("como-conectamos-todo")
-                  ?.scrollIntoView({ behavior: "smooth" })
+                document.getElementById("planes")?.scrollIntoView({ behavior: "smooth" })
               }
             >
-              Descubre cómo funciona
+              Ver los planes
             </Button>
           </div>
         </motion.div>
