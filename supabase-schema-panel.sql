@@ -400,3 +400,29 @@ alter table cotizador_config add column if not exists descuentos_volumen jsonb n
 -- Cada paquete decide si aplica ese descuento. Los paquetes que ya existían quedan
 -- en false para que su precio no cambie solo; los nuevos se crean con true.
 alter table cotizador_paquetes add column if not exists aplicar_descuento boolean not null default false;
+
+-- =========================================================
+-- REGISTROS DE TIEMPO
+-- Cuánto se demora Kathe en cada tipo de ejecución (flujos, sitios web,
+-- landing pages, campañas, etc.), por proyecto. Base para ir calculando
+-- promedios reales de tiempo por tarea.
+-- =========================================================
+create table if not exists registros_tiempo (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  created_by uuid references auth.users(id) default auth.uid(),
+
+  fecha date not null default current_date,
+  categoria text not null,
+  proyecto text,
+  horas numeric(5,2) not null check (horas > 0),
+  notas text
+);
+
+create index if not exists idx_registros_tiempo_fecha on registros_tiempo(fecha desc);
+
+alter table registros_tiempo enable row level security;
+
+drop policy if exists "equipo autenticado - todo" on registros_tiempo;
+create policy "equipo autenticado - todo" on registros_tiempo
+  for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
