@@ -11,8 +11,11 @@ import { Input, Label } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { PhoneInput } from "@/components/ui/PhoneInput";
 import { PreguntasFiltro } from "@/components/panel/PreguntasFiltro";
-import { respuestasCompletas, type RespuestasFiltro } from "@/lib/panel/filtroRapido";
+import { respuestasCompletas, planSugerido, type RespuestasFiltro } from "@/lib/panel/filtroRapido";
 import { PAISES, monedaDesdePais } from "@/lib/panel/paises";
+import { linkWhatsApp } from "@/lib/panel/whatsapp";
+import { WHATSAPP_BIWOV } from "@/lib/contacto";
+import { PLANES } from "@/data/planes";
 
 interface Contacto {
   nombre: string;
@@ -64,6 +67,7 @@ export function QuoterModal() {
 
   const contactoValido = Boolean(contacto.nombre && numero.trim() && contacto.email);
   const moneda = monedaDesdePais(contacto.pais);
+  const plan = PLANES.find((p) => p.id === planSugerido(respuestas)) ?? PLANES[0];
 
   const continuarDesdeContacto = async () => {
     if (!contactoValido || enviando) return;
@@ -272,18 +276,45 @@ export function QuoterModal() {
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="py-8 text-center"
+                className="py-4 text-center"
               >
                 <GlassCard className="mx-auto max-w-md p-8">
-                  <p className="text-2xl">📩</p>
+                  <p className="text-2xl">✅</p>
                   <h3 className="mt-3 text-xl font-semibold text-white">
-                    ¡Gracias, {contacto.nombre.split(" ")[0]}!
+                    ¡Listo, {contacto.nombre.split(" ")[0]}!
                   </h3>
                   <p className="mt-2 text-sm text-text-secondary">
-                    Ya tenemos tu información. Nos estaremos contactando contigo por WhatsApp o
-                    correo para conocer más sobre tu negocio y darte las mejores recomendaciones.
+                    Según lo que nos contaste, este es el plan que más se ajusta a tu negocio hoy:
                   </p>
-                  <Button size="lg" className="mt-6 w-full" onClick={handleClose}>
+
+                  <div className="mt-5 rounded-2xl border border-accent/40 bg-accent/10 p-5 text-left">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-accent">
+                      Plan sugerido
+                    </span>
+                    <h4 className="mt-1 text-lg font-semibold text-white">{plan.nombre}</h4>
+                    <p className="text-sm font-medium text-white/80">{plan.claim}</p>
+                    <p className="mt-2 text-sm text-text-secondary">{plan.paraQuien}</p>
+                  </div>
+
+                  <p className="mt-5 text-sm text-text-secondary">
+                    Este es un primer resultado automático. Kathe va a revisar tus respuestas y te
+                    escribe por WhatsApp para confirmarlo y agendar tu asesoría.
+                  </p>
+
+                  <a
+                    href={linkWhatsApp(
+                      WHATSAPP_BIWOV,
+                      `¡Hola! Acabo de hacer el diagnóstico en la página biwov.com y me sugirieron el plan ${plan.nombre}. Quiero agendar una asesoría.`,
+                    )}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-6 block"
+                  >
+                    <Button size="lg" className="w-full">
+                      Agendar por WhatsApp
+                    </Button>
+                  </a>
+                  <Button size="lg" variant="secondary" className="mt-3 w-full" onClick={handleClose}>
                     Cerrar
                   </Button>
                 </GlassCard>

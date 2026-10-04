@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { Sparkles } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { GlassCard } from "@/components/ui/GlassCard";
@@ -57,12 +58,16 @@ export function Ecosystems() {
                   <p className="text-xs text-text-secondary">{plan.montajeInicial}</p>
                   <p className="mt-1 text-xs text-text-secondary">{plan.pautaSugerida}</p>
                 </div>
+                <div className="mt-6 flex items-center justify-center gap-1.5 rounded-full bg-accent/10 px-3 py-1.5 text-center text-xs font-semibold text-accent">
+                  <Sparkles className="h-3.5 w-3.5 shrink-0" />
+                  Empieza con un diagnóstico 100% gratis
+                </div>
                 <Button
                   variant={plan.id === "crecimiento" ? "primary" : "secondary"}
-                  className="mt-6 w-full"
+                  className="mt-3 w-full"
                   onClick={() => open()}
                 >
-                  Diagnosticar mi negocio
+                  Haz tu diagnóstico gratis
                 </Button>
               </GlassCard>
             </motion.div>

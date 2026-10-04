@@ -1,5 +1,6 @@
 import { RANGOS_PRESUPUESTO, type Moneda } from "./panelConfig";
 import type { Semaforo } from "./prospectos";
+import type { Plan } from "@/data/planes";
 
 export type Objetivo = "sin-resultados" | "no-calificados" | "sin-presencia" | "otro";
 export type Meta = "mas-clientes" | "favorito-industria" | "proceso-automatizado" | "otro";
@@ -206,4 +207,18 @@ export function calcularSemaforo(r: RespuestasFiltro, moneda: Moneda): Resultado
     semaforo: "amarillo",
     razon: "No cumple todas las condiciones para 🟢, pero tampoco descalifica del todo.",
   };
+}
+
+/**
+ * Qué plan (Esencial/Crecimiento/Escala) le mostramos al visitante como
+ * sugerencia al terminar el diagnóstico público. Es una sugerencia visible
+ * para cualquiera, así que nunca se basa en el semáforo interno (eso es
+ * solo para la lectura de Kathe) — se basa en qué tan avanzado está el
+ * negocio, no en qué tan buen prospecto es.
+ */
+export function planSugerido(r: RespuestasFiltro): Plan["id"] {
+  if (r.objetivo === "sin-presencia") return "esencial";
+  if (r.cumplimientoVentas === "cumple-constante") return "escala";
+  if (r.objetivo === "no-calificados" || r.meta === "proceso-automatizado") return "crecimiento";
+  return "esencial";
 }
