@@ -13,8 +13,8 @@ export function CaseStudies() {
       <Container>
         <SectionHeading
           eyebrow="Casos de éxito"
-          title="Ecosistemas que ya están funcionando"
-          description="Desde sitios en constructor hasta desarrollo a medida y embudos con automatización: así se ve un Ecosistema Digital Inteligente en la vida real."
+          title="Negocios que ya tienen todo conectado"
+          description="Desde sitios en construcción hasta desarrollo a medida y ventas con automatización: así se ve en la vida real un negocio con todo conectado."
         />
 
         <div className="mt-14 grid gap-6 md:grid-cols-2">

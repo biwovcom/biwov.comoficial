@@ -9,7 +9,7 @@ import { useQuoter } from "@/components/quoter/QuoterProvider";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
-  { href: "#ecosistemas", label: "Ecosistemas" },
+  { href: "#soluciones", label: "Soluciones" },
   { href: "#como-funciona", label: "Cómo funciona" },
   { href: "#casos", label: "Casos de éxito" },
   { href: "#testimonios", label: "Testimonios" },

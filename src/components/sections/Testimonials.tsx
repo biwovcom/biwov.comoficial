@@ -14,7 +14,7 @@ export function Testimonials() {
         <SectionHeading
           eyebrow="Testimonios"
           title="Lo que dicen quienes ya transformaron su negocio"
-          description="Video, texto y fotos: resultados reales de negocios que ya operan como un Ecosistema Digital Inteligente."
+          description="Video, texto y fotos: resultados reales de negocios que ya tienen todo conectado."
         />
 
         <div className="mt-14 grid gap-6 md:grid-cols-2">

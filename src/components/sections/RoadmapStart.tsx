@@ -11,7 +11,7 @@ export function RoadmapStart() {
     <section className="py-24 md:py-32">
       <Container>
         <SectionHeading
-          eyebrow="Cómo evoluciona tu ecosistema"
+          eyebrow="Cómo evoluciona tu negocio con nosotros"
           title="Así se ve tu primer mes, y los que siguen"
           description="Nada de promesas vagas: así trabajamos mes a mes, desde que arrancas en START hasta que escalas a automatización y landing pages."
         />

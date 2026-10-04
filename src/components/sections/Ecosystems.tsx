@@ -13,12 +13,12 @@ export function Ecosystems() {
   const { open } = useQuoter();
 
   return (
-    <section id="ecosistemas" className="py-24 md:py-32">
+    <section id="soluciones" className="py-24 md:py-32">
       <Container>
         <SectionHeading
           eyebrow="Nuestras soluciones"
-          title="Nuestros Ecosistemas"
-          description="No servicios sueltos: tres ecosistemas diseñados para cada momento de tu negocio."
+          title="Nuestros planes"
+          description="No servicios sueltos: tres planes pensados para cada momento de tu negocio."
         />
 
         <div className="mt-14 grid gap-6 lg:grid-cols-3">
@@ -37,7 +37,7 @@ export function Ecosystems() {
                 )}
               >
                 <span className="text-xs font-semibold uppercase tracking-wide text-accent">
-                  Ecosistema
+                  Plan
                 </span>
                 <h3 className="mt-1 text-2xl font-semibold text-white">{eco.nombre}</h3>
                 <p className="mt-1 text-sm font-medium text-white/80">{eco.claim}</p>

@@ -9,7 +9,7 @@ export function Footer() {
       <Container className="flex flex-col items-center justify-between gap-6 text-sm text-text-secondary md:flex-row">
         <div className="flex items-center gap-2">
           <span className="font-logo text-lg font-bold text-white">biwov</span>
-          <span>Ecosistemas Digitales Inteligentes</span>
+          <span>Todo tu negocio conectado</span>
         </div>
         <div className="flex items-center gap-6">
           <Link href="/contrato" className="hover:text-white">

@@ -21,15 +21,15 @@ export function Hero() {
           className="mx-auto max-w-3xl text-center"
         >
           <span className="mb-6 inline-block rounded-full border border-border-glass bg-white/[0.03] px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-accent">
-            Transformación digital, no marketing tradicional
+            Todo conectado, para vender más
           </span>
           <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl md:text-6xl">
-            Diseñamos Ecosistemas Digitales Inteligentes.
+            Hacemos que tu negocio venda más, sin que tengas que hacerlo todo tú.
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-text-secondary md:text-lg">
-            Conectamos marketing, ventas, automatización e inteligencia
-            artificial para que tu negocio crezca con procesos organizados y
-            escalables.
+            Conectamos tus redes, tu WhatsApp, tus ventas y la inteligencia
+            artificial, para que todo funcione junto y tengas más tiempo
+            libre.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button size="lg" onClick={() => open()}>
@@ -40,7 +40,7 @@ export function Hero() {
               variant="secondary"
               onClick={() =>
                 document
-                  .getElementById("ecosistema-digital")
+                  .getElementById("como-conectamos-todo")
                   ?.scrollIntoView({ behavior: "smooth" })
               }
             >

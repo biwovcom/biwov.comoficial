@@ -12,7 +12,7 @@ export function Process() {
         <SectionHeading
           eyebrow="Nuestro método"
           title="Así funciona biwov"
-          description="Un proceso claro, de principio a fin, para llevar tu negocio a un Ecosistema Digital Inteligente."
+          description="Un proceso claro, de principio a fin, para que todo en tu negocio quede funcionando conectado."
         />
 
         <div className="relative mx-auto mt-16 max-w-2xl">

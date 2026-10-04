@@ -7,7 +7,7 @@ import { VERSION_CONTRATO } from "@/lib/contrato";
 export const metadata: Metadata = {
   title: "Contrato y Términos y Condiciones | biwov",
   description:
-    "Términos y condiciones del servicio de biwov para el diseño e implementación de Ecosistemas Digitales Inteligentes.",
+    "Términos y condiciones del servicio de biwov para el diseño e implementación de soluciones digitales conectadas.",
 };
 
 export default function ContratoPage() {
@@ -37,9 +37,9 @@ export default function ContratoPage() {
               <h2 className="mb-2 text-lg font-semibold text-white">1. Partes</h2>
               <p>
                 El presente contrato se celebra entre <strong>biwov</strong>{" "}
-                (&quot;el Proveedor&quot;), empresa de transformación digital dedicada
-                al diseño e implementación de Ecosistemas Digitales
-                Inteligentes, y el cliente que acepta estos términos al
+                (&quot;el Proveedor&quot;), empresa dedicada al diseño e
+                implementación de soluciones digitales conectadas para
+                negocios, y el cliente que acepta estos términos al
                 momento de adquirir un plan a través del sitio web de biwov
                 (&quot;el Cliente&quot;).
               </p>
@@ -49,8 +49,8 @@ export default function ContratoPage() {
               <h2 className="mb-2 text-lg font-semibold text-white">2. Objeto</h2>
               <p>
                 biwov prestará al Cliente los servicios correspondientes al
-                Ecosistema Digital seleccionado (START, GROWTH o ENTERPRISE),
-                según el alcance, módulos e inversión detallados en la
+                plan seleccionado (START, GROWTH o ENTERPRISE), según el
+                alcance, módulos e inversión detallados en la
                 cotización personalizada aceptada por el Cliente, la cual
                 forma parte integral de este contrato.
               </p>
@@ -77,8 +77,8 @@ export default function ContratoPage() {
               </h2>
               <p>
                 La prestación del servicio sigue el proceso de biwov:
-                Diagnóstico, Diseño del Ecosistema, Implementación,
-                Automatización y Escalamiento. Los tiempos de entrega se
+                Diagnóstico, Diseño del plan, Implementación, Automatización
+                y Escalamiento. Los tiempos de entrega se
                 acuerdan en el diagnóstico inicial y dependen de la entrega
                 oportuna de información e insumos por parte del Cliente.
               </p>

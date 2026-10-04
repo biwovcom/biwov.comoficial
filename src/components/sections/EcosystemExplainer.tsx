@@ -17,12 +17,12 @@ const CENTRO = { x: 200, y: 200 };
 
 export function EcosystemExplainer() {
   return (
-    <section id="ecosistema-digital" className="py-24 md:py-32">
+    <section id="como-conectamos-todo" className="py-24 md:py-32">
       <Container>
         <SectionHeading
-          eyebrow="¿Qué es un Ecosistema Digital?"
+          eyebrow="¿Cómo funciona?"
           title="Todo conectado. Nada aislado."
-          description="Un Ecosistema Digital Inteligente es un sistema donde todas las herramientas trabajan conectadas para atraer clientes, vender más y automatizar procesos."
+          description="Conectamos tus redes, tu WhatsApp, tu página web y tus ventas para que se hablen entre sí — como un solo equipo trabajando para ti, sin que tengas que conectar nada a mano."
         />
 
         <div className="mx-auto mt-16 max-w-md">
@@ -81,10 +81,10 @@ export function EcosystemExplainer() {
                 fontWeight={600}
                 fill="#FFFFFF"
               >
-                Ecosistema
+                Tu negocio
               </text>
               <text x={CENTRO.x} y={CENTRO.y + 12} textAnchor="middle" fontSize={12} fontWeight={600} fill="#FFFFFF">
-                Digital
+                conectado
               </text>
             </motion.g>
 
@@ -107,8 +107,8 @@ export function EcosystemExplainer() {
           En palabras simples: en vez de contratar por separado un
           community manager, una página web, un CRM y automatizaciones que
           nunca se hablan entre sí, biwov te entrega todo eso funcionando
-          como <span className="text-white">un solo sistema</span>. Eso es
-          un Ecosistema Digital.
+          como <span className="text-white">un solo equipo</span>. Eso es
+          tener todo conectado.
         </motion.p>
       </Container>
     </section>

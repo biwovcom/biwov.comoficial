@@ -18,21 +18,21 @@ const museoModerno = MuseoModerno({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://biwov.com"),
-  title: "biwov — Ecosistemas Digitales Inteligentes",
+  title: "biwov — Todo tu negocio conectado",
   description:
-    "biwov diseña Ecosistemas Digitales Inteligentes: marketing, ventas, automatización e inteligencia artificial conectados para que tu negocio crezca de forma organizada y escalable.",
+    "biwov conecta tus redes, tu WhatsApp, tus ventas y la inteligencia artificial en un solo sistema, para que tu negocio venda más sin que tengas que hacerlo todo tú.",
   keywords: [
-    "ecosistema digital",
-    "transformación digital",
+    "negocio conectado",
     "automatización",
     "CRM",
     "marketing digital",
+    "ventas por WhatsApp",
     "biwov",
   ],
   openGraph: {
-    title: "biwov — Ecosistemas Digitales Inteligentes",
+    title: "biwov — Todo tu negocio conectado",
     description:
-      "No vendemos servicios aislados. Diseñamos sistemas donde cada herramienta trabaja en conjunto para atraer clientes, automatizar procesos y aumentar las ventas.",
+      "No vendemos servicios sueltos. Conectamos tus herramientas para que trabajen juntas: atraer clientes, venderles y automatizar lo repetitivo.",
     url: "https://biwov.com",
     siteName: "biwov",
     locale: "es_CO",
@@ -40,9 +40,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "biwov — Ecosistemas Digitales Inteligentes",
+    title: "biwov — Todo tu negocio conectado",
     description:
-      "Diseñamos Ecosistemas Digitales Inteligentes para que tu negocio crezca con procesos organizados y escalables.",
+      "Conectamos tus redes, tu WhatsApp y tus ventas para que tu negocio crezca sin que tengas que hacerlo todo tú.",
   },
 };
 

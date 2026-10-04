@@ -13,7 +13,7 @@ export const PASOS_PROCESO: PasoProceso[] = [
   },
   {
     numero: 2,
-    titulo: "Diseñamos el Ecosistema",
+    titulo: "Armamos el plan",
     descripcion:
       "Definimos qué piezas necesitas y cómo se van a conectar entre sí.",
   },
@@ -33,6 +33,6 @@ export const PASOS_PROCESO: PasoProceso[] = [
     numero: 5,
     titulo: "Escalamos",
     descripcion:
-      "Medimos, optimizamos y hacemos crecer el ecosistema junto con tu negocio.",
+      "Medimos, optimizamos y hacemos crecer todo junto con tu negocio.",
   },
 ];
