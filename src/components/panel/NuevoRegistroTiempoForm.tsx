@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
+import { CronometroTiempo } from "@/components/panel/CronometroTiempo";
 import { CATEGORIAS_TIEMPO_SUGERIDAS, type NuevoRegistroTiempoInput } from "@/lib/panel/tiempo";
 
 const HOY = () => new Date().toISOString().slice(0, 10);
@@ -52,10 +53,21 @@ export function NuevoRegistroTiempoForm() {
   };
 
   return (
-    <GlassCard className="p-6">
+    <div className="space-y-4">
+      <CronometroTiempo
+        onFinalizar={({ categoria, proyecto, horas }) =>
+          setForm((prev) => ({ ...prev, categoria, proyecto, horas, fecha: HOY() }))
+        }
+      />
+
+      <GlassCard className="p-6">
       <h2 className="text-sm font-semibold uppercase tracking-wide text-text-secondary">
         Registrar tiempo
       </h2>
+      <p className="mt-1 text-xs text-text-secondary">
+        Al finalizar el cronómetro, las horas llegan aquí — revísalas o ajústalas antes de guardar
+        si olvidaste pausarlo.
+      </p>
       <form onSubmit={guardar} className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <div>
           <Label htmlFor="fecha">Fecha</Label>
@@ -121,6 +133,7 @@ export function NuevoRegistroTiempoForm() {
           </Button>
         </div>
       </form>
-    </GlassCard>
+      </GlassCard>
+    </div>
   );
 }
