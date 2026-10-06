@@ -30,6 +30,9 @@ export function Footer() {
           <Link href="/contrato" className="hover:text-white">
             Términos y condiciones
           </Link>
+          <Link href="/politica-datos" className="hover:text-white">
+            Política de datos
+          </Link>
           <a
             href={linkWhatsApp(WHATSAPP_BIWOV, MENSAJE_WHATSAPP_BIWOV)}
             target="_blank"

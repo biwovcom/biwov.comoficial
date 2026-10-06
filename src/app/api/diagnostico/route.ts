@@ -15,7 +15,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Supabase no está configurado" }, { status: 500 });
   }
 
-  const body: { prospectoId: string; respuestas: RespuestasFiltro } = await request.json();
+  const body: { prospectoId: string; respuestas: RespuestasFiltro; autorizaDatos?: boolean } =
+    await request.json();
 
   if (!body.prospectoId || !respuestasCompletas(body.respuestas)) {
     return NextResponse.json({ error: "Faltan respuestas" }, { status: 400 });
@@ -29,6 +30,13 @@ export async function POST(request: Request) {
 
   if (errorProspecto || !prospecto) {
     return NextResponse.json({ error: "Prospecto no encontrado" }, { status: 404 });
+  }
+
+  if (!prospecto.acepto_tratamiento_datos && !body.autorizaDatos) {
+    return NextResponse.json(
+      { error: "Debes autorizar el tratamiento de tus datos para continuar" },
+      { status: 400 },
+    );
   }
 
   const moneda = monedaDesdePais(prospecto.pais);
@@ -47,7 +55,14 @@ export async function POST(request: Request) {
 
   const { error: errorUpdate } = await supabase
     .from("prospectos")
-    .update({ paso_actual: "filtro", semaforo })
+    .update({
+      paso_actual: "filtro",
+      semaforo,
+      ...(!prospecto.acepto_tratamiento_datos && {
+        acepto_tratamiento_datos: true,
+        acepto_tratamiento_datos_en: new Date().toISOString(),
+      }),
+    })
     .eq("id", body.prospectoId);
 
   if (errorUpdate) {

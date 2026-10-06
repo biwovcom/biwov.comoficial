@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, ArrowLeft } from "lucide-react";
 import { useQuoter } from "./QuoterProvider";
@@ -47,6 +48,7 @@ export function QuoterModal() {
   const [numero, setNumero] = useState("");
   const [respuestas, setRespuestas] = useState<RespuestasFiltro>({});
   const [prospectoId, setProspectoId] = useState<string | null>(null);
+  const [autorizaDatos, setAutorizaDatos] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -57,6 +59,7 @@ export function QuoterModal() {
     setNumero("");
     setRespuestas({});
     setProspectoId(null);
+    setAutorizaDatos(false);
     setError(null);
   };
 
@@ -65,7 +68,7 @@ export function QuoterModal() {
     setTimeout(reset, 300);
   };
 
-  const contactoValido = Boolean(contacto.nombre && numero.trim() && contacto.email);
+  const contactoValido = Boolean(contacto.nombre && numero.trim() && contacto.email && autorizaDatos);
   const moneda = monedaDesdePais(contacto.pais);
   const plan = PLANES.find((p) => p.id === planSugerido(respuestas)) ?? PLANES[0];
 
@@ -81,7 +84,11 @@ export function QuoterModal() {
       const res = await fetch("/api/diagnostico/prospecto", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...contacto, whatsapp: `${codigoPais} ${numero.trim()}` }),
+        body: JSON.stringify({
+          ...contacto,
+          whatsapp: `${codigoPais} ${numero.trim()}`,
+          autorizaDatos,
+        }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => null);
@@ -230,6 +237,25 @@ export function QuoterModal() {
                       onChange={(e) => setContacto((c) => ({ ...c, email: e.target.value }))}
                     />
                   </div>
+                  <label className="flex items-start gap-2.5 text-sm text-text-secondary">
+                    <input
+                      type="checkbox"
+                      checked={autorizaDatos}
+                      onChange={(e) => setAutorizaDatos(e.target.checked)}
+                      className="mt-0.5 h-4 w-4 shrink-0 accent-accent"
+                    />
+                    <span>
+                      Autorizo el tratamiento de mis datos personales según la{" "}
+                      <Link
+                        href="/politica-datos"
+                        target="_blank"
+                        className="text-accent underline hover:text-white"
+                      >
+                        política de tratamiento de datos
+                      </Link>
+                      .
+                    </span>
+                  </label>
                 </div>
 
                 {error && <p className="mt-4 text-sm text-red-400">{error}</p>}

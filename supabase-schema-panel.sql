@@ -437,3 +437,11 @@ alter table registros_tiempo enable row level security;
 drop policy if exists "equipo autenticado - todo" on registros_tiempo;
 create policy "equipo autenticado - todo" on registros_tiempo
   for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+-- =========================================================
+-- AUTORIZACIÓN DE TRATAMIENTO DE DATOS
+-- Queda registrado cuándo un prospecto autorizó, desde un formulario
+-- público, el uso de sus datos personales (Ley 1581 de 2012 - Colombia).
+-- =========================================================
+alter table prospectos add column if not exists acepto_tratamiento_datos boolean not null default false;
+alter table prospectos add column if not exists acepto_tratamiento_datos_en timestamptz;

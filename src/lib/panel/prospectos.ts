@@ -84,6 +84,8 @@ export interface Prospecto {
   nicho_mercado: string | null;
   seguimiento: string | null;
   fecha_ultimo_seguimiento: string | null;
+  acepto_tratamiento_datos: boolean;
+  acepto_tratamiento_datos_en: string | null;
 }
 
 export interface NuevoProspectoInput {

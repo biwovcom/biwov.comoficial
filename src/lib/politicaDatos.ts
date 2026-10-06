@@ -1,0 +1,1 @@
+export const VERSION_POLITICA_DATOS = "2026-10-07-v1";

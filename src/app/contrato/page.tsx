@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
-import { ImprimirButton } from "./ImprimirButton";
+import { ImprimirButton } from "@/components/ui/ImprimirButton";
 import { VERSION_CONTRATO } from "@/lib/contrato";
 
 export const metadata: Metadata = {

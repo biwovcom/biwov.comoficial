@@ -20,10 +20,17 @@ export async function POST(request: Request) {
     email: string;
     pais?: string;
     ciudad?: string;
+    autorizaDatos?: boolean;
   } = await request.json();
 
   if (!body.nombre?.trim() || !body.whatsapp?.trim() || !body.email?.trim()) {
     return NextResponse.json({ error: "Nombre, WhatsApp y correo son obligatorios" }, { status: 400 });
+  }
+  if (!body.autorizaDatos) {
+    return NextResponse.json(
+      { error: "Debes autorizar el tratamiento de tus datos para continuar" },
+      { status: 400 },
+    );
   }
 
   const { data, error } = await supabase
@@ -37,6 +44,8 @@ export async function POST(request: Request) {
       pais: body.pais?.trim() || null,
       ciudad: body.ciudad?.trim() || null,
       canal_origen: "pagina-web",
+      acepto_tratamiento_datos: true,
+      acepto_tratamiento_datos_en: new Date().toISOString(),
     })
     .select("id")
     .single();

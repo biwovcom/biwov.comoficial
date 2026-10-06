@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { PreguntasFiltro } from "@/components/panel/PreguntasFiltro";
 import { respuestasCompletas, type RespuestasFiltro } from "@/lib/panel/filtroRapido";
@@ -14,6 +15,7 @@ export function DiagnosticoPublicoForm({
   moneda: Moneda;
 }) {
   const [respuestas, setRespuestas] = useState<RespuestasFiltro>({});
+  const [autorizaDatos, setAutorizaDatos] = useState(false);
   const [enviado, setEnviado] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -23,13 +25,17 @@ export function DiagnosticoPublicoForm({
 
   const enviar = async () => {
     if (!respuestasCompletas(respuestas)) return;
+    if (!autorizaDatos) {
+      setError("Debes autorizar el tratamiento de tus datos para continuar.");
+      return;
+    }
     setEnviando(true);
     setError(null);
     try {
       const res = await fetch("/api/diagnostico", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prospectoId, respuestas }),
+        body: JSON.stringify({ prospectoId, respuestas, autorizaDatos }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => null);
@@ -65,6 +71,25 @@ export function DiagnosticoPublicoForm({
         error={error}
         labelBoton="Enviar mis respuestas"
       />
+      <label className="mt-5 flex items-start gap-2.5 text-sm text-text-secondary">
+        <input
+          type="checkbox"
+          checked={autorizaDatos}
+          onChange={(e) => setAutorizaDatos(e.target.checked)}
+          className="mt-0.5 h-4 w-4 shrink-0 accent-accent"
+        />
+        <span>
+          Autorizo el tratamiento de mis datos personales según la{" "}
+          <Link
+            href="/politica-datos"
+            target="_blank"
+            className="text-accent underline hover:text-white"
+          >
+            política de tratamiento de datos
+          </Link>
+          .
+        </span>
+      </label>
     </GlassCard>
   );
 }
