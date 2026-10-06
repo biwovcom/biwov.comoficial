@@ -4,7 +4,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, ArrowLeft } from "lucide-react";
 import { useQuoter } from "./QuoterProvider";
-import { ProgressBar } from "./ProgressBar";
+import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Button } from "@/components/ui/Button";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Input, Label } from "@/components/ui/Input";
@@ -247,28 +247,16 @@ export function QuoterModal() {
 
             {vista === "filtro" && (
               <div>
-                <ProgressBar step={1} total={2} />
-                <h3 className="mt-6 mb-6 text-xl font-semibold text-white">
-                  Cuéntanos sobre tu negocio
-                </h3>
-                <div className="space-y-6">
-                  <PreguntasFiltro
-                    respuestas={respuestas}
-                    update={(patch) => setRespuestas((prev) => ({ ...prev, ...patch }))}
-                    moneda={moneda}
-                  />
-                </div>
-
-                {error && <p className="mt-4 text-sm text-red-400">{error}</p>}
-
-                <Button
-                  size="lg"
-                  className="mt-8 w-full"
-                  disabled={!respuestasCompletas(respuestas) || enviando}
-                  onClick={enviarFiltro}
-                >
-                  {enviando ? "Enviando..." : "Enviar mi información"}
-                </Button>
+                <h3 className="mb-6 text-xl font-semibold text-white">Cuéntanos sobre tu negocio</h3>
+                <PreguntasFiltro
+                  respuestas={respuestas}
+                  update={(patch) => setRespuestas((prev) => ({ ...prev, ...patch }))}
+                  moneda={moneda}
+                  onSubmit={enviarFiltro}
+                  enviando={enviando}
+                  error={error}
+                  labelBoton="Enviar mi información"
+                />
               </div>
             )}
 

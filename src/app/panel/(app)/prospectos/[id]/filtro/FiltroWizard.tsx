@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { GlassCard } from "@/components/ui/GlassCard";
-import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { PreguntasFiltro } from "@/components/panel/PreguntasFiltro";
 import { MensajeSugeridoWhatsApp } from "@/components/panel/MensajeSugeridoWhatsApp";
@@ -96,19 +95,16 @@ export function FiltroWizard({
   }
 
   return (
-    <GlassCard className="max-w-2xl space-y-6 p-8">
-      <PreguntasFiltro respuestas={respuestas} update={update} moneda={moneda} />
-
-      {error && <p className="text-sm text-red-400">{error}</p>}
-
-      <Button
-        size="lg"
-        className="w-full"
-        disabled={!respuestasCompletas(respuestas) || enviando}
-        onClick={calcular}
-      >
-        {enviando ? "Calculando..." : "Calcular semáforo"}
-      </Button>
+    <GlassCard className="max-w-2xl p-8">
+      <PreguntasFiltro
+        respuestas={respuestas}
+        update={update}
+        moneda={moneda}
+        onSubmit={calcular}
+        enviando={enviando}
+        error={error}
+        labelBoton="Calcular semáforo"
+      />
     </GlassCard>
   );
 }

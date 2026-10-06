@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { GlassCard } from "@/components/ui/GlassCard";
-import { Button } from "@/components/ui/Button";
 import { PreguntasFiltro } from "@/components/panel/PreguntasFiltro";
 import { respuestasCompletas, type RespuestasFiltro } from "@/lib/panel/filtroRapido";
 import type { Moneda } from "@/lib/panel/panelConfig";
@@ -56,19 +55,16 @@ export function DiagnosticoPublicoForm({
   }
 
   return (
-    <GlassCard className="space-y-6 p-8">
-      <PreguntasFiltro respuestas={respuestas} update={update} moneda={moneda} />
-
-      {error && <p className="text-sm text-red-400">{error}</p>}
-
-      <Button
-        size="lg"
-        className="w-full"
-        disabled={!respuestasCompletas(respuestas) || enviando}
-        onClick={enviar}
-      >
-        {enviando ? "Enviando..." : "Enviar mis respuestas"}
-      </Button>
+    <GlassCard className="p-8">
+      <PreguntasFiltro
+        respuestas={respuestas}
+        update={update}
+        moneda={moneda}
+        onSubmit={enviar}
+        enviando={enviando}
+        error={error}
+        labelBoton="Enviar mis respuestas"
+      />
     </GlassCard>
   );
 }
