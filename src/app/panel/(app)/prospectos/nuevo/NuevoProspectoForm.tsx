@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { AlertTriangle } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
@@ -9,6 +11,7 @@ import { Select } from "@/components/ui/Select";
 import { PhoneInput } from "@/components/ui/PhoneInput";
 import { PAISES } from "@/lib/panel/paises";
 import { NOMBRES_CATEGORIA, type NuevoProspectoInput } from "@/lib/panel/prospectos";
+import { detectarDuplicados, type ProspectoResumen } from "@/lib/panel/duplicados";
 
 const CANALES_ORIGEN = [
   { id: "instagram", label: "Instagram" },
@@ -30,6 +33,23 @@ export function NuevoProspectoForm() {
   const [numero, setNumero] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [guardando, setGuardando] = useState(false);
+  const [existentes, setExistentes] = useState<ProspectoResumen[]>([]);
+
+  useEffect(() => {
+    fetch("/api/panel/prospectos/resumen")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => setExistentes(data?.prospectos ?? []))
+      .catch(() => {});
+  }, []);
+
+  const duplicados = useMemo(
+    () =>
+      detectarDuplicados(
+        { nombre: form.nombre, whatsapp: numero ? `${codigoPais} ${numero}` : "", email: form.email },
+        existentes,
+      ),
+    [form.nombre, form.email, codigoPais, numero, existentes],
+  );
 
   const zonaHoraria = PAISES.find((p) => p.pais === form.pais)?.zonaHoraria;
 
@@ -200,6 +220,30 @@ export function NuevoProspectoForm() {
             onChange={(e) => update({ notas: e.target.value })}
           />
         </div>
+
+        {duplicados.length > 0 && (
+          <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-4">
+            <p className="flex items-center gap-2 text-sm font-semibold text-amber-300">
+              <AlertTriangle size={16} />
+              Posible prospecto repetido
+            </p>
+            <ul className="mt-2 space-y-1.5">
+              {duplicados.map((d, i) => (
+                <li key={`${d.prospecto.id}-${d.campo}-${i}`} className="text-sm text-amber-200/90">
+                  Mismo <strong>{d.campo}</strong> que{" "}
+                  <Link
+                    href={`/panel/prospectos/${d.prospecto.id}`}
+                    target="_blank"
+                    className="underline hover:text-white"
+                  >
+                    {d.prospecto.nombre}
+                  </Link>{" "}
+                  — revisa si ya habías hablado con esta persona.
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {error && <p className="text-sm text-red-400">{error}</p>}
 
