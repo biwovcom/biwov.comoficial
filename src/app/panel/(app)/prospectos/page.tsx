@@ -13,7 +13,6 @@ import {
   ESTILO_SEGUIMIENTO,
   NOMBRES_CATEGORIA,
   NOMBRES_PASO,
-  NOMBRES_SEGUIMIENTO,
   type Categoria,
   type Prospecto,
 } from "@/lib/panel/prospectos";
@@ -186,11 +185,11 @@ export default async function ProspectosPage({
                       <span
                         className={cn(
                           "mt-1 flex w-fit items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold",
-                          ESTILO_SEGUIMIENTO[p.seguimiento],
+                          ESTILO_SEGUIMIENTO,
                         )}
                       >
                         <AlertTriangle size={11} />
-                        {NOMBRES_SEGUIMIENTO[p.seguimiento]}
+                        {p.seguimiento}
                       </span>
                     )}
                   </Link>

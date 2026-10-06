@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Select } from "@/components/ui/Select";
 import { Input, Label } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { NOMBRES_CATEGORIA, NOMBRES_SEGUIMIENTO, type Categoria, type Seguimiento } from "@/lib/panel/prospectos";
+import { NOMBRES_CATEGORIA, SEGUIMIENTO_SUGERIDO, type Categoria } from "@/lib/panel/prospectos";
 
 export function EditarClasificacion({
   prospectoId,
@@ -16,12 +16,12 @@ export function EditarClasificacion({
   prospectoId: string;
   categoriaInicial: Categoria | null;
   nichoMercadoInicial: string | null;
-  seguimientoInicial: Seguimiento | null;
+  seguimientoInicial: string | null;
 }) {
   const router = useRouter();
   const [categoria, setCategoria] = useState<Categoria>(categoriaInicial ?? "contacto");
   const [nicho, setNicho] = useState(nichoMercadoInicial ?? "");
-  const [seguimiento, setSeguimiento] = useState<Seguimiento | "">(seguimientoInicial ?? "");
+  const [seguimiento, setSeguimiento] = useState(seguimientoInicial ?? "");
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,12 +31,13 @@ export function EditarClasificacion({
     const res = await fetch(`/api/panel/prospectos/${prospectoId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ categoria, nichoMercado: nicho, seguimiento: seguimiento || null }),
+      body: JSON.stringify({ categoria, nichoMercado: nicho, seguimiento }),
     });
     setGuardando(false);
 
     if (!res.ok) {
-      setError("No se pudo guardar.");
+      const data = await res.json().catch(() => null);
+      setError(data?.error ?? "No se pudo guardar.");
       return;
     }
     router.refresh();
@@ -69,18 +70,18 @@ export function EditarClasificacion({
       </div>
       <div className="sm:col-span-2">
         <Label htmlFor="seguimiento">Alerta de seguimiento</Label>
-        <Select
+        <Input
           id="seguimiento"
+          list="seguimiento-sugerido"
+          placeholder="Ej: Pendiente enviar cotización (déjalo vacío para quitar la alerta)"
           value={seguimiento}
-          onChange={(e) => setSeguimiento(e.target.value as Seguimiento | "")}
-        >
-          <option value="">Sin alerta</option>
-          {Object.entries(NOMBRES_SEGUIMIENTO).map(([valor, etiqueta]) => (
-            <option key={valor} value={valor}>
-              {etiqueta}
-            </option>
+          onChange={(e) => setSeguimiento(e.target.value)}
+        />
+        <datalist id="seguimiento-sugerido">
+          {SEGUIMIENTO_SUGERIDO.map((s) => (
+            <option key={s} value={s} />
           ))}
-        </Select>
+        </datalist>
       </div>
       <div className="sm:col-span-2">
         {error && <p className="mb-2 text-sm text-red-400">{error}</p>}
