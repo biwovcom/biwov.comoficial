@@ -2,27 +2,14 @@ import Link from "next/link";
 import { AlertTriangle } from "lucide-react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
-import { Table, TableHead, TableBody, Th, Tr, Td } from "@/components/ui/Table";
 import { cn } from "@/lib/utils";
-import { linkWhatsApp } from "@/lib/panel/whatsapp";
 import { FiltroNicho } from "@/components/panel/FiltroNicho";
 import { BuscarProspecto } from "@/components/panel/BuscarProspecto";
-import {
-  BADGE_VARIANTE_CATEGORIA,
-  ESTILO_SEGUIMIENTO,
-  NOMBRES_CATEGORIA,
-  NOMBRES_PASO,
-  type Categoria,
-  type Prospecto,
-} from "@/lib/panel/prospectos";
-import { diasDesde, estaVencido } from "@/lib/panel/seguimiento";
+import { TablaProspectos } from "@/components/panel/TablaProspectos";
+import { type Categoria, type Prospecto } from "@/lib/panel/prospectos";
+import { estaVencido } from "@/lib/panel/seguimiento";
 
 export const dynamic = "force-dynamic";
-
-function celda(valor: string | null): string {
-  return valor && valor.trim() !== "" ? valor : "—";
-}
 
 const TABS: { id: Categoria | "todos"; label: string }[] = [
   { id: "todos", label: "Todos" },
@@ -57,10 +44,10 @@ export default async function ProspectosPage({
     .order("created_at", { ascending: false })
     .returns<{ prospecto_id: string; razon: string; created_at: string }[]>();
 
-  const razonPorProspecto = new Map<string, string>();
+  const razonPorProspecto: Record<string, string> = {};
   for (const f of filtros ?? []) {
-    if (!razonPorProspecto.has(f.prospecto_id)) {
-      razonPorProspecto.set(f.prospecto_id, f.razon);
+    if (!(f.prospecto_id in razonPorProspecto)) {
+      razonPorProspecto[f.prospecto_id] = f.razon;
     }
   }
 
@@ -181,97 +168,7 @@ export default async function ProspectosPage({
       </div>
 
       <div className="mt-6">
-        <Table>
-          <TableHead>
-            <Th>Fecha</Th>
-            <Th>Nombre</Th>
-            <Th>Negocio</Th>
-            <Th>Nicho</Th>
-            <Th>WhatsApp</Th>
-            <Th>Etiqueta</Th>
-            <Th>Semáforo</Th>
-            <Th>Resumen del filtro</Th>
-            <Th>Paso</Th>
-          </TableHead>
-          <TableBody>
-            {lista.length === 0 && (
-              <Tr>
-                <Td colSpan={9} className="py-8 text-center text-text-secondary">
-                  No hay registros en esta categoría.
-                </Td>
-              </Tr>
-            )}
-            {lista.map((p) => (
-              <Tr key={p.id} className="hover:bg-white/[0.03]">
-                <Td>
-                  <Link href={`/panel/prospectos/${p.id}`} className="block">
-                    {new Date(p.created_at).toLocaleDateString("es-CO")}
-                  </Link>
-                </Td>
-                <Td>
-                  <Link href={`/panel/prospectos/${p.id}`} className="block">
-                    <span className="font-medium text-white">{p.nombre}</span>
-                    {p.seguimiento && (
-                      <span
-                        className={cn(
-                          "mt-1 flex w-fit items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold",
-                          estaVencido(p.seguimiento, p.fecha_ultimo_seguimiento)
-                            ? "border-red-500/50 bg-red-500/15 text-red-300"
-                            : ESTILO_SEGUIMIENTO,
-                        )}
-                      >
-                        <AlertTriangle size={11} />
-                        {p.seguimiento}
-                        {(() => {
-                          const dias = diasDesde(p.fecha_ultimo_seguimiento);
-                          return dias !== null ? ` · hace ${dias}d` : "";
-                        })()}
-                      </span>
-                    )}
-                  </Link>
-                </Td>
-                <Td>{celda(p.empresa)}</Td>
-                <Td>{celda(p.nicho_mercado)}</Td>
-                <Td>
-                  <a
-                    href={linkWhatsApp(p.whatsapp)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-accent hover:underline"
-                  >
-                    {p.whatsapp}
-                  </a>
-                </Td>
-                <Td>
-                  {p.categoria ? (
-                    <Badge variant={BADGE_VARIANTE_CATEGORIA[p.categoria]}>
-                      {NOMBRES_CATEGORIA[p.categoria]}
-                    </Badge>
-                  ) : (
-                    "—"
-                  )}
-                </Td>
-                <Td>
-                  {p.semaforo ? (
-                    <Badge variant={p.semaforo}>
-                      {p.semaforo === "verde" ? "🟢" : p.semaforo === "amarillo" ? "🟡" : "🔴"}
-                    </Badge>
-                  ) : (
-                    "—"
-                  )}
-                </Td>
-                <Td className="max-w-[240px]">
-                  <span className="line-clamp-2 text-xs text-text-secondary">
-                    {razonPorProspecto.get(p.id) ?? "—"}
-                  </span>
-                </Td>
-                <Td>
-                  <Badge>{NOMBRES_PASO[p.paso_actual]}</Badge>
-                </Td>
-              </Tr>
-            ))}
-          </TableBody>
-        </Table>
+        <TablaProspectos lista={lista} razonPorProspecto={razonPorProspecto} />
       </div>
     </div>
   );
