@@ -71,7 +71,13 @@ export default async function ProspectosPage({
     .filter((p) => !nicho || p.nicho_mercado === nicho)
     .filter((p) => !soloAlerta || Boolean(p.seguimiento))
     .filter((p) => !soloVencido || estaVencido(p.seguimiento, p.fecha_ultimo_seguimiento))
-    .filter((p) => !busqueda || p.nombre.toLowerCase().includes(busqueda));
+    .filter(
+      (p) =>
+        !busqueda ||
+        p.nombre.toLowerCase().includes(busqueda) ||
+        (p.empresa?.toLowerCase().includes(busqueda) ?? false) ||
+        (p.redes_sociales?.toLowerCase().includes(busqueda) ?? false),
+    );
   const base = nicho ? todos.filter((p) => p.nicho_mercado === nicho) : todos;
   const conAlertaTotal = base.filter((p) => p.seguimiento).length;
   const vencidosTotal = base.filter((p) => estaVencido(p.seguimiento, p.fecha_ultimo_seguimiento)).length;

@@ -141,17 +141,20 @@ export function TablaProspectos({
                   {p.seguimiento && (
                     <span
                       className={cn(
-                        "mt-1 flex w-fit items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold",
+                        "mt-1 flex max-w-[170px] items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] font-medium",
                         estaVencido(p.seguimiento, p.fecha_ultimo_seguimiento)
                           ? "border-red-500/50 bg-red-500/15 text-red-300"
                           : ESTILO_SEGUIMIENTO,
                       )}
+                      title={p.seguimiento}
                     >
-                      <AlertTriangle size={11} />
-                      {p.seguimiento}
+                      <AlertTriangle size={10} className="shrink-0" />
+                      <span className="min-w-0 truncate">{p.seguimiento}</span>
                       {(() => {
                         const dias = diasDesde(p.fecha_ultimo_seguimiento);
-                        return dias !== null ? ` · hace ${dias}d` : "";
+                        return dias !== null ? (
+                          <span className="shrink-0 whitespace-nowrap">· {dias}d</span>
+                        ) : null;
                       })()}
                     </span>
                   )}
