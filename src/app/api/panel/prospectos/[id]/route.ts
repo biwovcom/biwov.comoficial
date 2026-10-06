@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import type { Categoria } from "@/lib/panel/prospectos";
+import type { Categoria, Seguimiento } from "@/lib/panel/prospectos";
 
 const CATEGORIAS_VALIDAS: Categoria[] = ["contacto", "lead", "prospecto", "cliente"];
+const SEGUIMIENTOS_VALIDOS: Seguimiento[] = ["pendiente_escribir", "pendiente_info", "interesado"];
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -15,7 +16,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
-  const body: { categoria?: Categoria; nichoMercado?: string } = await request.json();
+  const body: { categoria?: Categoria; nichoMercado?: string; seguimiento?: Seguimiento | null } =
+    await request.json();
   const patch: Record<string, string | null> = {};
 
   if (body.categoria !== undefined) {
@@ -26,6 +28,12 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
   if (body.nichoMercado !== undefined) {
     patch.nicho_mercado = body.nichoMercado.trim() || null;
+  }
+  if (body.seguimiento !== undefined) {
+    if (body.seguimiento !== null && !SEGUIMIENTOS_VALIDOS.includes(body.seguimiento)) {
+      return NextResponse.json({ error: "Seguimiento inválido" }, { status: 400 });
+    }
+    patch.seguimiento = body.seguimiento;
   }
 
   if (Object.keys(patch).length === 0) {

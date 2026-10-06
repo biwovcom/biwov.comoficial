@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AlertTriangle } from "lucide-react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -6,10 +7,13 @@ import { Table, TableHead, TableBody, Th, Tr, Td } from "@/components/ui/Table";
 import { cn } from "@/lib/utils";
 import { linkWhatsApp } from "@/lib/panel/whatsapp";
 import { FiltroNicho } from "@/components/panel/FiltroNicho";
+import { BuscarProspecto } from "@/components/panel/BuscarProspecto";
 import {
   BADGE_VARIANTE_CATEGORIA,
+  ESTILO_SEGUIMIENTO,
   NOMBRES_CATEGORIA,
   NOMBRES_PASO,
+  NOMBRES_SEGUIMIENTO,
   type Categoria,
   type Prospecto,
 } from "@/lib/panel/prospectos";
@@ -31,9 +35,9 @@ const TABS: { id: Categoria | "todos"; label: string }[] = [
 export default async function ProspectosPage({
   searchParams,
 }: {
-  searchParams: Promise<{ categoria?: string; nicho?: string }>;
+  searchParams: Promise<{ categoria?: string; nicho?: string; alerta?: string; q?: string }>;
 }) {
-  const { categoria, nicho } = await searchParams;
+  const { categoria, nicho, alerta, q } = await searchParams;
   const supabase = await createSupabaseServerClient();
   const { data: prospectos } = await supabase
     .from("prospectos")
@@ -66,9 +70,16 @@ export default async function ProspectosPage({
     categoria === "cliente"
       ? categoria
       : "todos";
+  const soloAlerta = alerta === "1";
+  const busqueda = q?.trim().toLowerCase() ?? "";
   const lista = todos
     .filter((p) => tabActiva === "todos" || p.categoria === tabActiva)
-    .filter((p) => !nicho || p.nicho_mercado === nicho);
+    .filter((p) => !nicho || p.nicho_mercado === nicho)
+    .filter((p) => !soloAlerta || Boolean(p.seguimiento))
+    .filter((p) => !busqueda || p.nombre.toLowerCase().includes(busqueda));
+  const conAlertaTotal = (nicho ? todos.filter((p) => p.nicho_mercado === nicho) : todos).filter(
+    (p) => p.seguimiento,
+  ).length;
 
   return (
     <div>
@@ -80,9 +91,12 @@ export default async function ProspectosPage({
             mezclar fríos con los que ya son clientes.
           </p>
         </div>
-        <Link href="/panel/prospectos/nuevo">
-          <Button>Nuevo prospecto</Button>
-        </Link>
+        <div className="flex flex-wrap items-center gap-3">
+          <BuscarProspecto />
+          <Link href="/panel/prospectos/nuevo">
+            <Button>Nuevo prospecto</Button>
+          </Link>
+        </div>
       </div>
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
@@ -111,7 +125,30 @@ export default async function ProspectosPage({
             );
           })}
         </div>
-        {nichos.length > 0 && <FiltroNicho nichos={nichos} />}
+        <div className="flex items-center gap-3">
+          {conAlertaTotal > 0 && (
+            <Link
+              href={(() => {
+                const params = new URLSearchParams();
+                if (tabActiva !== "todos") params.set("categoria", tabActiva);
+                if (nicho) params.set("nicho", nicho);
+                if (!soloAlerta) params.set("alerta", "1");
+                const query = params.toString();
+                return `/panel/prospectos${query ? `?${query}` : ""}`;
+              })()}
+              className={cn(
+                "flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-sm transition-colors",
+                soloAlerta
+                  ? "border-amber-500/50 bg-amber-500/15 text-amber-300"
+                  : "border-border-glass bg-white/[0.03] text-text-secondary hover:text-white",
+              )}
+            >
+              <AlertTriangle size={14} />
+              Con alerta ({conAlertaTotal})
+            </Link>
+          )}
+          {nichos.length > 0 && <FiltroNicho nichos={nichos} />}
+        </div>
       </div>
 
       <div className="mt-6">
@@ -143,8 +180,19 @@ export default async function ProspectosPage({
                   </Link>
                 </Td>
                 <Td>
-                  <Link href={`/panel/prospectos/${p.id}`} className="block font-medium text-white">
-                    {p.nombre}
+                  <Link href={`/panel/prospectos/${p.id}`} className="block">
+                    <span className="font-medium text-white">{p.nombre}</span>
+                    {p.seguimiento && (
+                      <span
+                        className={cn(
+                          "mt-1 flex w-fit items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold",
+                          ESTILO_SEGUIMIENTO[p.seguimiento],
+                        )}
+                      >
+                        <AlertTriangle size={11} />
+                        {NOMBRES_SEGUIMIENTO[p.seguimiento]}
+                      </span>
+                    )}
                   </Link>
                 </Td>
                 <Td>{celda(p.empresa)}</Td>

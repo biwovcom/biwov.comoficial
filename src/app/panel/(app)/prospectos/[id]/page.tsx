@@ -1,14 +1,18 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { AlertTriangle } from "lucide-react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Badge } from "@/components/ui/Badge";
 import {
   BADGE_VARIANTE_CATEGORIA,
+  ESTILO_SEGUIMIENTO,
   NOMBRES_CATEGORIA,
   NOMBRES_PASO,
+  NOMBRES_SEGUIMIENTO,
   type Prospecto,
 } from "@/lib/panel/prospectos";
+import { cn } from "@/lib/utils";
 import { resumenRespuestasFiltro, type RespuestasFiltro } from "@/lib/panel/filtroRapido";
 import { monedaDesdePais } from "@/lib/panel/paises";
 import { linkWhatsApp } from "@/lib/panel/whatsapp";
@@ -91,6 +95,17 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
             {prospecto.semaforo === "verde" ? "🟢" : prospecto.semaforo === "amarillo" ? "🟡" : "🔴"}
           </Badge>
         )}
+        {prospecto.seguimiento && (
+          <span
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold",
+              ESTILO_SEGUIMIENTO[prospecto.seguimiento],
+            )}
+          >
+            <AlertTriangle size={13} />
+            {NOMBRES_SEGUIMIENTO[prospecto.seguimiento]}
+          </span>
+        )}
       </div>
 
       <div className="mt-4 flex flex-wrap gap-3">
@@ -171,6 +186,7 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
               prospectoId={prospecto.id}
               categoriaInicial={prospecto.categoria}
               nichoMercadoInicial={prospecto.nicho_mercado}
+              seguimientoInicial={prospecto.seguimiento}
             />
           </div>
         </GlassCard>

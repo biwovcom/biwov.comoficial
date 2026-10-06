@@ -42,6 +42,8 @@ create table if not exists prospectos (
   categoria text default 'contacto'
     check (categoria in ('contacto','lead','prospecto','cliente')),
   nicho_mercado text,
+  seguimiento text
+    check (seguimiento in ('pendiente_escribir','pendiente_info','interesado')),
 
   link_redes_prospecto text,
   que_quiere_resolver text
@@ -54,6 +56,7 @@ alter table prospectos add column if not exists link_redes_prospecto text;
 alter table prospectos add column if not exists que_quiere_resolver text;
 alter table prospectos add column if not exists categoria text default 'contacto';
 alter table prospectos add column if not exists nicho_mercado text;
+alter table prospectos add column if not exists seguimiento text;
 
 -- Por si la tabla ya existía con el check antiguo (sin 'llamada' como paso válido).
 alter table prospectos drop constraint if exists prospectos_paso_actual_check;
@@ -63,6 +66,10 @@ alter table prospectos add constraint prospectos_paso_actual_check
 alter table prospectos drop constraint if exists prospectos_categoria_check;
 alter table prospectos add constraint prospectos_categoria_check
   check (categoria in ('contacto','lead','prospecto','cliente'));
+
+alter table prospectos drop constraint if exists prospectos_seguimiento_check;
+alter table prospectos add constraint prospectos_seguimiento_check
+  check (seguimiento in ('pendiente_escribir','pendiente_info','interesado'));
 
 -- Etiqueta (contacto/lead/prospecto/cliente) de lo que ya existía: a falta de
 -- mejor señal, se infiere del avance que ya tiene en el embudo. Es un punto
