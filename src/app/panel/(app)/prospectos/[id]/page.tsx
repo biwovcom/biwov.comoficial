@@ -12,6 +12,7 @@ import {
   type Prospecto,
 } from "@/lib/panel/prospectos";
 import { cn } from "@/lib/utils";
+import { estaVencido } from "@/lib/panel/seguimiento";
 import { resumenRespuestasFiltro, type RespuestasFiltro } from "@/lib/panel/filtroRapido";
 import { monedaDesdePais } from "@/lib/panel/paises";
 import { linkWhatsApp } from "@/lib/panel/whatsapp";
@@ -98,11 +99,14 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
           <span
             className={cn(
               "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold",
-              ESTILO_SEGUIMIENTO,
+              estaVencido(prospecto.seguimiento, prospecto.fecha_ultimo_seguimiento)
+                ? "border-red-500/50 bg-red-500/15 text-red-300"
+                : ESTILO_SEGUIMIENTO,
             )}
           >
             <AlertTriangle size={13} />
             {prospecto.seguimiento}
+            {estaVencido(prospecto.seguimiento, prospecto.fecha_ultimo_seguimiento) && " · vencido"}
           </span>
         )}
       </div>
@@ -186,6 +190,7 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
               categoriaInicial={prospecto.categoria}
               nichoMercadoInicial={prospecto.nicho_mercado}
               seguimientoInicial={prospecto.seguimiento}
+              fechaUltimoSeguimientoInicial={prospecto.fecha_ultimo_seguimiento}
             />
           </div>
         </GlassCard>

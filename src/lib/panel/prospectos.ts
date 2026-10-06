@@ -1,3 +1,5 @@
+import { NOMBRES_ETAPAS_SEGUIMIENTO } from "./seguimiento";
+
 export type PasoActual =
   | "nuevo"
   | "filtro"
@@ -16,6 +18,11 @@ export type Categoria = "contacto" | "lead" | "prospecto" | "cliente";
  * Alerta de seguimiento manual — independiente del paso del embudo. Es
  * texto libre (como nicho_mercado): estas son solo sugerencias para no
  * escribir desde cero, Kathe puede escribir cualquier otra etiqueta.
+ *
+ * Las que vienen de ETAPAS_SEGUIMIENTO (Primer/Segundo/Tercer/Cuarto
+ * seguimiento y "No dio respuesta") son especiales: si el texto coincide
+ * exactamente con una de ellas, el panel muestra además el plazo, objetivo,
+ * canal y enfoque sugeridos, y calcula si ya está vencida.
  */
 export const SEGUIMIENTO_SUGERIDO = [
   "Pendiente por escribir",
@@ -24,6 +31,7 @@ export const SEGUIMIENTO_SUGERIDO = [
   "Pendiente agendar llamada",
   "Pendiente confirmar pago",
   "Interesado",
+  ...NOMBRES_ETAPAS_SEGUIMIENTO,
 ];
 
 export const NOMBRES_PASO: Record<PasoActual, string> = {
@@ -75,6 +83,7 @@ export interface Prospecto {
   categoria: Categoria | null;
   nicho_mercado: string | null;
   seguimiento: string | null;
+  fecha_ultimo_seguimiento: string | null;
 }
 
 export interface NuevoProspectoInput {

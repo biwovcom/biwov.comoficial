@@ -15,8 +15,12 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
-  const body: { categoria?: Categoria; nichoMercado?: string; seguimiento?: string | null } =
-    await request.json();
+  const body: {
+    categoria?: Categoria;
+    nichoMercado?: string;
+    seguimiento?: string | null;
+    fechaUltimoSeguimiento?: string | null;
+  } = await request.json();
   const patch: Record<string, string | null> = {};
 
   if (body.categoria !== undefined) {
@@ -30,6 +34,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
   if (body.seguimiento !== undefined) {
     patch.seguimiento = body.seguimiento?.trim() || null;
+  }
+  if (body.fechaUltimoSeguimiento !== undefined) {
+    patch.fecha_ultimo_seguimiento = body.fechaUltimoSeguimiento || null;
   }
 
   if (Object.keys(patch).length === 0) {

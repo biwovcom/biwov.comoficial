@@ -43,7 +43,11 @@ create table if not exists prospectos (
     check (categoria in ('contacto','lead','prospecto','cliente')),
   nicho_mercado text,
   -- Alerta de seguimiento: texto libre (como nicho_mercado), no una lista cerrada.
+  -- Si coincide con una de las 5 etapas de la secuencia (Primer/Segundo/Tercer/
+  -- Cuarto seguimiento, No dio respuesta), el panel usa fecha_ultimo_seguimiento
+  -- para calcular hace cuántos días fue y si ya toca el siguiente paso.
   seguimiento text,
+  fecha_ultimo_seguimiento date,
 
   link_redes_prospecto text,
   que_quiere_resolver text
@@ -57,6 +61,7 @@ alter table prospectos add column if not exists que_quiere_resolver text;
 alter table prospectos add column if not exists categoria text default 'contacto';
 alter table prospectos add column if not exists nicho_mercado text;
 alter table prospectos add column if not exists seguimiento text;
+alter table prospectos add column if not exists fecha_ultimo_seguimiento date;
 
 -- Por si la tabla ya existía con el check antiguo (sin 'llamada' como paso válido).
 alter table prospectos drop constraint if exists prospectos_paso_actual_check;

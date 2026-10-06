@@ -16,6 +16,7 @@ import {
   type Categoria,
   type Prospecto,
 } from "@/lib/panel/prospectos";
+import { diasDesde, estaVencido } from "@/lib/panel/seguimiento";
 
 export const dynamic = "force-dynamic";
 
@@ -34,9 +35,15 @@ const TABS: { id: Categoria | "todos"; label: string }[] = [
 export default async function ProspectosPage({
   searchParams,
 }: {
-  searchParams: Promise<{ categoria?: string; nicho?: string; alerta?: string; q?: string }>;
+  searchParams: Promise<{
+    categoria?: string;
+    nicho?: string;
+    alerta?: string;
+    vencido?: string;
+    q?: string;
+  }>;
 }) {
-  const { categoria, nicho, alerta, q } = await searchParams;
+  const { categoria, nicho, alerta, vencido, q } = await searchParams;
   const supabase = await createSupabaseServerClient();
   const { data: prospectos } = await supabase
     .from("prospectos")
@@ -70,15 +77,17 @@ export default async function ProspectosPage({
       ? categoria
       : "todos";
   const soloAlerta = alerta === "1";
+  const soloVencido = vencido === "1";
   const busqueda = q?.trim().toLowerCase() ?? "";
   const lista = todos
     .filter((p) => tabActiva === "todos" || p.categoria === tabActiva)
     .filter((p) => !nicho || p.nicho_mercado === nicho)
     .filter((p) => !soloAlerta || Boolean(p.seguimiento))
+    .filter((p) => !soloVencido || estaVencido(p.seguimiento, p.fecha_ultimo_seguimiento))
     .filter((p) => !busqueda || p.nombre.toLowerCase().includes(busqueda));
-  const conAlertaTotal = (nicho ? todos.filter((p) => p.nicho_mercado === nicho) : todos).filter(
-    (p) => p.seguimiento,
-  ).length;
+  const base = nicho ? todos.filter((p) => p.nicho_mercado === nicho) : todos;
+  const conAlertaTotal = base.filter((p) => p.seguimiento).length;
+  const vencidosTotal = base.filter((p) => estaVencido(p.seguimiento, p.fecha_ultimo_seguimiento)).length;
 
   return (
     <div>
@@ -146,6 +155,27 @@ export default async function ProspectosPage({
               Con alerta ({conAlertaTotal})
             </Link>
           )}
+          {vencidosTotal > 0 && (
+            <Link
+              href={(() => {
+                const params = new URLSearchParams();
+                if (tabActiva !== "todos") params.set("categoria", tabActiva);
+                if (nicho) params.set("nicho", nicho);
+                if (!soloVencido) params.set("vencido", "1");
+                const query = params.toString();
+                return `/panel/prospectos${query ? `?${query}` : ""}`;
+              })()}
+              className={cn(
+                "flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-sm transition-colors",
+                soloVencido
+                  ? "border-red-500/50 bg-red-500/15 text-red-300"
+                  : "border-border-glass bg-white/[0.03] text-text-secondary hover:text-white",
+              )}
+            >
+              <AlertTriangle size={14} />
+              Vencidos ({vencidosTotal})
+            </Link>
+          )}
           {nichos.length > 0 && <FiltroNicho nichos={nichos} />}
         </div>
       </div>
@@ -185,11 +215,17 @@ export default async function ProspectosPage({
                       <span
                         className={cn(
                           "mt-1 flex w-fit items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold",
-                          ESTILO_SEGUIMIENTO,
+                          estaVencido(p.seguimiento, p.fecha_ultimo_seguimiento)
+                            ? "border-red-500/50 bg-red-500/15 text-red-300"
+                            : ESTILO_SEGUIMIENTO,
                         )}
                       >
                         <AlertTriangle size={11} />
                         {p.seguimiento}
+                        {(() => {
+                          const dias = diasDesde(p.fecha_ultimo_seguimiento);
+                          return dias !== null ? ` · hace ${dias}d` : "";
+                        })()}
                       </span>
                     )}
                   </Link>
