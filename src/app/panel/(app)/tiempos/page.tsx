@@ -3,7 +3,7 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { Table, TableHead, TableBody, Th, Tr, Td } from "@/components/ui/Table";
 import { NuevoRegistroTiempoForm } from "@/components/panel/NuevoRegistroTiempoForm";
 import { EliminarRegistroTiempoButton } from "@/components/panel/EliminarRegistroTiempoButton";
-import { resumenPorCategoria, type RegistroTiempo } from "@/lib/panel/tiempo";
+import { resumenPorCategoria, resumenPorProyecto, type RegistroTiempo } from "@/lib/panel/tiempo";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +26,7 @@ export default async function TiemposPage() {
 
   const lista = registros ?? [];
   const resumen = resumenPorCategoria(lista);
+  const resumenProyectos = resumenPorProyecto(lista);
   const totalHoras = lista.reduce((acc, r) => acc + r.horas, 0);
 
   return (
@@ -57,6 +58,27 @@ export default async function TiemposPage() {
                 <p className="text-xs text-text-secondary">
                   promedio · {r.cantidad} registro{r.cantidad === 1 ? "" : "s"} ·{" "}
                   {formatoHoras(r.totalHoras)} en total
+                </p>
+              </GlassCard>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {resumenProyectos.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-text-secondary">
+            Total de horas por proyecto
+          </h2>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {resumenProyectos.map((r) => (
+              <GlassCard key={r.proyecto} className="p-5">
+                <p className="text-sm font-medium text-white">{r.proyecto}</p>
+                <p className="mt-2 text-2xl font-semibold text-accent">
+                  {formatoHoras(r.totalHoras)}
+                </p>
+                <p className="text-xs text-text-secondary">
+                  en total · {r.cantidad} registro{r.cantidad === 1 ? "" : "s"}
                 </p>
               </GlassCard>
             ))}

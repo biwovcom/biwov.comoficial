@@ -53,3 +53,25 @@ export function resumenPorCategoria(registros: RegistroTiempo[]): ResumenCategor
     }))
     .sort((a, b) => b.totalHoras - a.totalHoras);
 }
+
+export interface ResumenProyecto {
+  proyecto: string;
+  totalHoras: number;
+  cantidad: number;
+}
+
+/** Cuánto tiempo acumulado llevas invertido en cada proyecto/empresa, sumando todos sus registros. */
+export function resumenPorProyecto(registros: RegistroTiempo[]): ResumenProyecto[] {
+  const mapa = new Map<string, { total: number; cantidad: number }>();
+  for (const r of registros) {
+    const proyecto = r.proyecto?.trim();
+    if (!proyecto) continue;
+    const actual = mapa.get(proyecto) ?? { total: 0, cantidad: 0 };
+    actual.total += r.horas;
+    actual.cantidad += 1;
+    mapa.set(proyecto, actual);
+  }
+  return Array.from(mapa.entries())
+    .map(([proyecto, { total, cantidad }]) => ({ proyecto, totalHoras: total, cantidad }))
+    .sort((a, b) => b.totalHoras - a.totalHoras);
+}
