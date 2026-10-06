@@ -59,13 +59,26 @@ export function Hero() {
           transition={{ duration: 0.7, ease: "easeOut", delay: 0.15 }}
           className="relative order-1 mx-auto aspect-[16/9] w-full max-w-xl lg:order-2 lg:max-w-none"
         >
+          <div
+            className="pointer-events-none absolute inset-0 -z-10"
+            style={{
+              background:
+                "radial-gradient(ellipse 60% 70% at 35% 45%, rgba(15,18,24,0.6), transparent 70%)",
+            }}
+          />
           <Image
             src="/kathe.png"
             alt="Katherine Usma Aristizábal, fundadora de biwov_"
             fill
             priority
             sizes="(max-width: 1024px) 90vw, 50vw"
-            className="object-cover [mask-image:radial-gradient(circle_at_30%_50%,black_42%,transparent_72%)] object-[20%_50%]"
+            className="object-cover object-[20%_50%]"
+            style={{
+              maskImage:
+                "radial-gradient(ellipse 48% 62% at 35% 45%, black 45%, transparent 90%)",
+              WebkitMaskImage:
+                "radial-gradient(ellipse 48% 62% at 35% 45%, black 45%, transparent 90%)",
+            }}
           />
         </motion.div>
       </Container>
