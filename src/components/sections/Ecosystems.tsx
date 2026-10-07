@@ -88,18 +88,18 @@ export function Ecosystems() {
                   <div className="mt-5 flex gap-2">
                     <Button
                       variant="secondary"
-                      className="flex-1"
+                      className="flex-1 !px-3 !py-2 !text-xs whitespace-nowrap"
                       onClick={() => {
                         setAbrirEnCompra(false);
                         setPlanAbierto(plan);
                       }}
                     >
                       Más información
-                      <ArrowRight className="h-4 w-4" />
+                      <ArrowRight className="h-3.5 w-3.5" />
                     </Button>
                     <Button
                       variant={plan.id === "crecimiento" ? "primary" : "secondary"}
-                      className="flex-1"
+                      className="flex-1 !px-3 !py-2 !text-xs whitespace-nowrap"
                       onClick={() => {
                         setAbrirEnCompra(true);
                         setPlanAbierto(plan);
