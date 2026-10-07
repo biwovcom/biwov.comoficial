@@ -445,3 +445,28 @@ create policy "equipo autenticado - todo" on registros_tiempo
 -- =========================================================
 alter table prospectos add column if not exists acepto_tratamiento_datos boolean not null default false;
 alter table prospectos add column if not exists acepto_tratamiento_datos_en timestamptz;
+
+-- =========================================================
+-- HISTORIAL MANUAL DEL PROSPECTO
+-- Notas sueltas que Kathe agrega a mano para ir armando el historial de
+-- cada empresa (diagnóstico de redes, diagnóstico de la empresa, llamadas,
+-- reuniones, etc.). "tipo" es texto libre con sugerencias en el frontend,
+-- no un enum, para poder agregar categorías nuevas sin tocar código.
+-- =========================================================
+create table if not exists prospecto_historial (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  created_by uuid references auth.users(id) default auth.uid(),
+
+  prospecto_id uuid not null references prospectos(id) on delete cascade,
+  tipo text not null,
+  contenido text not null
+);
+
+create index if not exists idx_prospecto_historial_prospecto on prospecto_historial(prospecto_id, created_at desc);
+
+alter table prospecto_historial enable row level security;
+
+drop policy if exists "equipo autenticado - todo" on prospecto_historial;
+create policy "equipo autenticado - todo" on prospecto_historial
+  for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');

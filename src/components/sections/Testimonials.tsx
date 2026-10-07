@@ -29,8 +29,8 @@ export function Testimonials() {
             >
               <GlassCard variant="light" className="flex h-full flex-col p-6">
                 <div className="flex aspect-video items-center justify-center rounded-2xl bg-bg-light">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accent-warm/15">
-                    <Play className="h-6 w-6 text-accent-warm" fill="currentColor" />
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accent/15">
+                    <Play className="h-6 w-6 text-accent" fill="currentColor" />
                   </div>
                 </div>
                 <p className="mt-4 text-sm text-text-on-light-secondary">{t.contenido}</p>

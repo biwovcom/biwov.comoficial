@@ -36,7 +36,7 @@ export function SectionHeading({
           className={cn(
             "mb-4 inline-block rounded-full border px-4 py-1.5 text-xs font-semibold tracking-wide uppercase",
             light
-              ? "border-border-light bg-white text-accent-warm"
+              ? "border-border-light bg-white text-accent"
               : "border-border-glass bg-white/[0.03] text-accent",
           )}
         >

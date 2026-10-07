@@ -16,8 +16,6 @@
   --text-on-light: #0d1420;
   --text-on-light-secondary: #5b6677;
   --border-light: rgba(13, 59, 102, 0.12);
-  --accent-warm: #ff7a59;
-  --accent-warm-soft: #ff7a5920;
 }
 
 @theme inline {
@@ -32,7 +30,6 @@
   --color-text-on-light: var(--text-on-light);
   --color-text-on-light-secondary: var(--text-on-light-secondary);
   --color-border-light: var(--border-light);
-  --color-accent-warm: var(--accent-warm);
   --font-sans: var(--font-poppins);
   --font-logo: var(--font-museo);
 }

@@ -22,7 +22,9 @@ import { EliminarProspectoButton } from "@/components/panel/EliminarProspectoBut
 import { CopiarParaIABoton } from "@/components/panel/CopiarParaIABoton";
 import { RedesSocialesLinks } from "@/components/panel/RedesSocialesLinks";
 import { EditarClasificacion } from "@/components/panel/EditarClasificacion";
+import { HistorialProspecto } from "@/components/panel/HistorialProspecto";
 import type { RespuestasDiagnosticoLargo } from "@/lib/panel/diagnosticoLargo";
+import type { HistorialEntrada } from "@/lib/panel/historial";
 
 interface FiltroRespuestaFila {
   respuestas: RespuestasFiltro;
@@ -75,6 +77,13 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
     .select("completado")
     .eq("prospecto_id", id)
     .maybeSingle<{ completado: boolean }>();
+
+  const { data: historial } = await supabase
+    .from("prospecto_historial")
+    .select("id, prospecto_id, tipo, contenido, created_at")
+    .eq("prospecto_id", id)
+    .order("created_at", { ascending: false })
+    .returns<HistorialEntrada[]>();
 
   return (
     <div>
@@ -282,6 +291,8 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
           </div>
         </GlassCard>
       )}
+
+      <HistorialProspecto prospectoId={prospecto.id} entradasIniciales={historial ?? []} />
     </div>
   );
 }

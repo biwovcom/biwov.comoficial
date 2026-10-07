@@ -7,12 +7,20 @@ import { X, Sparkles, Printer } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { DURACION_MINIMA_MESES, type Plan } from "@/data/planes";
 import { GRABACION_EDICION } from "@/data/addOns";
-import { formatMonedaAmbas, sumarPrecios, multiplicarPrecio } from "@/lib/moneda";
+import { formatMoneda, sumarPrecios, multiplicarPrecio, type Moneda } from "@/lib/moneda";
 import { linkWhatsApp } from "@/lib/panel/whatsapp";
 import { WHATSAPP_BIWOV } from "@/lib/contacto";
 import { useQuoter } from "@/components/quoter/QuoterProvider";
 
-export function PlanDetalleModal({ plan, onClose }: { plan: Plan | null; onClose: () => void }) {
+export function PlanDetalleModal({
+  plan,
+  moneda,
+  onClose,
+}: {
+  plan: Plan | null;
+  moneda: Moneda;
+  onClose: () => void;
+}) {
   const { open: abrirDiagnostico } = useQuoter();
   const [mostrarAddOn, setMostrarAddOn] = useState(false);
   const [aceptaAddOn, setAceptaAddOn] = useState(false);
@@ -84,18 +92,18 @@ export function PlanDetalleModal({ plan, onClose }: { plan: Plan | null; onClose
 
             <div className="mt-6 rounded-2xl border border-border-glass bg-white/[0.02] p-5">
               <p className="text-base font-semibold text-white">
-                {formatMonedaAmbas(plan.precioDesde)} al mes
+                {formatMoneda(plan.precioDesde, moneda)} al mes
               </p>
               <p className="mt-1 text-xs text-text-secondary">
-                + montaje inicial de {formatMonedaAmbas(plan.montajeInicial)}
+                + montaje inicial de {formatMoneda(plan.montajeInicial, moneda)}
               </p>
               <p className="mt-1 text-xs text-text-secondary">
-                Publicidad aparte, sugerida desde {formatMonedaAmbas(plan.pautaSugerida)} al mes.
+                Publicidad aparte, sugerida desde {formatMoneda(plan.pautaSugerida, moneda)} al mes.
               </p>
 
               <div className="mt-4 border-t border-border-glass pt-4">
                 <p className="text-sm font-semibold text-white">
-                  Total por {DURACION_MINIMA_MESES} meses: {formatMonedaAmbas(totalSeisMeses)}
+                  Total por {DURACION_MINIMA_MESES} meses: {formatMoneda(totalSeisMeses, moneda)}
                 </p>
                 <p className="mt-1 text-xs text-text-secondary">
                   Nuestros planes tienen un compromiso mínimo de {DURACION_MINIMA_MESES} meses: es el
@@ -103,7 +111,7 @@ export function PlanDetalleModal({ plan, onClose }: { plan: Plan | null; onClose
                 </p>
                 <p className="mt-2 text-xs text-text-secondary">
                   ¿Prefieres diferir el montaje inicial? Puedes pagarlo en 2 cuotas iguales de{" "}
-                  {formatMonedaAmbas(cuotaMontaje)}, sin recargo: una al iniciar y otra al segundo mes.
+                  {formatMoneda(cuotaMontaje, moneda)}, sin recargo: una al iniciar y otra al segundo mes.
                 </p>
               </div>
             </div>
@@ -145,7 +153,7 @@ export function PlanDetalleModal({ plan, onClose }: { plan: Plan | null; onClose
                     ))}
                   </ul>
                   <p className="mt-3 text-sm font-semibold text-white">
-                    {formatMonedaAmbas(GRABACION_EDICION.precio)} · pago único
+                    {formatMoneda(GRABACION_EDICION.precio, moneda)} · pago único
                   </p>
 
                   <label className="mt-4 flex items-start gap-2.5 text-xs text-text-secondary">

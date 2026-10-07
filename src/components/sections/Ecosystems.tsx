@@ -7,12 +7,13 @@ import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Button } from "@/components/ui/Button";
 import { PLANES, type Plan } from "@/data/planes";
-import { formatMonedaAmbas } from "@/lib/moneda";
+import { formatMoneda, type Moneda } from "@/lib/moneda";
 import { PlanDetalleModal } from "@/components/planes/PlanDetalleModal";
 import { cn } from "@/lib/utils";
 
 export function Ecosystems() {
   const [planAbierto, setPlanAbierto] = useState<Plan | null>(null);
+  const [moneda, setMoneda] = useState<Moneda>("COP");
 
   return (
     <section id="planes" className="bg-bg-light py-16 md:py-24">
@@ -24,7 +25,25 @@ export function Ecosystems() {
           description="Empiezas donde estás y avanzas cuando los números lo indican. Sin contratos eternos ni promesas infladas."
         />
 
-        <div className="mt-12 grid gap-6 lg:grid-cols-3">
+        <div className="mt-8 flex justify-center">
+          <div className="inline-flex rounded-full border border-border-light bg-white p-1">
+            {(["COP", "USD"] as Moneda[]).map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setMoneda(m)}
+                className={cn(
+                  "rounded-full px-4 py-1.5 text-xs font-semibold transition-colors",
+                  moneda === m ? "bg-gradient-brand text-white" : "text-text-on-light-secondary hover:text-text-on-light",
+                )}
+              >
+                {m === "COP" ? "Pesos colombianos" : "Dólares (USD)"}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-10 grid gap-6 lg:grid-cols-3">
           {PLANES.map((plan, i) => (
             <motion.div
               key={plan.id}
@@ -53,15 +72,15 @@ export function Ecosystems() {
                 <div className="flex flex-1 flex-col p-7">
                   <p className="text-sm leading-relaxed text-white/70">{plan.paraQuien}</p>
 
-                  <div className="mt-6 flex-1 rounded-2xl border border-accent-warm/25 bg-accent-warm/10 px-4 py-3">
-                    <p className="text-[11px] font-semibold uppercase tracking-wide text-accent-warm">
+                  <div className="mt-6 flex-1 rounded-2xl border border-accent/25 bg-accent/10 px-4 py-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-accent">
                       Lo que logras
                     </p>
                     <p className="mt-1 text-sm text-white/90">{plan.resumen}</p>
                   </div>
 
                   <p className="mt-6 text-base font-semibold text-white">
-                    Desde {formatMonedaAmbas(plan.precioDesde)} al mes
+                    Desde {formatMoneda(plan.precioDesde, moneda)} al mes
                   </p>
                   <p className="mt-1 text-xs text-text-secondary">Plan con compromiso mínimo de 6 meses.</p>
 
@@ -80,12 +99,12 @@ export function Ecosystems() {
         </div>
 
         <p className="mx-auto mt-10 max-w-2xl text-center text-xs text-text-on-light-secondary">
-          Valores de referencia en pesos colombianos y su equivalente aproximado en dólares. Mínimo 6
-          meses. Las plataformas y la publicidad se pagan aparte.
+          Valores de referencia en pesos colombianos o dólares, según elijas arriba. Mínimo 6 meses.
+          Las plataformas y la publicidad se pagan aparte.
         </p>
       </Container>
 
-      <PlanDetalleModal plan={planAbierto} onClose={() => setPlanAbierto(null)} />
+      <PlanDetalleModal plan={planAbierto} moneda={moneda} onClose={() => setPlanAbierto(null)} />
     </section>
   );
 }
