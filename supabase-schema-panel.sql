@@ -470,3 +470,32 @@ alter table prospecto_historial enable row level security;
 drop policy if exists "equipo autenticado - todo" on prospecto_historial;
 create policy "equipo autenticado - todo" on prospecto_historial
   for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+-- =========================================================
+-- COMPRAS DE PLANES (checkout público, sin pasarela todavía)
+-- Cuando alguien da clic en "Comprar ahora" en un plan, se guarda su
+-- intención de compra aquí y se le lleva a WhatsApp para coordinar el pago
+-- (todavía no hay pasarela de pago conectada). Esto le da a Kathe un
+-- registro de quién quiso comprar, aunque el pago se cierre por fuera.
+-- =========================================================
+create table if not exists plan_compras (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+
+  plan_id text not null,
+  nombre text not null,
+  email text,
+  whatsapp text,
+  empresa text,
+  moneda text not null check (moneda in ('COP','USD')),
+  monto numeric not null,
+  snapshot jsonb not null default '{}'::jsonb
+);
+
+create index if not exists idx_plan_compras_created on plan_compras(created_at desc);
+
+alter table plan_compras enable row level security;
+
+drop policy if exists "equipo autenticado - todo" on plan_compras;
+create policy "equipo autenticado - todo" on plan_compras
+  for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');

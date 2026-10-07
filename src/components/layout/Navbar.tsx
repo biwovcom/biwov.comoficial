@@ -58,6 +58,9 @@ export function Navbar() {
           ))}
         </nav>
         <div className="hidden items-center gap-3 md:flex">
+          <Button size="md" variant="secondary" onClick={() => open()}>
+            Diagnóstico gratis
+          </Button>
           <Button size="md" onClick={() => open()}>
             Agenda una asesoría
           </Button>
@@ -92,6 +95,9 @@ export function Navbar() {
                   {link.label}
                 </a>
               ))}
+              <Button size="md" variant="secondary" className="mt-2 w-full" onClick={cerrarYAgendar}>
+                Diagnóstico gratis
+              </Button>
               <Button size="md" className="mt-2 w-full" onClick={cerrarYAgendar}>
                 Agenda una asesoría
               </Button>

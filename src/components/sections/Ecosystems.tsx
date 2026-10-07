@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 
 export function Ecosystems() {
   const [planAbierto, setPlanAbierto] = useState<Plan | null>(null);
+  const [abrirEnCompra, setAbrirEnCompra] = useState(false);
   const [moneda, setMoneda] = useState<Moneda>("COP");
 
   return (
@@ -84,14 +85,29 @@ export function Ecosystems() {
                   </p>
                   <p className="mt-1 text-xs text-text-secondary">Plan con compromiso mínimo de 6 meses.</p>
 
-                  <Button
-                    variant={plan.id === "crecimiento" ? "primary" : "secondary"}
-                    className="mt-5 w-full"
-                    onClick={() => setPlanAbierto(plan)}
-                  >
-                    Más información
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
+                  <div className="mt-5 flex gap-2">
+                    <Button
+                      variant="secondary"
+                      className="flex-1"
+                      onClick={() => {
+                        setAbrirEnCompra(false);
+                        setPlanAbierto(plan);
+                      }}
+                    >
+                      Más información
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant={plan.id === "crecimiento" ? "primary" : "secondary"}
+                      className="flex-1"
+                      onClick={() => {
+                        setAbrirEnCompra(true);
+                        setPlanAbierto(plan);
+                      }}
+                    >
+                      Comprar ahora
+                    </Button>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -104,7 +120,12 @@ export function Ecosystems() {
         </p>
       </Container>
 
-      <PlanDetalleModal plan={planAbierto} moneda={moneda} onClose={() => setPlanAbierto(null)} />
+      <PlanDetalleModal
+        plan={planAbierto}
+        moneda={moneda}
+        abrirEnCompra={abrirEnCompra}
+        onClose={() => setPlanAbierto(null)}
+      />
     </section>
   );
 }
