@@ -3,15 +3,47 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
-import { X, Printer } from "lucide-react";
+import { X, Printer, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
-import { DURACION_MINIMA_MESES, type Plan } from "@/data/planes";
+import { DURACION_MINIMA_MESES, type ItemPlan, type Plan } from "@/data/planes";
 import { formatMoneda, sumarPrecios, multiplicarPrecio, type Moneda } from "@/lib/moneda";
 import { linkWhatsApp } from "@/lib/panel/whatsapp";
 import { WHATSAPP_BIWOV } from "@/lib/contacto";
+import { cn } from "@/lib/utils";
 
 const CONTACTO_INICIAL = { nombre: "", whatsapp: "", email: "", empresa: "" };
+
+function FilaIncluye({ item }: { item: ItemPlan }) {
+  const [abierto, setAbierto] = useState(false);
+  const tieneSubitems = Boolean(item.subitems?.length);
+
+  return (
+    <li className="text-sm text-white/90">
+      <div
+        className={cn("flex items-start gap-2", tieneSubitems && "cursor-pointer")}
+        onClick={() => tieneSubitems && setAbierto((v) => !v)}
+      >
+        <span className="mt-0.5 text-accent">✔</span>
+        <span className="flex-1">{item.label}</span>
+        {tieneSubitems && (
+          <ChevronDown
+            className={cn("mt-0.5 h-3.5 w-3.5 shrink-0 text-accent transition-transform", abierto && "rotate-180")}
+          />
+        )}
+      </div>
+      {tieneSubitems && abierto && (
+        <ul className="mt-2 ml-6 space-y-1.5 border-l border-border-glass pl-3">
+          {item.subitems!.map((sub) => (
+            <li key={sub} className="text-xs text-text-secondary">
+              {sub}
+            </li>
+          ))}
+        </ul>
+      )}
+    </li>
+  );
+}
 
 export function PlanDetalleModal({
   plan,
@@ -140,9 +172,7 @@ function PlanDetalleTarjeta({
             </p>
             <ul className="mt-3 space-y-2">
               {plan.incluye.map((item) => (
-                <li key={item} className="flex items-start gap-2 text-sm text-white/90">
-                  <span className="mt-0.5 text-accent">✔</span> {item}
-                </li>
+                <FilaIncluye key={item.label} item={item} />
               ))}
             </ul>
 
