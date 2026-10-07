@@ -8,14 +8,17 @@ export function SectionHeading({
   title,
   description,
   align = "center",
+  variant = "dark",
   className,
 }: {
   eyebrow?: string;
   title: string;
   description?: string;
   align?: "center" | "left";
+  variant?: "dark" | "light";
   className?: string;
 }) {
+  const light = variant === "light";
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
@@ -29,15 +32,32 @@ export function SectionHeading({
       )}
     >
       {eyebrow && (
-        <span className="mb-4 inline-block rounded-full border border-border-glass bg-white/[0.03] px-4 py-1.5 text-xs font-semibold tracking-wide text-accent uppercase">
+        <span
+          className={cn(
+            "mb-4 inline-block rounded-full border px-4 py-1.5 text-xs font-semibold tracking-wide uppercase",
+            light
+              ? "border-border-light bg-white text-accent-warm"
+              : "border-border-glass bg-white/[0.03] text-accent",
+          )}
+        >
           {eyebrow}
         </span>
       )}
-      <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl md:text-5xl">
+      <h2
+        className={cn(
+          "text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl",
+          light ? "text-text-on-light" : "text-white",
+        )}
+      >
         {title}
       </h2>
       {description && (
-        <p className="mt-5 text-base leading-relaxed text-text-secondary md:text-lg">
+        <p
+          className={cn(
+            "mt-5 text-base leading-relaxed md:text-lg",
+            light ? "text-text-on-light-secondary" : "text-text-secondary",
+          )}
+        >
           {description}
         </p>
       )}

@@ -1,42 +1,57 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { TRAYECTORIA } from "@/data/kathe";
 
 export function Trayectoria() {
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  const desplazar = (dir: 1 | -1) => {
+    trackRef.current?.scrollBy({ left: dir * 300, behavior: "smooth" });
+  };
+
   return (
     <section className="py-16 md:py-20">
       <Container>
-        <SectionHeading eyebrow="Trayectoria" title="Cómo he llegado hasta aquí" />
-
-        <div className="relative mx-auto mt-14 max-w-2xl">
-          <div className="absolute left-6 top-2 bottom-2 w-px bg-gradient-to-b from-accent/60 via-accent/20 to-transparent" />
-          <div className="space-y-8">
-            {TRAYECTORIA.map((hito, i) => (
-              <motion.div
-                key={hito.anio}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.5, delay: i * 0.05 }}
-                className="relative flex items-start gap-6"
-              >
-                <div className="mt-1 h-3 w-3 shrink-0 translate-x-[18px] rounded-full bg-accent" />
-                <GlassCard className="flex-1 p-6">
-                  <span className="text-xs font-semibold uppercase tracking-wide text-accent">
-                    {hito.anio}
-                  </span>
-                  <h3 className="mt-1 text-lg font-semibold text-white">{hito.titulo}</h3>
-                  <p className="mt-2 text-sm text-text-secondary">{hito.detalle}</p>
-                </GlassCard>
-              </motion.div>
-            ))}
+        <div className="flex items-end justify-between gap-4">
+          <SectionHeading align="left" eyebrow="Trayectoria" title="Cómo he llegado hasta aquí" />
+          <div className="hidden shrink-0 gap-2 md:flex">
+            <button
+              type="button"
+              onClick={() => desplazar(-1)}
+              aria-label="Anterior"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-border-glass text-white transition-colors hover:bg-white/[0.06]"
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <button
+              type="button"
+              onClick={() => desplazar(1)}
+              aria-label="Siguiente"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-border-glass text-white transition-colors hover:bg-white/[0.06]"
+            >
+              <ChevronRight size={18} />
+            </button>
           </div>
         </div>
       </Container>
+
+      <div
+        ref={trackRef}
+        className="scrollbar-none mt-10 flex gap-5 overflow-x-auto scroll-smooth px-6 pb-2 snap-x snap-mandatory md:px-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))]"
+      >
+        {TRAYECTORIA.map((hito) => (
+          <GlassCard key={hito.anio} className="w-72 shrink-0 snap-start p-6">
+            <span className="text-xs font-semibold uppercase tracking-wide text-accent">{hito.anio}</span>
+            <h3 className="mt-1 text-lg font-semibold text-white">{hito.titulo}</h3>
+            <p className="mt-2 text-sm text-text-secondary">{hito.detalle}</p>
+          </GlassCard>
+        ))}
+      </div>
     </section>
   );
 }

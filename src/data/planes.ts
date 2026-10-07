@@ -4,12 +4,15 @@ export interface Plan {
   id: "esencial" | "crecimiento" | "escala";
   nombre: string;
   claim: string;
+  resumen: string;
   paraQuien: string;
   incluye: string[];
   precioDesde: PrecioDual;
   montajeInicial: PrecioDual;
   pautaSugerida: PrecioDual;
 }
+
+export const DURACION_MINIMA_MESES = 6;
 
 // Valores en USD son una referencia aproximada (tasa ~4.000 COP/USD).
 // Ajusta estos números directamente aquí si quieres precios distintos en dólares.
@@ -18,6 +21,7 @@ export const PLANES: Plan[] = [
     id: "esencial",
     nombre: "Esencial",
     claim: "Ordena y empieza a atraer",
+    resumen: "Tu WhatsApp organizado, con asistente y primeras campañas corriendo con orden.",
     paraQuien:
       "Para negocios que ya publican pero sin estrategia, o que quieren empezar a pautar con orden.",
     incluye: [
@@ -38,6 +42,7 @@ export const PLANES: Plan[] = [
     id: "crecimiento",
     nombre: "Crecimiento",
     claim: "Atrae interesados que sí pueden comprar",
+    resumen: "Seguimiento ordenado y una oferta clara para convertir a quien ya te vio.",
     paraQuien:
       "Para negocios que ya tienen contenido o publicidad, pero les falta estrategia, orden y medir.",
     incluye: [
@@ -57,6 +62,7 @@ export const PLANES: Plan[] = [
     id: "escala",
     nombre: "Escala",
     claim: "Que ningún cliente se pierda",
+    resumen: "Lista organizada de clientes y mensajes para que nadie se quede sin respuesta.",
     paraQuien:
       "Para negocios que ya venden y quieren un sistema que atraiga, atienda y haga seguimiento.",
     incluye: [

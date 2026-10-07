@@ -8,6 +8,16 @@
   --text-primary: #ffffff;
   --text-secondary: #a9b4c2;
   --border-glass: rgba(50, 153, 204, 0.15);
+
+  /* Franjas claras alternadas + acento vivo, para que el sitio no se
+     sienta todo negro (pedido explícito de Kathe). */
+  --bg-light: #f3f6fb;
+  --bg-light-elevated: #ffffff;
+  --text-on-light: #0d1420;
+  --text-on-light-secondary: #5b6677;
+  --border-light: rgba(13, 59, 102, 0.12);
+  --accent-warm: #ff7a59;
+  --accent-warm-soft: #ff7a5920;
 }
 
 @theme inline {
@@ -17,6 +27,12 @@
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
   --color-border-glass: var(--border-glass);
+  --color-bg-light: var(--bg-light);
+  --color-bg-light-elevated: var(--bg-light-elevated);
+  --color-text-on-light: var(--text-on-light);
+  --color-text-on-light-secondary: var(--text-on-light-secondary);
+  --color-border-light: var(--border-light);
+  --color-accent-warm: var(--accent-warm);
   --font-sans: var(--font-poppins);
   --font-logo: var(--font-museo);
 }
@@ -73,6 +89,14 @@ body {
 .animate-marquee {
   animation: marquee 28s linear infinite;
 }
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+  }
+}
 
 @keyframes pulse-glow {
   0%,
@@ -87,6 +111,56 @@ body {
 }
 .animate-pulse-glow {
   animation: pulse-glow 2.2s ease-in-out infinite;
+}
+
+/* Descarga en PDF de la propuesta de un plan (modal de Planes): al
+   imprimir, se recorta el árbol hasta el modal (body > main > sección >
+   modal) en vez de solo ocultar con visibility, para que no quede el resto
+   de la página en blanco/negro debajo. */
+@media print {
+  body {
+    background: #ffffff !important;
+  }
+  body > *:not(#plan-modal-overlay):not(:has(#plan-modal-overlay)) {
+    display: none !important;
+  }
+  main > *:not(#plan-modal-overlay):not(:has(#plan-modal-overlay)) {
+    display: none !important;
+  }
+  #planes > *:not(#plan-modal-overlay):not(:has(#plan-modal-overlay)) {
+    display: none !important;
+  }
+  #planes {
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+  #plan-modal-overlay {
+    position: static !important;
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+  }
+  #plan-modal-overlay > div {
+    max-height: none !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: #111827 !important;
+  }
+  #plan-modal-overlay h2,
+  #plan-modal-overlay h3,
+  #plan-modal-overlay p,
+  #plan-modal-overlay span,
+  #plan-modal-overlay li {
+    color: #111827 !important;
+  }
+  #plan-modal-overlay [class*="text-secondary"] {
+    color: #4b5563 !important;
+  }
+  #plan-modal-overlay [class*="border-"] {
+    border-color: #d1d5db !important;
+  }
 }
 
 /* Versión imprimible de /kathe: hoja de vida en blanco, sin chrome del
