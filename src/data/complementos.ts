@@ -1,16 +1,33 @@
+export interface ComplementoItem {
+  label: string;
+  precio: string;
+}
+
 export interface Complemento {
   titulo: string;
   detalle: string;
+  items?: ComplementoItem[];
+  nota?: string;
 }
 
 export const COMPLEMENTOS: Complemento[] = [
   {
     titulo: "Producción de contenido",
-    detalle: "Edición de tus videos o diseño de piezas. Se cotiza aparte.",
+    detalle: "8 videos grabados y editados profesionalmente para redes. Se cotiza aparte.",
+    items: [{ label: "Paquete de 8 videos: grabación + edición, listo para publicar", precio: "$2.000.000 COP · pago único" }],
   },
   {
     titulo: "Páginas adicionales",
-    detalle: "Para un nuevo producto, evento o lanzamiento.",
+    detalle: "Landing pages para un nuevo producto, evento o lanzamiento.",
+    items: [
+      {
+        label: "Landing page para recolectar base de datos (solo captura de leads)",
+        precio: "$1.000.000 COP (página) + $100.000 COP (dominio) + US$33/mes (herramienta)",
+      },
+      { label: "Landing page de agendamiento", precio: "Costo por definir" },
+      { label: "Landing page de ventas de producto", precio: "Costo por definir" },
+    ],
+    nota: "El valor de la herramienta mensual puede cambiar si el proveedor ajusta sus precios; queda estipulado en el contrato.",
   },
   {
     titulo: "Base de datos para prospección",

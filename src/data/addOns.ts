@@ -14,6 +14,7 @@ export const GRABACION_EDICION: AddOn = {
   descripcion:
     "Para cuando quieres contenido grabado y editado profesionalmente, sin tener que aprender a hacerlo tú misma.",
   incluye: [
+    "8 videos grabados y editados",
     "Sesión de grabación en tu negocio o producto",
     "Edición profesional de los videos para redes",
     "Entrega lista para publicar, formato vertical y horizontal",
