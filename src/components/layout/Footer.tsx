@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LockKeyhole } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { linkWhatsApp } from "@/lib/panel/whatsapp";
 import {
@@ -62,7 +63,16 @@ export function Footer() {
             Kathe
           </a>
         </div>
-        <p>© {new Date().getFullYear()} biwov. Todos los derechos reservados.</p>
+        <p className="flex items-center gap-1.5">
+          © {new Date().getFullYear()} biwov. Todos los derechos reservados.
+          <Link
+            href="/panel/login"
+            aria-label="Acceso privado"
+            className="opacity-20 transition-opacity hover:opacity-60"
+          >
+            <LockKeyhole className="h-3 w-3" />
+          </Link>
+        </p>
       </Container>
     </footer>
   );

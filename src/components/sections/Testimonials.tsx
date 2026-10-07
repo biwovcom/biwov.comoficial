@@ -9,7 +9,7 @@ import { TESTIMONIOS } from "@/data/testimonios";
 
 export function Testimonials() {
   return (
-    <section id="testimonios" className="py-24 md:py-32">
+    <section id="testimonios" className="py-16 md:py-24">
       <Container>
         <SectionHeading
           eyebrow="Testimonios"

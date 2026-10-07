@@ -12,7 +12,7 @@ export function NeedsPaths() {
   const { open } = useQuoter();
 
   return (
-    <section className="py-24 md:py-32">
+    <section className="py-16 md:py-24">
       <Container>
         <SectionHeading
           eyebrow="Encuentra tu camino"

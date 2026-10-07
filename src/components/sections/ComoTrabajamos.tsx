@@ -9,7 +9,7 @@ import { RESPONSABILIDADES, METODO_4_PASOS } from "@/data/comoTrabajamos";
 
 export function ComoTrabajamos() {
   return (
-    <section id="como-funciona" className="py-24 md:py-32">
+    <section id="como-funciona" className="py-16 md:py-24">
       <Container>
         <SectionHeading
           eyebrow="Cómo trabajamos"

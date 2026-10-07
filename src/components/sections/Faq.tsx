@@ -13,7 +13,7 @@ export function Faq() {
   const [abierta, setAbierta] = useState<number | null>(null);
 
   return (
-    <section className="py-24 md:py-32">
+    <section className="py-16 md:py-24">
       <Container>
         <SectionHeading eyebrow="Preguntas frecuentes" title="Lo que más nos preguntan" />
 

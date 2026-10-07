@@ -8,7 +8,7 @@ import { EL_CAMINO, PASOS_CAMINO_TITULO, ETIQUETAS_CAMINO } from "@/data/elCamin
 
 export function ElCamino() {
   return (
-    <section id="como-conectamos-todo" className="py-24 md:py-32">
+    <section id="como-conectamos-todo" className="py-16 md:py-24">
       <Container>
         <SectionHeading
           eyebrow="El camino"

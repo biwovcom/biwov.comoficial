@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
 import { WhatsAppFloatButton } from "./WhatsAppFloatButton";
+import { SupportFloatButton } from "./SupportFloatButton";
 import { QuoterModal } from "@/components/quoter/QuoterModal";
 import { useQuoter } from "@/components/quoter/QuoterProvider";
 
@@ -45,6 +46,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
       <Footer />
       <QuoterModal />
       <WhatsAppFloatButton />
+      <SupportFloatButton />
     </>
   );
 }

@@ -9,7 +9,7 @@ export function FinalCTA() {
   const { open } = useQuoter();
 
   return (
-    <section className="py-24 md:py-32">
+    <section className="py-16 md:py-24">
       <Container>
         <motion.div
           initial={{ opacity: 0, y: 24 }}

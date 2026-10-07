@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { LockKeyhole } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Menu, X } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { useQuoter } from "@/components/quoter/QuoterProvider";
@@ -18,6 +19,7 @@ const LINKS = [
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [menuAbierto, setMenuAbierto] = useState(false);
   const { open } = useQuoter();
 
   useEffect(() => {
@@ -26,11 +28,16 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const cerrarYAgendar = () => {
+    setMenuAbierto(false);
+    open();
+  };
+
   return (
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-all duration-300",
-        scrolled
+        scrolled || menuAbierto
           ? "border-b border-border-glass bg-bg-base/80 backdrop-blur-xl"
           : "border-b border-transparent bg-transparent",
       )}
@@ -50,20 +57,48 @@ export function Navbar() {
             </a>
           ))}
         </nav>
-        <div className="flex items-center gap-3">
-          <Link
-            href="/panel/login"
-            aria-label="Panel privado"
-            title="Panel privado"
-            className="text-text-secondary/60 transition-colors hover:text-accent"
-          >
-            <LockKeyhole size={18} />
-          </Link>
+        <div className="hidden items-center gap-3 md:flex">
           <Button size="md" onClick={() => open()}>
             Agenda una asesoría
           </Button>
         </div>
+        <button
+          type="button"
+          onClick={() => setMenuAbierto((v) => !v)}
+          aria-label={menuAbierto ? "Cerrar menú" : "Abrir menú"}
+          className="text-white md:hidden"
+        >
+          {menuAbierto ? <X size={24} /> : <Menu size={24} />}
+        </button>
       </Container>
+
+      <AnimatePresence>
+        {menuAbierto && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="overflow-hidden border-t border-border-glass bg-bg-base md:hidden"
+          >
+            <Container className="flex flex-col gap-1 py-4">
+              {LINKS.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMenuAbierto(false)}
+                  className="rounded-xl px-3 py-3 text-base text-text-secondary transition-colors hover:bg-white/[0.05] hover:text-white"
+                >
+                  {link.label}
+                </a>
+              ))}
+              <Button size="md" className="mt-2 w-full" onClick={cerrarYAgendar}>
+                Agenda una asesoría
+              </Button>
+            </Container>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

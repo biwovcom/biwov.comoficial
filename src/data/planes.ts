@@ -1,14 +1,18 @@
+import type { PrecioDual } from "@/lib/moneda";
+
 export interface Plan {
   id: "esencial" | "crecimiento" | "escala";
   nombre: string;
   claim: string;
   paraQuien: string;
   incluye: string[];
-  precioDesde: string;
-  montajeInicial: string;
-  pautaSugerida: string;
+  precioDesde: PrecioDual;
+  montajeInicial: PrecioDual;
+  pautaSugerida: PrecioDual;
 }
 
+// Valores en USD son una referencia aproximada (tasa ~4.000 COP/USD).
+// Ajusta estos números directamente aquí si quieres precios distintos en dólares.
 export const PLANES: Plan[] = [
   {
     id: "esencial",
@@ -20,14 +24,15 @@ export const PLANES: Plan[] = [
       "Diagnóstico de tu negocio y tus redes",
       "Plan de trabajo con tareas semanales",
       "Ideas y guiones para 3 videos por semana, más guías para historias",
-      "Guía para optimizar tu WhatsApp Business",
-      "1 campaña de publicidad en Meta creada y manejada por nosotros",
+      "Guía para optimizar tu WhatsApp Business, Instagram y Facebook",
+      "1 a 2 campañas de publicidad en Meta creadas y manejadas por nosotros",
+      "Guía en creación de comunidad",
       "2 sesiones de acompañamiento al mes y reporte mensual",
       "Guías y herramientas de IA para automatizar tus procesos",
     ],
-    precioDesde: "Desde $900.000 al mes",
-    montajeInicial: "+ montaje inicial de $600.000",
-    pautaSugerida: "Publicidad aparte, sugerida desde $500.000 al mes.",
+    precioDesde: { cop: 900000, usd: 225 },
+    montajeInicial: { cop: 600000, usd: 150 },
+    pautaSugerida: { cop: 500000, usd: 125 },
   },
   {
     id: "crecimiento",
@@ -44,9 +49,9 @@ export const PLANES: Plan[] = [
       "Asistente con IA que filtra a los curiosos y te pasa los interesados",
       "Guías y herramientas de IA para automatizar tus procesos",
     ],
-    precioDesde: "Desde $1.500.000 al mes",
-    montajeInicial: "+ montaje inicial de $1.800.000",
-    pautaSugerida: "Publicidad aparte, sugerida desde $1.000.000 al mes.",
+    precioDesde: { cop: 1500000, usd: 375 },
+    montajeInicial: { cop: 1800000, usd: 450 },
+    pautaSugerida: { cop: 1000000, usd: 250 },
   },
   {
     id: "escala",
@@ -63,8 +68,8 @@ export const PLANES: Plan[] = [
       "Reporte del camino completo, desde el anuncio hasta la venta",
       "Guías y herramientas de IA para automatizar tus procesos",
     ],
-    precioDesde: "Desde $2.400.000 al mes",
-    montajeInicial: "+ montaje inicial de $3.200.000",
-    pautaSugerida: "Publicidad aparte, sugerida desde $2.000.000 al mes.",
+    precioDesde: { cop: 2400000, usd: 600 },
+    montajeInicial: { cop: 3200000, usd: 800 },
+    pautaSugerida: { cop: 2000000, usd: 500 },
   },
 ];

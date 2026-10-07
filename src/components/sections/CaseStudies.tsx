@@ -9,7 +9,7 @@ import { CASOS_EXITO } from "@/data/casos";
 
 export function CaseStudies() {
   return (
-    <section id="casos" className="py-24 md:py-32">
+    <section id="casos" className="py-16 md:py-24">
       <Container>
         <SectionHeading
           eyebrow="Casos de éxito"

@@ -26,7 +26,7 @@ const HERRAMIENTAS_SUELTAS = [
 
 export function Problem() {
   return (
-    <section className="py-24 md:py-32">
+    <section className="py-16 md:py-24">
       <Container>
         <SectionHeading
           eyebrow="El problema"

@@ -8,7 +8,7 @@ import { COMPLEMENTOS } from "@/data/complementos";
 
 export function Complementos() {
   return (
-    <section className="py-24 md:py-32">
+    <section className="py-16 md:py-24">
       <Container>
         <SectionHeading eyebrow="Complementos" title="¿Necesitas algo más?" />
 
