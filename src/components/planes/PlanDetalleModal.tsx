@@ -21,19 +21,27 @@ function FilaIncluye({ item }: { item: ItemPlan }) {
   return (
     <li className="text-sm text-white/90">
       <div
-        className={cn("flex items-start gap-2", tieneSubitems && "cursor-pointer")}
+        className={cn("flex items-start gap-2", tieneSubitems && "cursor-pointer print:cursor-auto")}
         onClick={() => tieneSubitems && setAbierto((v) => !v)}
       >
         <span className="mt-0.5 text-accent">✔</span>
         <span className="flex-1">{item.label}</span>
         {tieneSubitems && (
           <ChevronDown
-            className={cn("mt-0.5 h-3.5 w-3.5 shrink-0 text-accent transition-transform", abierto && "rotate-180")}
+            className={cn(
+              "mt-0.5 h-3.5 w-3.5 shrink-0 text-accent transition-transform print:hidden",
+              abierto && "rotate-180",
+            )}
           />
         )}
       </div>
-      {tieneSubitems && abierto && (
-        <ul className="mt-2 ml-6 space-y-1.5 border-l border-border-glass pl-3">
+      {tieneSubitems && (
+        <ul
+          className={cn(
+            "mt-2 ml-6 space-y-1.5 border-l border-border-glass pl-3 print:!block",
+            abierto ? "block" : "hidden",
+          )}
+        >
           {item.subitems!.map((sub) => (
             <li key={sub} className="text-xs text-text-secondary">
               {sub}

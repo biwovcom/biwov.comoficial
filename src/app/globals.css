@@ -118,13 +118,13 @@ body {
   body {
     background: #ffffff !important;
   }
-  body > *:not(#plan-modal-overlay):not(:has(#plan-modal-overlay)) {
+  body:has(#plan-modal-overlay) > *:not(#plan-modal-overlay):not(:has(#plan-modal-overlay)) {
     display: none !important;
   }
-  main > *:not(#plan-modal-overlay):not(:has(#plan-modal-overlay)) {
+  main:has(#plan-modal-overlay) > *:not(#plan-modal-overlay):not(:has(#plan-modal-overlay)) {
     display: none !important;
   }
-  #planes > *:not(#plan-modal-overlay):not(:has(#plan-modal-overlay)) {
+  #planes:has(#plan-modal-overlay) > *:not(#plan-modal-overlay):not(:has(#plan-modal-overlay)) {
     display: none !important;
   }
   #planes {
@@ -169,6 +169,65 @@ body {
     color: #4b5563 !important;
   }
   #plan-modal-overlay [class*="border-"] {
+    border-color: #d1d5db !important;
+  }
+}
+
+/* Lo mismo, para la descarga en PDF de los complementos (Producción de
+   contenido, Páginas adicionales, etc.) desde la sección "¿Necesitas algo
+   más?". */
+@media print {
+  body:has(#complemento-modal-overlay) > *:not(#complemento-modal-overlay):not(:has(#complemento-modal-overlay)) {
+    display: none !important;
+  }
+  main:has(#complemento-modal-overlay) > *:not(#complemento-modal-overlay):not(:has(#complemento-modal-overlay)) {
+    display: none !important;
+  }
+  #complementos-section:has(#complemento-modal-overlay) > *:not(#complemento-modal-overlay):not(:has(#complemento-modal-overlay)) {
+    display: none !important;
+  }
+  #complementos-section {
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+  #complemento-modal-overlay {
+    position: static !important;
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+  }
+  #complemento-modal-overlay > div {
+    max-height: none !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: #111827 !important;
+    font-family: var(--font-montserrat), ui-sans-serif, sans-serif !important;
+  }
+  #complemento-modal-overlay h2,
+  #complemento-modal-overlay h3,
+  #complemento-modal-overlay p,
+  #complemento-modal-overlay span,
+  #complemento-modal-overlay li,
+  #complemento-modal-overlay dt,
+  #complemento-modal-overlay dd {
+    color: #111827 !important;
+  }
+  #complemento-modal-overlay h2 {
+    color: #1d4772 !important;
+  }
+  #complemento-modal-overlay [class*="text-accent"] {
+    color: #3d98cc !important;
+  }
+  #complemento-modal-overlay .font-logo {
+    font-family: var(--font-museo), cursive !important;
+    color: #1d4772 !important;
+  }
+  #complemento-modal-overlay [class*="text-secondary"] {
+    color: #4b5563 !important;
+  }
+  #complemento-modal-overlay [class*="border-"] {
     border-color: #d1d5db !important;
   }
 }

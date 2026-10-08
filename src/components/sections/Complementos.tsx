@@ -2,19 +2,42 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Printer } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { COMPLEMENTOS } from "@/data/complementos";
 import { ProduccionContenidoDetalle } from "./ProduccionContenidoDetalle";
+import { ComplementoPdfModal } from "./ComplementoPdfModal";
 import { cn } from "@/lib/utils";
+
+function DetalleComplemento({ item }: { item: (typeof COMPLEMENTOS)[number] }) {
+  if (item.tipo === "produccion") {
+    return <ProduccionContenidoDetalle />;
+  }
+  return (
+    <>
+      <ul className="space-y-3">
+        {item.items!.map((it) => (
+          <li key={it.label} className="text-sm">
+            <p className="text-white/90">{it.label}</p>
+            <p className="mt-0.5 text-xs font-medium text-accent">{it.precio}</p>
+          </li>
+        ))}
+      </ul>
+      {item.nota && <p className="mt-3 text-xs text-text-secondary">{item.nota}</p>}
+    </>
+  );
+}
 
 export function Complementos() {
   const [abierto, setAbierto] = useState<string | null>(null);
+  const [pdfAbierto, setPdfAbierto] = useState<string | null>(null);
+
+  const itemPdf = COMPLEMENTOS.find((c) => c.titulo === pdfAbierto) ?? null;
 
   return (
-    <section className="py-16 md:py-24">
+    <section id="complementos-section" className="py-16 md:py-24">
       <Container>
         <SectionHeading eyebrow="Complementos" title="¿Necesitas algo más?" />
 
@@ -57,23 +80,19 @@ export function Complementos() {
                         transition={{ duration: 0.25 }}
                         className="overflow-hidden"
                       >
-                        {item.tipo === "produccion" ? (
-                          <div className="mt-4 border-t border-border-glass pt-4">
-                            <ProduccionContenidoDetalle />
-                          </div>
-                        ) : (
-                          <ul className="mt-4 space-y-3 border-t border-border-glass pt-4">
-                            {item.items!.map((it) => (
-                              <li key={it.label} className="text-sm">
-                                <p className="text-white/90">{it.label}</p>
-                                <p className="mt-0.5 text-xs font-medium text-accent">{it.precio}</p>
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                        {item.nota && (
-                          <p className="mt-3 text-xs text-text-secondary">{item.nota}</p>
-                        )}
+                        <div className="mt-4 border-t border-border-glass pt-4">
+                          <DetalleComplemento item={item} />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPdfAbierto(item.titulo);
+                          }}
+                          className="mt-4 flex w-full items-center justify-center gap-2 rounded-full border border-border-glass py-2 text-xs font-medium text-text-secondary transition-colors hover:border-accent/40 hover:text-white"
+                        >
+                          <Printer size={13} /> Descargar en PDF
+                        </button>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -83,6 +102,14 @@ export function Complementos() {
           })}
         </div>
       </Container>
+
+      <ComplementoPdfModal
+        titulo={itemPdf?.titulo ?? ""}
+        abierto={Boolean(itemPdf)}
+        onClose={() => setPdfAbierto(null)}
+      >
+        {itemPdf && <DetalleComplemento item={itemPdf} />}
+      </ComplementoPdfModal>
     </section>
   );
 }

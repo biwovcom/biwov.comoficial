@@ -76,7 +76,7 @@ export function ProduccionContenidoDetalle() {
                 Reels: <span className="text-white/90">{nivel.reels}</span>
               </p>
               <p className="text-text-secondary">
-                B-Roll: <span className="text-white/90">{nivel.clipsBRoll}</span>
+                B-Roll (videos de apoyo, no la toma principal): <span className="text-white/90">{nivel.clipsBRoll}</span>
               </p>
             </div>
           </div>
