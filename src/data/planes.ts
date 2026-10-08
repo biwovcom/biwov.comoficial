@@ -70,6 +70,7 @@ export const PLANES: Plan[] = [
     precioDesde: { cop: 1900000, usd: 475 },
     montajeInicial: { cop: 1800000, usd: 450 },
     pautaSugerida: { cop: 1000000, usd: 250 },
+    linkPago: "https://pay.hotmart.com/H107949388O?bid=1791494825555",
   },
   {
     id: "escala",
@@ -92,5 +93,6 @@ export const PLANES: Plan[] = [
     precioDesde: { cop: 2400000, usd: 600 },
     montajeInicial: { cop: 3800000, usd: 950 },
     pautaSugerida: { cop: 2000000, usd: 500 },
+    linkPago: "https://pay.hotmart.com/L107949454H?bid=1791495121348",
   },
 ];

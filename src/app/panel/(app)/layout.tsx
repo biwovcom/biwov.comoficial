@@ -18,11 +18,13 @@ export default async function PanelAppLayout({ children }: { children: ReactNode
   }
 
   return (
-    <div className="flex min-h-screen bg-bg-base print:bg-white">
+    <div className="flex min-h-screen flex-col bg-bg-base md:flex-row print:bg-white">
       <div className="print:hidden">
         <Sidebar />
       </div>
-      <main className="flex-1 overflow-y-auto p-8 md:p-10 print:p-0">{children}</main>
+      <main className="flex-1 overflow-y-auto overflow-x-hidden p-5 md:p-10 print:p-0">
+        {children}
+      </main>
     </div>
   );
 }

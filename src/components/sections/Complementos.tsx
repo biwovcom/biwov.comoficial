@@ -3,7 +3,6 @@
 import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronLeft, ChevronRight, Printer } from "lucide-react";
-import { GlassCard } from "@/components/ui/GlassCard";
 import { COMPLEMENTOS } from "@/data/complementos";
 import { ProduccionContenidoDetalle } from "./ProduccionContenidoDetalle";
 import { ComplementoPdfModal } from "./ComplementoPdfModal";
@@ -72,16 +71,16 @@ export function Complementos() {
 
       <div
         ref={trackRef}
-        className="scrollbar-none mt-8 flex gap-5 overflow-x-auto scroll-smooth pb-2 snap-x snap-mandatory"
+        className="scrollbar-none mt-8 flex gap-5 overflow-x-auto scroll-smooth pb-2 pr-6 snap-x snap-mandatory [mask-image:linear-gradient(to_right,black,black_92%,transparent)]"
       >
         {COMPLEMENTOS.map((item) => {
           const tieneDetalle = Boolean(item.items?.length) || item.tipo === "produccion";
           const estaAbierto = abierto === item.titulo;
           return (
-            <GlassCard
+            <div
               key={item.titulo}
               className={cn(
-                "shrink-0 snap-start p-6",
+                "shrink-0 snap-start rounded-3xl border border-border-glass bg-[#0c1119] p-6 shadow-[0_12px_40px_-16px_rgba(13,59,102,0.35)]",
                 item.tipo === "produccion" ? "w-[340px] sm:w-[620px]" : "w-[320px] sm:w-[360px]",
                 tieneDetalle && "cursor-pointer",
               )}
@@ -141,7 +140,7 @@ export function Complementos() {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </GlassCard>
+            </div>
           );
         })}
       </div>
