@@ -17,14 +17,11 @@ export function ElCamino() {
         />
       </Container>
 
-      <div className="mt-14">
-        <Marquee
-          items={EL_CAMINO}
-          keyFn={(paso) => paso.numero}
-          durationSeconds={38}
-          renderItem={(paso) => {
-            const i = paso.numero - 1;
-            return (
+      <div className="mt-14 scrollbar-none flex gap-4 overflow-x-auto px-6 pb-2 scroll-smooth snap-x snap-mandatory [mask-image:linear-gradient(to_right,black,black_90%,transparent)] md:justify-center md:px-0">
+        {EL_CAMINO.map((paso) => {
+          const i = paso.numero - 1;
+          return (
+            <div key={paso.numero} className="shrink-0 snap-start">
               <GlassCard className="h-full w-72 p-6">
                 <div className="flex items-center gap-3">
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-brand text-sm font-semibold text-white">
@@ -35,9 +32,9 @@ export function ElCamino() {
                 <p className="mt-3 text-sm text-text-secondary">{paso.pasa}</p>
                 <p className="mt-3 text-xs font-medium text-accent">{paso.posible}</p>
               </GlassCard>
-            );
-          }}
-        />
+            </div>
+          );
+        })}
       </div>
 
       <div className="mt-6">

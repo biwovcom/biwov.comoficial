@@ -1,12 +1,13 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronLeft, ChevronRight, Printer } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { COMPLEMENTOS } from "@/data/complementos";
 import { ProduccionContenidoDetalle } from "./ProduccionContenidoDetalle";
 import { ComplementoPdfModal } from "./ComplementoPdfModal";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/Button";
+import { linkWhatsApp } from "@/lib/panel/whatsapp";
+import { WHATSAPP_BIWOV } from "@/lib/contacto";
 
 function DetalleComplemento({ item }: { item: (typeof COMPLEMENTOS)[number] }) {
   if (item.tipo === "produccion") {
@@ -27,12 +28,36 @@ function DetalleComplemento({ item }: { item: (typeof COMPLEMENTOS)[number] }) {
   );
 }
 
+function BotonAccion({ item }: { item: (typeof COMPLEMENTOS)[number] }) {
+  if (item.linkAgendar) {
+    return (
+      <a href={item.linkAgendar} target="_blank" rel="noopener noreferrer" className="flex-1">
+        <Button variant="primary" className="w-full !px-3 !py-2 !text-xs whitespace-nowrap">
+          {item.textoBotonAgendar ?? "Agendar"}
+        </Button>
+      </a>
+    );
+  }
+  const mensaje = `¡Hola! 👋 Quiero adquirir el complemento "${item.titulo}". Quisiera coordinar el pago.`;
+  return (
+    <a
+      href={linkWhatsApp(WHATSAPP_BIWOV, mensaje)}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex-1"
+    >
+      <Button variant="primary" className="w-full !px-3 !py-2 !text-xs whitespace-nowrap">
+        Adquirir
+      </Button>
+    </a>
+  );
+}
+
 export function Complementos() {
-  const [abierto, setAbierto] = useState<string | null>(null);
-  const [pdfAbierto, setPdfAbierto] = useState<string | null>(null);
+  const [modalAbierto, setModalAbierto] = useState<string | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
 
-  const itemPdf = COMPLEMENTOS.find((c) => c.titulo === pdfAbierto) ?? null;
+  const itemModal = COMPLEMENTOS.find((c) => c.titulo === modalAbierto) ?? null;
 
   const desplazar = (dir: 1 | -1) => {
     trackRef.current?.scrollBy({ left: dir * 360, behavior: "smooth" });
@@ -73,84 +98,41 @@ export function Complementos() {
         ref={trackRef}
         className="scrollbar-none mt-8 flex gap-5 overflow-x-auto scroll-smooth pb-2 pr-6 snap-x snap-mandatory [mask-image:linear-gradient(to_right,black,black_92%,transparent)]"
       >
-        {COMPLEMENTOS.map((item) => {
-          const tieneDetalle = Boolean(item.items?.length) || item.tipo === "produccion";
-          const estaAbierto = abierto === item.titulo;
-          return (
-            <div
-              key={item.titulo}
-              className={cn(
-                "shrink-0 snap-start rounded-3xl border border-border-glass bg-[#0c1119] p-6 shadow-[0_12px_40px_-16px_rgba(13,59,102,0.35)]",
-                item.tipo === "produccion" ? "w-[340px] sm:w-[620px]" : "w-[320px] sm:w-[360px]",
-                tieneDetalle && "cursor-pointer",
-              )}
-              onClick={() => tieneDetalle && setAbierto(estaAbierto ? null : item.titulo)}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <h4 className="text-base font-semibold text-white">{item.titulo}</h4>
-                {tieneDetalle && (
-                  <ChevronDown
-                    className={cn(
-                      "h-4 w-4 shrink-0 text-accent transition-transform",
-                      estaAbierto && "rotate-180",
-                    )}
-                  />
-                )}
-              </div>
-              <p className="mt-1.5 text-sm text-text-secondary">{item.detalle}</p>
+        {COMPLEMENTOS.map((item) => (
+          <div
+            key={item.titulo}
+            className="flex w-[300px] shrink-0 snap-start flex-col rounded-3xl border border-border-glass bg-[#0c1119] p-6 shadow-[0_12px_40px_-16px_rgba(13,59,102,0.35)]"
+          >
+            <h4 className="text-base font-semibold text-white">{item.titulo}</h4>
+            <p className="mt-1.5 flex-1 text-sm text-text-secondary">{item.detalle}</p>
 
-              <AnimatePresence>
-                {tieneDetalle && estaAbierto && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.25 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="mt-4 border-t border-border-glass pt-4">
-                      <DetalleComplemento item={item} />
-                    </div>
-                    {item.linkAgendar && (
-                      <a
-                        href={item.linkAgendar}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="mt-4 block"
-                      >
-                        <button
-                          type="button"
-                          className="w-full rounded-full bg-gradient-brand px-4 py-2.5 text-sm font-semibold text-white transition-transform hover:scale-[1.02]"
-                        >
-                          {item.textoBotonAgendar ?? "Agendar"}
-                        </button>
-                      </a>
-                    )}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setPdfAbierto(item.titulo);
-                      }}
-                      className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-border-glass py-2 text-xs font-medium text-text-secondary transition-colors hover:border-accent/40 hover:text-white"
-                    >
-                      <Printer size={13} /> Descargar en PDF
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+            <div className="mt-5 flex gap-2">
+              <Button
+                variant="secondary"
+                className="flex-1 !px-3 !py-2 !text-xs whitespace-nowrap"
+                onClick={() => setModalAbierto(item.titulo)}
+              >
+                Más información
+              </Button>
+              <BotonAccion item={item} />
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
 
       <ComplementoPdfModal
-        titulo={itemPdf?.titulo ?? ""}
-        abierto={Boolean(itemPdf)}
-        onClose={() => setPdfAbierto(null)}
+        titulo={itemModal?.titulo ?? ""}
+        abierto={Boolean(itemModal)}
+        onClose={() => setModalAbierto(null)}
       >
-        {itemPdf && <DetalleComplemento item={itemPdf} />}
+        {itemModal && (
+          <>
+            <DetalleComplemento item={itemModal} />
+            <div className="mt-6 flex gap-2 print:hidden">
+              <BotonAccion item={itemModal} />
+            </div>
+          </>
+        )}
       </ComplementoPdfModal>
     </div>
   );

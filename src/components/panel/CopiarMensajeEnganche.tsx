@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { ClipboardCopy, Check } from "lucide-react";
 import { LINKS_PANEL } from "@/lib/panel/panelConfig";
+import { BloqueMensajeCopiable } from "./BloqueMensajeCopiable";
 
 function mensajeAgendar(): string {
   const link = LINKS_PANEL.calendario || "[pendiente: pega tu link de agendamiento en panelConfig.ts]";
@@ -19,36 +18,11 @@ function mensajeFormulario(): string {
   );
 }
 
-function BloqueMensaje({ titulo, mensaje }: { titulo: string; mensaje: string }) {
-  const [copiado, setCopiado] = useState(false);
-
-  const copiar = async () => {
-    await navigator.clipboard.writeText(mensaje);
-    setCopiado(true);
-    setTimeout(() => setCopiado(false), 2000);
-  };
-
-  return (
-    <div className="rounded-xl border border-border-glass bg-white/[0.02] p-4">
-      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-secondary">{titulo}</p>
-      <p className="whitespace-pre-line text-sm text-white/90">{mensaje}</p>
-      <button
-        type="button"
-        onClick={copiar}
-        className="mt-3 flex items-center gap-2 rounded-full border border-border-glass px-4 py-2 text-xs font-medium text-text-secondary transition-colors hover:border-accent/40 hover:text-white"
-      >
-        {copiado ? <Check size={14} className="text-accent" /> : <ClipboardCopy size={14} />}
-        {copiado ? "¡Copiado!" : "Copiar mensaje"}
-      </button>
-    </div>
-  );
-}
-
 export function CopiarMensajeEnganche() {
   return (
     <div className="space-y-3">
-      <BloqueMensaje titulo="1. Cuando muestre interés: agenda de una vez" mensaje={mensajeAgendar()} />
-      <BloqueMensaje
+      <BloqueMensajeCopiable titulo="1. Cuando muestre interés: agenda de una vez" mensaje={mensajeAgendar()} />
+      <BloqueMensajeCopiable
         titulo="2. Apenas quede agendado: manda el formulario como preparación"
         mensaje={mensajeFormulario()}
       />

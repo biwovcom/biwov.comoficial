@@ -2,6 +2,8 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
@@ -72,6 +74,13 @@ export function LoginForm() {
           {cargando ? "Entrando..." : "Entrar"}
         </Button>
       </form>
+
+      <Link
+        href="/"
+        className="mt-6 flex items-center justify-center gap-2 text-sm text-text-secondary transition-colors hover:text-white"
+      >
+        <ArrowLeft size={15} /> Volver al sitio web
+      </Link>
     </GlassCard>
   );
 }
