@@ -190,6 +190,12 @@ body {
     padding: 0 !important;
     background: #ffffff !important;
   }
+  /* Los complementos ahora viven dentro de la sección de Planes (#planes):
+     hay que ocultar también el resto del contenido de Planes (encabezado,
+     selector de moneda, tarjetas de planes) cuando se imprime un complemento. */
+  body:has(#complemento-modal-overlay) .planes-contenido-principal {
+    display: none !important;
+  }
   #complemento-modal-overlay {
     position: static !important;
     background: #ffffff !important;

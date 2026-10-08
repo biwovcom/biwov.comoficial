@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { PLANES, type Plan } from "@/data/planes";
 import { formatMoneda, type Moneda } from "@/lib/moneda";
 import { PlanDetalleModal } from "@/components/planes/PlanDetalleModal";
+import { Complementos } from "./Complementos";
 import { cn } from "@/lib/utils";
 
 export function Ecosystems() {
@@ -19,6 +20,7 @@ export function Ecosystems() {
   return (
     <section id="planes" className="bg-bg-light py-16 md:py-24">
       <Container>
+        <div className="planes-contenido-principal">
         <SectionHeading
           variant="light"
           eyebrow="Los planes"
@@ -118,6 +120,9 @@ export function Ecosystems() {
           Valores de referencia en pesos colombianos o dólares, según elijas arriba. Mínimo 6 meses.
           Las plataformas y la publicidad se pagan aparte.
         </p>
+        </div>
+
+        <Complementos />
       </Container>
 
       <PlanDetalleModal

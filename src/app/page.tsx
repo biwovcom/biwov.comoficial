@@ -4,7 +4,6 @@ import { ElCamino } from "@/components/sections/ElCamino";
 import { NeedsPaths } from "@/components/sections/NeedsPaths";
 import { ComoTrabajamos } from "@/components/sections/ComoTrabajamos";
 import { Ecosystems } from "@/components/sections/Ecosystems";
-import { Complementos } from "@/components/sections/Complementos";
 import { RoadmapStart } from "@/components/sections/RoadmapStart";
 import { FounderTeaser } from "@/components/sections/FounderTeaser";
 import { CaseStudies } from "@/components/sections/CaseStudies";
@@ -21,7 +20,6 @@ export default function Home() {
       <NeedsPaths />
       <ComoTrabajamos />
       <Ecosystems />
-      <Complementos />
       <RoadmapStart />
       <FounderTeaser />
       <CaseStudies />

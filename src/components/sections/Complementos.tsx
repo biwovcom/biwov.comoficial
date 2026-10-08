@@ -1,10 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, Printer } from "lucide-react";
-import { Container } from "@/components/ui/Container";
-import { SectionHeading } from "@/components/ui/SectionHeading";
+import { ChevronDown, ChevronLeft, ChevronRight, Printer } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { COMPLEMENTOS } from "@/data/complementos";
 import { ProduccionContenidoDetalle } from "./ProduccionContenidoDetalle";
@@ -33,91 +31,120 @@ function DetalleComplemento({ item }: { item: (typeof COMPLEMENTOS)[number] }) {
 export function Complementos() {
   const [abierto, setAbierto] = useState<string | null>(null);
   const [pdfAbierto, setPdfAbierto] = useState<string | null>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
 
   const itemPdf = COMPLEMENTOS.find((c) => c.titulo === pdfAbierto) ?? null;
 
+  const desplazar = (dir: 1 | -1) => {
+    trackRef.current?.scrollBy({ left: dir * 360, behavior: "smooth" });
+  };
+
   return (
-    <section id="complementos-section" className="py-16 md:py-24">
-      <Container>
-        <SectionHeading eyebrow="Complementos" title="¿Necesitas algo más?" />
+    <div id="complementos-section" className="mt-16 border-t border-border-light pt-16">
+      <div className="flex items-end justify-between gap-4">
+        <div>
+          <span className="inline-block rounded-full border border-border-light bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-accent">
+            Complementos
+          </span>
+          <h3 className="mt-3 text-2xl font-semibold text-text-on-light sm:text-3xl">
+            ¿Necesitas algo más?
+          </h3>
+        </div>
+        <div className="hidden shrink-0 gap-2 md:flex">
+          <button
+            type="button"
+            onClick={() => desplazar(-1)}
+            aria-label="Anterior"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-border-light text-text-on-light transition-colors hover:bg-white"
+          >
+            <ChevronLeft size={18} />
+          </button>
+          <button
+            type="button"
+            onClick={() => desplazar(1)}
+            aria-label="Siguiente"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-border-light text-text-on-light transition-colors hover:bg-white"
+          >
+            <ChevronRight size={18} />
+          </button>
+        </div>
+      </div>
 
-        <div className="mt-12 grid gap-5 sm:grid-cols-2">
-          {COMPLEMENTOS.map((item, i) => {
-            const tieneDetalle = Boolean(item.items?.length) || item.tipo === "produccion";
-            const estaAbierto = abierto === item.titulo;
-            return (
-              <motion.div
-                key={item.titulo}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.06 }}
-                className={cn(item.tipo === "produccion" && "sm:col-span-2")}
-              >
-                <GlassCard
-                  className={cn("h-full p-6", tieneDetalle && "cursor-pointer")}
-                  onClick={() => tieneDetalle && setAbierto(estaAbierto ? null : item.titulo)}
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <h3 className="text-base font-semibold text-white">{item.titulo}</h3>
-                    {tieneDetalle && (
-                      <ChevronDown
-                        className={cn(
-                          "h-4 w-4 shrink-0 text-accent transition-transform",
-                          estaAbierto && "rotate-180",
-                        )}
-                      />
+      <div
+        ref={trackRef}
+        className="scrollbar-none mt-8 flex gap-5 overflow-x-auto scroll-smooth pb-2 snap-x snap-mandatory"
+      >
+        {COMPLEMENTOS.map((item) => {
+          const tieneDetalle = Boolean(item.items?.length) || item.tipo === "produccion";
+          const estaAbierto = abierto === item.titulo;
+          return (
+            <GlassCard
+              key={item.titulo}
+              className={cn(
+                "shrink-0 snap-start p-6",
+                item.tipo === "produccion" ? "w-[340px] sm:w-[620px]" : "w-[320px] sm:w-[360px]",
+                tieneDetalle && "cursor-pointer",
+              )}
+              onClick={() => tieneDetalle && setAbierto(estaAbierto ? null : item.titulo)}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <h4 className="text-base font-semibold text-white">{item.titulo}</h4>
+                {tieneDetalle && (
+                  <ChevronDown
+                    className={cn(
+                      "h-4 w-4 shrink-0 text-accent transition-transform",
+                      estaAbierto && "rotate-180",
                     )}
-                  </div>
-                  <p className="mt-1.5 text-sm text-text-secondary">{item.detalle}</p>
+                  />
+                )}
+              </div>
+              <p className="mt-1.5 text-sm text-text-secondary">{item.detalle}</p>
 
-                  <AnimatePresence>
-                    {tieneDetalle && estaAbierto && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.25 }}
-                        className="overflow-hidden"
+              <AnimatePresence>
+                {tieneDetalle && estaAbierto && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="mt-4 border-t border-border-glass pt-4">
+                      <DetalleComplemento item={item} />
+                    </div>
+                    {item.linkAgendar && (
+                      <a
+                        href={item.linkAgendar}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="mt-4 block"
                       >
-                        <div className="mt-4 border-t border-border-glass pt-4">
-                          <DetalleComplemento item={item} />
-                        </div>
-                        {item.linkAgendar && (
-                          <a
-                            href={item.linkAgendar}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
-                            className="mt-4 block"
-                          >
-                            <button
-                              type="button"
-                              className="w-full rounded-full bg-gradient-brand px-4 py-2.5 text-sm font-semibold text-white transition-transform hover:scale-[1.02]"
-                            >
-                              {item.textoBotonAgendar ?? "Agendar"}
-                            </button>
-                          </a>
-                        )}
                         <button
                           type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setPdfAbierto(item.titulo);
-                          }}
-                          className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-border-glass py-2 text-xs font-medium text-text-secondary transition-colors hover:border-accent/40 hover:text-white"
+                          className="w-full rounded-full bg-gradient-brand px-4 py-2.5 text-sm font-semibold text-white transition-transform hover:scale-[1.02]"
                         >
-                          <Printer size={13} /> Descargar en PDF
+                          {item.textoBotonAgendar ?? "Agendar"}
                         </button>
-                      </motion.div>
+                      </a>
                     )}
-                  </AnimatePresence>
-                </GlassCard>
-              </motion.div>
-            );
-          })}
-        </div>
-      </Container>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPdfAbierto(item.titulo);
+                      }}
+                      className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-border-glass py-2 text-xs font-medium text-text-secondary transition-colors hover:border-accent/40 hover:text-white"
+                    >
+                      <Printer size={13} /> Descargar en PDF
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </GlassCard>
+          );
+        })}
+      </div>
 
       <ComplementoPdfModal
         titulo={itemPdf?.titulo ?? ""}
@@ -126,6 +153,6 @@ export function Complementos() {
       >
         {itemPdf && <DetalleComplemento item={itemPdf} />}
       </ComplementoPdfModal>
-    </section>
+    </div>
   );
 }
