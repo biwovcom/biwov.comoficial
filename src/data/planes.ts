@@ -15,6 +15,8 @@ export interface Plan {
   precioDesde: PrecioDual;
   montajeInicial: PrecioDual;
   pautaSugerida: PrecioDual;
+  /** Link de pago real (ej. Hotmart). Mientras no exista, "Comprar ahora" usa el flujo de WhatsApp. */
+  linkPago?: string;
 }
 
 export const DURACION_MINIMA_MESES = 6;
@@ -46,6 +48,7 @@ export const PLANES: Plan[] = [
     precioDesde: { cop: 900000, usd: 225 },
     montajeInicial: { cop: 600000, usd: 150 },
     pautaSugerida: { cop: 500000, usd: 125 },
+    linkPago: "https://pay.hotmart.com/H107948359T?bid=1791493935287",
   },
   {
     id: "crecimiento",

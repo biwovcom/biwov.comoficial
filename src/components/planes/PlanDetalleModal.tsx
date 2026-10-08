@@ -253,6 +253,12 @@ function PlanDetalleTarjeta({
                     </Button>
                   </a>
                 </div>
+              ) : plan.linkPago ? (
+                <a href={plan.linkPago} target="_blank" rel="noopener noreferrer" className="block">
+                  <Button size="lg" className="w-full">
+                    Comprar ahora
+                  </Button>
+                </a>
               ) : !mostrarCompra ? (
                 <Button size="lg" className="w-full" onClick={() => setMostrarCompra(true)}>
                   Comprar ahora

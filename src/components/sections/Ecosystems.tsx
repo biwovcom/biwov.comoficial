@@ -99,16 +99,29 @@ export function Ecosystems() {
                       Más información
                       <ArrowRight className="h-3.5 w-3.5" />
                     </Button>
-                    <Button
-                      variant="primary"
-                      className="flex-1 !px-3 !py-2 !text-xs whitespace-nowrap"
-                      onClick={() => {
-                        setAbrirEnCompra(true);
-                        setPlanAbierto(plan);
-                      }}
-                    >
-                      Comprar ahora
-                    </Button>
+                    {plan.linkPago ? (
+                      <a
+                        href={plan.linkPago}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1"
+                      >
+                        <Button variant="primary" className="w-full !px-3 !py-2 !text-xs whitespace-nowrap">
+                          Comprar ahora
+                        </Button>
+                      </a>
+                    ) : (
+                      <Button
+                        variant="primary"
+                        className="flex-1 !px-3 !py-2 !text-xs whitespace-nowrap"
+                        onClick={() => {
+                          setAbrirEnCompra(true);
+                          setPlanAbierto(plan);
+                        }}
+                      >
+                        Comprar ahora
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>
