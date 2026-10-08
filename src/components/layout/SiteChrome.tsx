@@ -24,13 +24,14 @@ export function SiteChrome({ children }: { children: ReactNode }) {
     pathname?.startsWith("/diagnostico") ||
     pathname?.startsWith("/cotizacion");
 
-  // Permite compartir un link directo (ej: biwov.com/?agenda=1) que abre
-  // de una vez el formulario "Agenda una asesoría", sin que el prospecto
-  // tenga que encontrar el botón.
+  // Permite compartir un link directo (ej: biwov.com/?diagnostico=1) que
+  // abre de una vez el formulario del diagnóstico gratis, sin que el
+  // prospecto tenga que encontrar el botón. "agenda" se mantiene por
+  // compatibilidad con links que ya se hayan compartido antes.
   useEffect(() => {
     if (sinChrome) return;
     const params = new URLSearchParams(window.location.search);
-    if (params.has("agenda")) {
+    if (params.has("diagnostico") || params.has("agenda")) {
       open();
     }
   }, [sinChrome, open]);

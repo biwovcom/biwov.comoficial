@@ -1,6 +1,7 @@
 import { GlassCard } from "@/components/ui/GlassCard";
 import { ETAPAS_SEGUIMIENTO } from "@/lib/panel/seguimiento";
 import { CopiarMensajeEnganche } from "@/components/panel/CopiarMensajeEnganche";
+import { CopyLinkButton } from "@/components/panel/CopyLinkButton";
 
 const PASOS_CIERRE = [
   {
@@ -37,6 +38,20 @@ export default function GuiaPage() {
         Los pasos para no improvisar: desde que alguien escribe hasta el cierre, y qué hacer si no
         responde.
       </p>
+
+      <GlassCard className="mt-6 p-6">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-text-secondary">
+          Link para enviar manualmente
+        </h2>
+        <p className="mt-1 text-sm text-text-secondary">
+          Si alguien te escribe por fuera del sitio (WhatsApp, Instagram, correo), copia este link
+          y mándaselo: al abrirlo le aparece el formulario del diagnóstico gratis de una vez, sin
+          que tenga que buscar el botón.
+        </p>
+        <div className="mt-3">
+          <CopyLinkButton path="/?diagnostico=1" label="Copiar link del diagnóstico gratis" />
+        </div>
+      </GlassCard>
 
       <GlassCard className="mt-6 p-6">
         <span className="rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-accent">
