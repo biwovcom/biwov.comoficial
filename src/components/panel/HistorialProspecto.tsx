@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Trash2, Plus, ChevronDown, Copy, Check } from "lucide-react";
+import { Trash2, Plus, ChevronDown, Copy, Check, Pencil } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
@@ -12,6 +12,17 @@ import {
   type HistorialEntrada,
 } from "@/lib/panel/historial";
 import { cn } from "@/lib/utils";
+
+async function actualizarEntrada(id: string, tipo: string, contenido: string) {
+  const res = await fetch("/api/panel/historial", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, tipo, contenido }),
+  });
+  if (!res.ok) return null;
+  const data = await res.json();
+  return data.entrada as HistorialEntrada;
+}
 
 function BotonCopiar({ texto }: { texto: string }) {
   const [copiado, setCopiado] = useState(false);
@@ -32,19 +43,63 @@ function BotonCopiar({ texto }: { texto: string }) {
   );
 }
 
+function FormularioEdicion({
+  tipoInicial,
+  contenidoInicial,
+  onGuardar,
+  onCancelar,
+}: {
+  tipoInicial: string;
+  contenidoInicial: string;
+  onGuardar: (tipo: string, contenido: string) => Promise<void>;
+  onCancelar: () => void;
+}) {
+  const [tipo, setTipo] = useState(tipoInicial);
+  const [contenido, setContenido] = useState(contenidoInicial);
+  const [guardando, setGuardando] = useState(false);
+
+  const guardar = async () => {
+    if (!tipo.trim() || !contenido.trim()) return;
+    setGuardando(true);
+    await onGuardar(tipo.trim(), contenido.trim());
+    setGuardando(false);
+  };
+
+  return (
+    <div onClick={(e) => e.stopPropagation()} className="space-y-2">
+      <Input value={tipo} onChange={(e) => setTipo(e.target.value)} />
+      <textarea
+        value={contenido}
+        onChange={(e) => setContenido(e.target.value)}
+        rows={5}
+        className="w-full rounded-xl border border-border-glass bg-white/[0.03] px-3 py-2 text-sm text-white outline-none focus:border-accent"
+      />
+      <div className="flex gap-2">
+        <Button size="md" onClick={guardar} disabled={guardando}>
+          {guardando ? "Guardando..." : "Guardar"}
+        </Button>
+        <Button size="md" variant="secondary" onClick={onCancelar} disabled={guardando}>
+          Cancelar
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 function CajaRecuadro({
   entrada,
   onEliminar,
-  anidado = false,
+  onActualizar,
 }: {
   entrada: HistorialEntrada;
   onEliminar: (id: string) => void;
-  anidado?: boolean;
+  onActualizar: (entrada: HistorialEntrada) => void;
 }) {
   const [abierto, setAbierto] = useState(false);
+  const [editando, setEditando] = useState(false);
 
   return (
-    <div className={cn("rounded-xl bg-white/[0.03] p-4", anidado && "bg-white/[0.05]")}>
+    <div className="rounded-xl bg-white/[0.05] p-4">
       <div className="flex items-start justify-between gap-3 cursor-pointer" onClick={() => setAbierto((v) => !v)}>
         <div className="min-w-0">
           <span className="text-xs font-semibold uppercase tracking-wide text-accent">{entrada.tipo}</span>
@@ -55,6 +110,19 @@ function CajaRecuadro({
         </div>
         <div className="flex shrink-0 items-center gap-3">
           <BotonCopiar texto={entrada.contenido} />
+          {abierto && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setEditando(true);
+              }}
+              aria-label="Editar"
+              className="text-text-secondary hover:text-accent"
+            >
+              <Pencil size={15} />
+            </button>
+          )}
           <button
             type="button"
             onClick={(e) => {
@@ -72,7 +140,25 @@ function CajaRecuadro({
           />
         </div>
       </div>
-      {abierto && <p className="mt-2 whitespace-pre-line text-sm text-white/90">{entrada.contenido}</p>}
+      {abierto && !editando && (
+        <p className="mt-2 whitespace-pre-line text-sm text-white/90">{entrada.contenido}</p>
+      )}
+      {abierto && editando && (
+        <div className="mt-2">
+          <FormularioEdicion
+            tipoInicial={entrada.tipo}
+            contenidoInicial={entrada.contenido}
+            onCancelar={() => setEditando(false)}
+            onGuardar={async (tipo, contenido) => {
+              const actualizada = await actualizarEntrada(entrada.id, tipo, contenido);
+              if (actualizada) {
+                onActualizar(actualizada);
+                setEditando(false);
+              }
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -179,6 +265,7 @@ export function HistorialProspecto({
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [abiertoId, setAbiertoId] = useState<string | null>(null);
+  const [editandoId, setEditandoId] = useState<string | null>(null);
 
   const agregar = async () => {
     if (!tipo.trim() || !contenido.trim()) {
@@ -215,6 +302,10 @@ export function HistorialProspecto({
     router.refresh();
   };
 
+  const actualizarEnLista = (actualizada: HistorialEntrada) => {
+    setEntradas((prev) => prev.map((e) => (e.id === actualizada.id ? actualizada : e)));
+  };
+
   const raiz = entradas.filter((e) => !e.parent_id);
   const hijosDe = (id: string) => entradas.filter((e) => e.parent_id === id);
 
@@ -226,7 +317,7 @@ export function HistorialProspecto({
       <p className="mt-1 text-xs text-text-secondary">
         Agrega notas sueltas (diagnóstico de redes, diagnóstico de la empresa, llamadas, reuniones…)
         para ir armando el historial completo de este prospecto. Da clic en una nota para
-        desplegarla, copiarla o agregarle una respuesta/resumen.
+        desplegarla, copiarla, editarla o agregarle una respuesta/resumen.
       </p>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-[220px_1fr]">
@@ -271,6 +362,7 @@ export function HistorialProspecto({
         )}
         {raiz.map((entrada) => {
           const abierto = abiertoId === entrada.id;
+          const editando = editandoId === entrada.id;
           const hijos = hijosDe(entrada.id);
           return (
             <div key={entrada.id} className="rounded-xl bg-white/[0.03] p-4">
@@ -290,6 +382,19 @@ export function HistorialProspecto({
                 </div>
                 <div className="flex shrink-0 items-center gap-3">
                   <BotonCopiar texto={entrada.contenido} />
+                  {abierto && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditandoId(entrada.id);
+                      }}
+                      aria-label="Editar"
+                      className="text-text-secondary hover:text-accent"
+                    >
+                      <Pencil size={15} />
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={(e) => {
@@ -310,12 +415,32 @@ export function HistorialProspecto({
 
               {abierto && (
                 <div className="mt-3 space-y-3">
-                  <p className="whitespace-pre-line text-sm text-white/90">{entrada.contenido}</p>
+                  {editando ? (
+                    <FormularioEdicion
+                      tipoInicial={entrada.tipo}
+                      contenidoInicial={entrada.contenido}
+                      onCancelar={() => setEditandoId(null)}
+                      onGuardar={async (tipoNuevo, contenidoNuevo) => {
+                        const actualizada = await actualizarEntrada(entrada.id, tipoNuevo, contenidoNuevo);
+                        if (actualizada) {
+                          actualizarEnLista(actualizada);
+                          setEditandoId(null);
+                        }
+                      }}
+                    />
+                  ) : (
+                    <p className="whitespace-pre-line text-sm text-white/90">{entrada.contenido}</p>
+                  )}
 
                   {hijos.length > 0 && (
                     <div className="space-y-2 border-l border-border-glass pl-4">
                       {hijos.map((hijo) => (
-                        <CajaRecuadro key={hijo.id} entrada={hijo} onEliminar={eliminar} anidado />
+                        <CajaRecuadro
+                          key={hijo.id}
+                          entrada={hijo}
+                          onEliminar={eliminar}
+                          onActualizar={actualizarEnLista}
+                        />
                       ))}
                     </div>
                   )}

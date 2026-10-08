@@ -36,6 +36,42 @@ export async function POST(request: Request) {
   return NextResponse.json({ ok: true, entrada: data });
 }
 
+export async function PATCH(request: Request) {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+
+  const body: { id?: string; tipo?: string; contenido?: string } = await request
+    .json()
+    .catch(() => ({}));
+
+  const id = body.id?.trim();
+  const tipo = body.tipo?.trim();
+  const contenido = body.contenido?.trim();
+
+  if (!id || !tipo || !contenido) {
+    return NextResponse.json({ error: "Falta el tipo o el contenido" }, { status: 400 });
+  }
+
+  const { data, error } = await supabase
+    .from("prospecto_historial")
+    .update({ tipo, contenido })
+    .eq("id", id)
+    .select("id, prospecto_id, parent_id, tipo, contenido, created_at")
+    .single();
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ ok: true, entrada: data });
+}
+
 export async function DELETE(request: Request) {
   const supabase = await createSupabaseServerClient();
   const {
