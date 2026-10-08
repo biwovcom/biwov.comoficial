@@ -80,7 +80,7 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
 
   const { data: historial } = await supabase
     .from("prospecto_historial")
-    .select("id, prospecto_id, tipo, contenido, created_at")
+    .select("id, prospecto_id, parent_id, tipo, contenido, created_at")
     .eq("prospecto_id", id)
     .order("created_at", { ascending: false })
     .returns<HistorialEntrada[]>();

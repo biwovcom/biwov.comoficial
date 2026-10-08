@@ -11,11 +11,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
-  const body: { prospectoId?: string; tipo?: string; contenido?: string } = await request
-    .json()
-    .catch(() => ({}));
+  const body: { prospectoId?: string; parentId?: string; tipo?: string; contenido?: string } =
+    await request.json().catch(() => ({}));
 
   const prospectoId = body.prospectoId?.trim();
+  const parentId = body.parentId?.trim() || null;
   const tipo = body.tipo?.trim();
   const contenido = body.contenido?.trim();
 
@@ -25,8 +25,8 @@ export async function POST(request: Request) {
 
   const { data, error } = await supabase
     .from("prospecto_historial")
-    .insert({ prospecto_id: prospectoId, tipo, contenido })
-    .select("id, prospecto_id, tipo, contenido, created_at")
+    .insert({ prospecto_id: prospectoId, parent_id: parentId, tipo, contenido })
+    .select("id, prospecto_id, parent_id, tipo, contenido, created_at")
     .single();
 
   if (error) {

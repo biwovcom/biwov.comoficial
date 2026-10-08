@@ -499,3 +499,13 @@ alter table plan_compras enable row level security;
 drop policy if exists "equipo autenticado - todo" on plan_compras;
 create policy "equipo autenticado - todo" on plan_compras
   for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+-- =========================================================
+-- HISTORIAL: RECUADROS ANIDADOS (respuestas/resúmenes dentro de una nota)
+-- Permite colgar recuadros adicionales (ej. "Respuesta", "Resumen") debajo
+-- de una nota del historial, sin mezclarlos como notas sueltas aparte.
+-- =========================================================
+alter table prospecto_historial add column if not exists parent_id uuid
+  references prospecto_historial(id) on delete cascade;
+
+create index if not exists idx_prospecto_historial_parent on prospecto_historial(parent_id);
