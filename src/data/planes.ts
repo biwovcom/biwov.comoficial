@@ -56,7 +56,12 @@ export const PLANES: Plan[] = [
       "Para negocios que ya tienen contenido o publicidad, pero les falta estrategia, orden y medir.",
     incluye: [
       { label: "Todo lo del Plan Esencial" },
-      { label: "1 página hecha para que te escriban, agenden o dejen sus datos" },
+      {
+        label: "1 página web hecha para que te escriban, agenden o dejen sus datos",
+        subitems: [
+          "Una página web (landing page, en inglés) es una sola pantalla enfocada en una sola cosa: lograr que la persona te escriba, agende una cita o deje sus datos — no es tu sitio web completo, es una página diseñada para convertir visitas en contactos.",
+        ],
+      },
       { label: "Asistente con IA que filtra a los curiosos y te pasa los interesados" },
     ],
     precioDesde: { cop: 1900000, usd: 475 },

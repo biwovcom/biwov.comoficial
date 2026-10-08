@@ -83,13 +83,29 @@ export function Complementos() {
                         <div className="mt-4 border-t border-border-glass pt-4">
                           <DetalleComplemento item={item} />
                         </div>
+                        {item.linkAgendar && (
+                          <a
+                            href={item.linkAgendar}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="mt-4 block"
+                          >
+                            <button
+                              type="button"
+                              className="w-full rounded-full bg-gradient-brand px-4 py-2.5 text-sm font-semibold text-white transition-transform hover:scale-[1.02]"
+                            >
+                              {item.textoBotonAgendar ?? "Agendar"}
+                            </button>
+                          </a>
+                        )}
                         <button
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
                             setPdfAbierto(item.titulo);
                           }}
-                          className="mt-4 flex w-full items-center justify-center gap-2 rounded-full border border-border-glass py-2 text-xs font-medium text-text-secondary transition-colors hover:border-accent/40 hover:text-white"
+                          className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-border-glass py-2 text-xs font-medium text-text-secondary transition-colors hover:border-accent/40 hover:text-white"
                         >
                           <Printer size={13} /> Descargar en PDF
                         </button>

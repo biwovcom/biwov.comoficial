@@ -53,6 +53,18 @@ export const BLOQUES_DIAGNOSTICO: BloqueDiagnostico[] = [
       "¿Por qué le compran a él y no a otros?",
       "3 competidores",
       "Testimonios o casos de éxito",
+      "¿En qué es profesional o especialista?",
+    ],
+  },
+  {
+    id: "identidad-marca",
+    titulo: "Identidad y branding",
+    preguntasGuia: [
+      "¿Qué emoción transmite su empresa, negocio, producto o servicio?",
+      "¿Cuáles son las utilidades prácticas de su negocio? (lo concreto que le resuelve al cliente en el día a día)",
+      "Filosofía de marca: ¿en qué cree la marca? Ej: \"compartir es bueno\", \"hoy ayudé a alguien más\".",
+      "Experiencia de marca: el signo de la marca, cómo la identifican visualmente (colores, logo, tono).",
+      "Comunidad de marca: ¿cuál es el propósito del negocio, de la empresa, del producto? ¿Para quién existe y a quién reúne?",
     ],
   },
   {
