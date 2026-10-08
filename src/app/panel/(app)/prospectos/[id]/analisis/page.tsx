@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Prospecto } from "@/lib/panel/prospectos";
+import type { HistorialEntrada } from "@/lib/panel/historial";
+import { HistorialProspecto } from "@/components/panel/HistorialProspecto";
 import { AnalisisForm } from "./AnalisisForm";
 
 export default async function AnalisisPage({ params }: { params: Promise<{ id: string }> }) {
@@ -32,6 +34,13 @@ export default async function AnalisisPage({ params }: { params: Promise<{ id: s
     .limit(1)
     .maybeSingle();
 
+  const { data: historial } = await supabase
+    .from("prospecto_historial")
+    .select("id, prospecto_id, parent_id, tipo, contenido, created_at")
+    .eq("prospecto_id", id)
+    .order("created_at", { ascending: false })
+    .returns<HistorialEntrada[]>();
+
   return (
     <div>
       <Link
@@ -46,6 +55,10 @@ export default async function AnalisisPage({ params }: { params: Promise<{ id: s
         Analiza el diagnóstico de {prospecto.nombre} e identifica el cuello de botella de su
         negocio. Puedes editar cualquier parte antes de usarla en la propuesta.
       </p>
+
+      <div className="print:hidden">
+        <HistorialProspecto prospectoId={id} entradasIniciales={historial ?? []} />
+      </div>
 
       <div className="mt-8">
         <AnalisisForm

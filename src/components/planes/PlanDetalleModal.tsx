@@ -133,6 +133,10 @@ function PlanDetalleTarjeta({
     }
     setEnviando(true);
     setError(null);
+    // Se abre la pestaña ya (en blanco) dentro del mismo clic del usuario:
+    // si se espera a que termine el fetch antes de abrir, el navegador lo
+    // trata como pop-up y lo bloquea.
+    const ventanaWhatsApp = window.open("", "_blank");
     const monto = moneda === "USD" ? totalSeisMeses.usd : totalSeisMeses.cop;
     const res = await fetch("/api/plan-checkout", {
       method: "POST",
@@ -149,11 +153,17 @@ function PlanDetalleTarjeta({
     });
     setEnviando(false);
     if (!res.ok) {
+      ventanaWhatsApp?.close();
       setError("No se pudo enviar. Intenta de nuevo.");
       return;
     }
     const mensaje = `¡Hola! 👋 Quiero comprar el Plan ${plan.nombre} (${formatMoneda(totalSeisMeses, moneda)} por ${DURACION_MINIMA_MESES} meses). Mi nombre es ${contacto.nombre}.`;
-    window.open(linkWhatsApp(contacto.whatsapp || WHATSAPP_BIWOV, mensaje), "_blank");
+    const urlWhatsApp = linkWhatsApp(contacto.whatsapp || WHATSAPP_BIWOV, mensaje);
+    if (ventanaWhatsApp) {
+      ventanaWhatsApp.location.href = urlWhatsApp;
+    } else {
+      window.open(urlWhatsApp, "_blank");
+    }
     setEnviado(true);
   };
 
@@ -227,8 +237,21 @@ function PlanDetalleTarjeta({
                   <p className="text-2xl">✅</p>
                   <p className="mt-2 text-sm text-white">
                     ¡Gracias, {contacto.nombre.split(" ")[0]}! Te abrimos WhatsApp para coordinar el
-                    pago. Si no se abrió, escríbenos directo.
+                    pago. Si no se abrió, dale clic aquí abajo.
                   </p>
+                  <a
+                    href={linkWhatsApp(
+                      contacto.whatsapp || WHATSAPP_BIWOV,
+                      `¡Hola! 👋 Quiero comprar el Plan ${plan.nombre}. Mi nombre es ${contacto.nombre}.`,
+                    )}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 block"
+                  >
+                    <Button size="lg" className="w-full">
+                      Abrir WhatsApp
+                    </Button>
+                  </a>
                 </div>
               ) : !mostrarCompra ? (
                 <Button size="lg" className="w-full" onClick={() => setMostrarCompra(true)}>

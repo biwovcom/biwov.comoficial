@@ -1,19 +1,26 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
-import { SITUACIONES_NEGOCIO, NOMBRES_PLAN } from "@/data/queNecesita";
+import { SITUACIONES_NEGOCIO, NOMBRES_PLAN, type PlanId } from "@/data/queNecesita";
 import { useQuoter } from "@/components/quoter/QuoterProvider";
+import { cn } from "@/lib/utils";
+
+const PLANES_TABS: PlanId[] = ["esencial", "crecimiento", "escala"];
 
 export function NeedsPaths() {
   const { open } = useQuoter();
+  const [activo, setActivo] = useState<PlanId>("esencial");
 
   const irAlPlan = () => {
     document.getElementById("planes")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
+
+  const situaciones = SITUACIONES_NEGOCIO.filter((s) => s.plan === activo);
 
   return (
     <section className="py-16 md:py-24">
@@ -21,33 +28,53 @@ export function NeedsPaths() {
         <SectionHeading
           eyebrow="Encuentra tu camino"
           title="¿Qué necesita tu negocio hoy?"
-          description="Elige lo que más se parece a tu situación. El plan que necesitas aparece debajo de cada opción: dale clic para verlo."
+          description="Elige el plan que más suena a ti y mira en qué casos encaja."
         />
 
-        <div className="mx-auto mt-14 grid max-w-4xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {SITUACIONES_NEGOCIO.map((item, i) => (
-            <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: i * 0.04 }}
+        <div className="mx-auto mt-10 flex max-w-md justify-center gap-2">
+          {PLANES_TABS.map((plan) => (
+            <button
+              key={plan}
+              type="button"
+              onClick={() => setActivo(plan)}
+              className={cn(
+                "flex-1 rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                activo === plan
+                  ? "border-accent bg-gradient-brand text-white"
+                  : "border-border-glass text-text-secondary hover:border-accent/40 hover:text-white",
+              )}
             >
-              <GlassCard
-                role="button"
-                tabIndex={0}
-                onClick={irAlPlan}
-                onKeyDown={(e) => e.key === "Enter" && irAlPlan()}
-                className="flex h-full cursor-pointer flex-col gap-3 p-5 transition-all hover:-translate-y-0.5 hover:border-accent/50"
-              >
-                <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-gradient-brand px-3 py-1 text-xs font-bold uppercase tracking-wide text-white shadow-[0_0_16px_-4px_rgba(50,153,204,0.8)]">
-                  Plan {NOMBRES_PLAN[item.plan]}
-                </span>
-                <p className="text-sm font-medium text-white md:text-base">{item.situacion}</p>
-                <p className="mt-auto text-xs text-text-secondary">{item.tecnica}</p>
-              </GlassCard>
-            </motion.div>
+              {NOMBRES_PLAN[plan]}
+            </button>
           ))}
+        </div>
+
+        <div className="mx-auto mt-8 max-w-2xl space-y-2.5">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activo}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+              className="space-y-2.5"
+            >
+              {situaciones.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={irAlPlan}
+                  className="group flex w-full items-center justify-between gap-3 rounded-2xl border border-border-glass bg-white/[0.03] px-5 py-3.5 text-left transition-colors hover:border-accent/50 hover:bg-white/[0.06]"
+                >
+                  <div>
+                    <p className="text-sm font-medium text-white">{item.situacion}</p>
+                    <p className="mt-0.5 text-xs text-text-secondary">{item.tecnica}</p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 shrink-0 text-accent opacity-0 transition-opacity group-hover:opacity-100" />
+                </button>
+              ))}
+            </motion.div>
+          </AnimatePresence>
         </div>
 
         <div className="mt-10 flex justify-center">
