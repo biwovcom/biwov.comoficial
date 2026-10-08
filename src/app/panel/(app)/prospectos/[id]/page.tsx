@@ -121,10 +121,6 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
       </div>
 
       <div className="mt-4 flex flex-wrap gap-3">
-        <CopyLinkButton
-          path={`/diagnostico/${prospecto.id}`}
-          label="Copiar link del diagnóstico para compartir"
-        />
         <EliminarProspectoButton prospectoId={prospecto.id} nombre={prospecto.nombre} />
       </div>
 
@@ -231,6 +227,14 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
                             : "Abrir →"}
                     </span>
                   </Link>
+                  {paso.ruta === "filtro" && (
+                    <div className="mt-2">
+                      <CopyLinkButton
+                        path={`/diagnostico/${prospecto.id}`}
+                        label="Copiar link del filtro para compartir"
+                      />
+                    </div>
+                  )}
                 </li>
               ) : (
                 <li

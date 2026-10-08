@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Poppins, MuseoModerno } from "next/font/google";
+import { Poppins, MuseoModerno, Montserrat } from "next/font/google";
 import "./globals.css";
 import { QuoterProvider } from "@/components/quoter/QuoterProvider";
 import { SiteChrome } from "@/components/layout/SiteChrome";
@@ -14,6 +14,13 @@ const museoModerno = MuseoModerno({
   variable: "--font-museo",
   subsets: ["latin"],
   weight: ["600", "700", "800"],
+});
+
+// Solo para las cotizaciones/propuestas en PDF (el sitio usa Poppins).
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -48,7 +55,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es" className={`${poppins.variable} ${museoModerno.variable} h-full antialiased`}>
+    <html
+      lang="es"
+      className={`${poppins.variable} ${museoModerno.variable} ${montserrat.variable} h-full antialiased`}
+    >
       <body className="flex min-h-full flex-col bg-bg-base">
         <QuoterProvider>
           <SiteChrome>{children}</SiteChrome>

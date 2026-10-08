@@ -148,6 +148,12 @@ function PlanDetalleTarjeta({
       exit={{ opacity: 0, y: 20, scale: 0.98 }}
       className="scrollbar-none max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-border-glass bg-[#0c1119] p-6 md:p-8"
     >
+      <div className="hidden print:mb-6 print:block">
+        <span className="font-logo text-2xl font-bold">biwov_</span>
+        <p className="mt-0.5 text-xs text-[#4b5563]">Agencia de Marketing Digital</p>
+        <div className="mt-3 h-1 w-full rounded-full bg-gradient-to-r from-[#1d4772] to-[#3d98cc]" />
+      </div>
+
       <div className="flex items-start justify-between gap-4">
               <div>
                 <span className="text-xs font-semibold uppercase tracking-wide text-accent">

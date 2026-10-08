@@ -144,6 +144,7 @@ body {
     border: none !important;
     box-shadow: none !important;
     color: #111827 !important;
+    font-family: var(--font-montserrat), ui-sans-serif, sans-serif !important;
   }
   #plan-modal-overlay h2,
   #plan-modal-overlay h3,
@@ -151,6 +152,18 @@ body {
   #plan-modal-overlay span,
   #plan-modal-overlay li {
     color: #111827 !important;
+  }
+  /* Marca biwov_: azul claro del logo para resaltar, azul oscuro para
+     títulos, y la tipografía del logo solo para la palabra "biwov". */
+  #plan-modal-overlay h2 {
+    color: #1d4772 !important;
+  }
+  #plan-modal-overlay [class*="text-accent"] {
+    color: #3d98cc !important;
+  }
+  #plan-modal-overlay .font-logo {
+    font-family: var(--font-museo), cursive !important;
+    color: #1d4772 !important;
   }
   #plan-modal-overlay [class*="text-secondary"] {
     color: #4b5563 !important;
