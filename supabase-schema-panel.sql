@@ -509,3 +509,19 @@ alter table prospecto_historial add column if not exists parent_id uuid
   references prospecto_historial(id) on delete cascade;
 
 create index if not exists idx_prospecto_historial_parent on prospecto_historial(parent_id);
+
+-- =========================================================
+-- REGISTRO DE VENTA MANUAL (paquete/costo por cliente) Y ACEPTACIÓN DE CONTRATO
+-- Para clientes que Kathe cierra directamente (costo puede variar del
+-- precio de lista), y para dejar constancia de que la persona aceptó el
+-- contrato y el uso de sus datos — tanto si lo hizo ella a mano como si lo
+-- hizo el cliente por el checkout público.
+-- =========================================================
+alter table prospectos add column if not exists paquete_adquirido text;
+alter table prospectos add column if not exists costo_paquete numeric;
+alter table prospectos add column if not exists costo_paquete_moneda text check (costo_paquete_moneda in ('COP','USD'));
+alter table prospectos add column if not exists contrato_aceptado boolean not null default false;
+alter table prospectos add column if not exists contrato_aceptado_en timestamptz;
+
+alter table plan_compras add column if not exists acepta_contrato boolean not null default false;
+alter table plan_compras add column if not exists acepta_datos boolean not null default false;

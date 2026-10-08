@@ -11,7 +11,6 @@ import {
   OPCIONES_META,
   OPCIONES_CUMPLIMIENTO_VENTAS,
   OPCIONES_CANAL_LLEGADA,
-  OPCIONES_PRIORIDAD_EQUIPO,
   OPCIONES_CUANDO_EMPEZAR,
   type RespuestasFiltro,
 } from "@/lib/panel/filtroRapido";
@@ -45,7 +44,7 @@ function OptionCard({
 const inputClass =
   "w-full rounded-xl border border-border-glass bg-white/[0.03] px-4 py-3 text-sm text-white placeholder:text-text-secondary/60 outline-none focus:border-accent";
 
-const TOTAL_PASOS = 7;
+const TOTAL_PASOS = 6;
 
 /**
  * Las 7 preguntas del diagnóstico inicial, reutilizadas tanto en la versión
@@ -84,7 +83,6 @@ export function PreguntasFiltro({
     Boolean(respuestas.meta) && (respuestas.meta !== "otro" || Boolean(respuestas.metaOtro?.trim())),
     Boolean(respuestas.cumplimientoVentas),
     canales.length > 0 && (!canales.includes("otro") || Boolean(respuestas.canalLlegadaOtro?.trim())),
-    Boolean(respuestas.prioridadEquipo),
     Boolean(respuestas.cuandoEmpezar),
     Boolean(respuestas.presupuesto),
   ];
@@ -232,26 +230,6 @@ export function PreguntasFiltro({
           {paso === 4 && (
             <>
               <p className="mb-1 text-sm font-medium text-white">
-                Para ti, ¿qué tan prioritario es contar con un equipo que te mantenga con total
-                visibilidad de las estadísticas, lidere el crecimiento con valor agregado y te dé
-                control estratégico de tu negocio?
-              </p>
-              <div className="grid gap-2 sm:grid-cols-2">
-                {OPCIONES_PRIORIDAD_EQUIPO.map((o) => (
-                  <OptionCard
-                    key={o.id}
-                    label={o.label}
-                    selected={respuestas.prioridadEquipo === o.id}
-                    onClick={() => update({ prioridadEquipo: o.id })}
-                  />
-                ))}
-              </div>
-            </>
-          )}
-
-          {paso === 5 && (
-            <>
-              <p className="mb-1 text-sm font-medium text-white">
                 Si encontraras la estrategia adecuada para tu negocio, ¿cuándo te gustaría
                 comenzar a implementarla?
               </p>
@@ -268,7 +246,7 @@ export function PreguntasFiltro({
             </>
           )}
 
-          {paso === 6 && (
+          {paso === 5 && (
             <>
               <p className="mb-1 text-sm font-medium text-white">
                 Para recomendarte algo que de verdad se ajuste a tu negocio, ¿cuánto podrías

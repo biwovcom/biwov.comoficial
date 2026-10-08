@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Calculator, Clock, Package, Users2, UserPlus } from "lucide-react";
+import { Calculator, Clock, CreditCard, Package, Users2, UserPlus } from "lucide-react";
 import { LogoutButton } from "./LogoutButton";
 
 const LINKS = [
@@ -7,6 +7,7 @@ const LINKS = [
   { href: "/panel/prospectos/nuevo", label: "Nuevo prospecto", icon: UserPlus },
   { href: "/panel/cotizaciones", label: "Cotizaciones", icon: Calculator },
   { href: "/panel/paquetes", label: "Paquetes", icon: Package },
+  { href: "/panel/compras", label: "Compras de planes", icon: CreditCard },
   { href: "/panel/tiempos", label: "Tiempos", icon: Clock },
 ];
 

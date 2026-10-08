@@ -98,7 +98,7 @@ export function Ecosystems() {
                       <ArrowRight className="h-3.5 w-3.5" />
                     </Button>
                     <Button
-                      variant={plan.id === "crecimiento" ? "primary" : "secondary"}
+                      variant="primary"
                       className="flex-1 !px-3 !py-2 !text-xs whitespace-nowrap"
                       onClick={() => {
                         setAbrirEnCompra(true);

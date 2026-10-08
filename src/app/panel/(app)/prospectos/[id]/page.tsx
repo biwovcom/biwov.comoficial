@@ -22,6 +22,7 @@ import { EliminarProspectoButton } from "@/components/panel/EliminarProspectoBut
 import { CopiarParaIABoton } from "@/components/panel/CopiarParaIABoton";
 import { RedesSocialesLinks } from "@/components/panel/RedesSocialesLinks";
 import { EditarClasificacion } from "@/components/panel/EditarClasificacion";
+import { PaqueteClienteForm } from "@/components/panel/PaqueteClienteForm";
 import { HistorialProspecto } from "@/components/panel/HistorialProspecto";
 import type { RespuestasDiagnosticoLargo } from "@/lib/panel/diagnosticoLargo";
 import type { HistorialEntrada } from "@/lib/panel/historial";
@@ -35,7 +36,6 @@ interface FiltroRespuestaFila {
 
 const PROXIMOS_PASOS = [
   { label: "Filtro rápido", ruta: "filtro" },
-  { label: "Preparar llamada (10 preguntas clave)", ruta: "llamada" },
   { label: "Diagnóstico profundo (onboarding, después de la venta)", ruta: "diagnostico" },
   { label: "Análisis con IA", ruta: "analisis" },
   { label: "Propuesta", ruta: null },
@@ -71,12 +71,6 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
     .select("completado, respuestas")
     .eq("prospecto_id", id)
     .maybeSingle<{ completado: boolean; respuestas: RespuestasDiagnosticoLargo }>();
-
-  const { data: llamada } = await supabase
-    .from("llamada_respuestas")
-    .select("completado")
-    .eq("prospecto_id", id)
-    .maybeSingle<{ completado: boolean }>();
 
   const { data: historial } = await supabase
     .from("prospecto_historial")
@@ -198,6 +192,18 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
               fechaUltimoSeguimientoInicial={prospecto.fecha_ultimo_seguimiento}
             />
           </div>
+          {prospecto.categoria === "cliente" && (
+            <div className="mt-4">
+              <PaqueteClienteForm
+                prospectoId={prospecto.id}
+                paqueteInicial={prospecto.paquete_adquirido}
+                costoInicial={prospecto.costo_paquete}
+                monedaInicial={prospecto.costo_paquete_moneda}
+                contratoAceptadoInicial={prospecto.contrato_aceptado}
+                contratoAceptadoEnInicial={prospecto.contrato_aceptado_en}
+              />
+            </div>
+          )}
         </GlassCard>
 
         <GlassCard className="p-6">
@@ -216,15 +222,11 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
                     <span className="text-xs text-accent">
                       {paso.ruta === "filtro" && resumenFiltro
                         ? "Ver de nuevo →"
-                        : paso.ruta === "llamada" && llamada
-                          ? llamada.completado
+                        : paso.ruta === "diagnostico" && diagnostico
+                          ? diagnostico.completado
                             ? "Ver de nuevo →"
                             : "Continuar →"
-                          : paso.ruta === "diagnostico" && diagnostico
-                            ? diagnostico.completado
-                              ? "Ver de nuevo →"
-                              : "Continuar →"
-                            : "Abrir →"}
+                          : "Abrir →"}
                     </span>
                   </Link>
                   {paso.ruta === "filtro" && (

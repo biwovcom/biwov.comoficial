@@ -12,7 +12,6 @@ export type CanalLlegada =
   | "ugc-influencers"
   | "pauta-paga"
   | "otro";
-export type PrioridadEquipo = "muy-alto" | "medio" | "bajo";
 export type CuandoEmpezar = "inmediatamente" | "proximas-semanas" | "proximos-meses";
 
 export interface RespuestasFiltro {
@@ -26,14 +25,13 @@ export interface RespuestasFiltro {
   canalLlegada?: CanalLlegada[];
   /** Solo aplica cuando canalLlegada incluye "otro". */
   canalLlegadaOtro?: string;
-  prioridadEquipo?: PrioridadEquipo;
   cuandoEmpezar?: CuandoEmpezar;
   presupuesto?: string; // id de RANGOS_PRESUPUESTO[moneda]
 }
 
 export const OPCIONES_OBJETIVO: { id: Objetivo; label: string }[] = [
   { id: "sin-resultados", label: "Ya hago contenido pero no tengo buenos resultados" },
-  { id: "no-calificados", label: "Me llegan clientes por redes pero no están calificados" },
+  { id: "no-calificados", label: "Me llega gente pero no calificada" },
   { id: "sin-presencia", label: "Aún no tengo presencia digital" },
   { id: "otro", label: "Otra" },
 ];
@@ -60,18 +58,6 @@ export const OPCIONES_CANAL_LLEGADA: { id: CanalLlegada; label: string }[] = [
   { id: "otro", label: "Otro" },
 ];
 
-export const OPCIONES_PRIORIDAD_EQUIPO: { id: PrioridadEquipo; label: string }[] = [
-  {
-    id: "muy-alto",
-    label: "Muy alto: busco un aliado estratégico que lidere los números y la ejecución",
-  },
-  {
-    id: "medio",
-    label: "Medio: me interesa delegar, pero quiero estar muy encima de cada detalle",
-  },
-  { id: "bajo", label: "Bajo: prefiero resolver la operación por mi cuenta" },
-];
-
 export const OPCIONES_CUANDO_EMPEZAR: { id: CuandoEmpezar; label: string }[] = [
   { id: "inmediatamente", label: "Inmediatamente (estamos listos para arrancar ya)" },
   { id: "proximas-semanas", label: "En las próximas semanas" },
@@ -81,7 +67,7 @@ export const OPCIONES_CUANDO_EMPEZAR: { id: CuandoEmpezar; label: string }[] = [
 /** Fragmentos para encajar en "ahora mismo estás batallando con que no tienes ___". */
 const FRASES_DESAFIO: Record<Objetivo, string> = {
   "sin-resultados": "buenos resultados con tu contenido",
-  "no-calificados": "clientes calificados llegando por tus redes",
+  "no-calificados": "gente calificada llegando por tus redes",
   "sin-presencia": "presencia digital",
   otro: "",
 };
@@ -143,10 +129,6 @@ export function resumenRespuestasFiltro(r: RespuestasFiltro, moneda: Moneda): Re
       respuesta: canales.length > 0 ? canales.join(", ") : "—",
     },
     {
-      pregunta: "Prioridad de tener un equipo con visibilidad y control estratégico",
-      respuesta: buscar(OPCIONES_PRIORIDAD_EQUIPO, r.prioridadEquipo),
-    },
-    {
       pregunta: "¿Cuándo quiere empezar a implementar la estrategia?",
       respuesta: buscar(OPCIONES_CUANDO_EMPEZAR, r.cuandoEmpezar),
     },
@@ -161,7 +143,6 @@ export function respuestasCompletas(r: RespuestasFiltro): boolean {
       r.cumplimientoVentas &&
       r.canalLlegada &&
       r.canalLlegada.length > 0 &&
-      r.prioridadEquipo &&
       r.cuandoEmpezar &&
       r.presupuesto,
   );

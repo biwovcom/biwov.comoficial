@@ -12,9 +12,17 @@ export async function POST(request: Request) {
   const moneda = body?.moneda === "USD" ? "USD" : "COP";
   const monto = Number(body?.monto ?? 0);
   const snapshot = body?.snapshot ?? {};
+  const aceptaContrato = Boolean(body?.aceptaContrato);
+  const aceptaDatos = Boolean(body?.aceptaDatos);
 
   if (!planId || !nombre || (!email && !whatsapp)) {
     return NextResponse.json({ error: "Escribe tu nombre y un correo o WhatsApp." }, { status: 400 });
+  }
+  if (!aceptaContrato || !aceptaDatos) {
+    return NextResponse.json(
+      { error: "Debes aceptar el contrato y el tratamiento de datos." },
+      { status: 400 },
+    );
   }
 
   const supabase = getSupabaseClient();
@@ -31,6 +39,8 @@ export async function POST(request: Request) {
     moneda,
     monto,
     snapshot,
+    acepta_contrato: aceptaContrato,
+    acepta_datos: aceptaDatos,
   });
 
   if (error) {

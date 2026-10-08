@@ -86,6 +86,11 @@ export interface Prospecto {
   fecha_ultimo_seguimiento: string | null;
   acepto_tratamiento_datos: boolean;
   acepto_tratamiento_datos_en: string | null;
+  paquete_adquirido: string | null;
+  costo_paquete: number | null;
+  costo_paquete_moneda: "COP" | "USD" | null;
+  contrato_aceptado: boolean;
+  contrato_aceptado_en: string | null;
 }
 
 export interface NuevoProspectoInput {

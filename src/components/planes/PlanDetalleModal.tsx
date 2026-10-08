@@ -103,6 +103,8 @@ function PlanDetalleTarjeta({
 }) {
   const [mostrarCompra, setMostrarCompra] = useState(abrirEnCompraInicial);
   const [contacto, setContacto] = useState(CONTACTO_INICIAL);
+  const [aceptaContrato, setAceptaContrato] = useState(false);
+  const [aceptaDatos, setAceptaDatos] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [enviado, setEnviado] = useState(false);
@@ -125,6 +127,10 @@ function PlanDetalleTarjeta({
       setError("Escribe tu nombre y un correo o WhatsApp.");
       return;
     }
+    if (!aceptaContrato || !aceptaDatos) {
+      setError("Debes aceptar el contrato y el tratamiento de tus datos para continuar.");
+      return;
+    }
     setEnviando(true);
     setError(null);
     const monto = moneda === "USD" ? totalSeisMeses.usd : totalSeisMeses.cop;
@@ -136,6 +142,8 @@ function PlanDetalleTarjeta({
         ...contacto,
         moneda,
         monto,
+        aceptaContrato,
+        aceptaDatos,
         snapshot: { nombre: plan.nombre, totalSeisMeses, moneda },
       }),
     });
@@ -202,10 +210,7 @@ function PlanDetalleTarjeta({
               </p>
 
               <div className="mt-4 border-t border-border-glass pt-4">
-                <p className="text-sm font-semibold text-white">
-                  Total por {DURACION_MINIMA_MESES} meses: {formatMoneda(totalSeisMeses, moneda)}
-                </p>
-                <p className="mt-1 text-xs text-text-secondary">
+                <p className="text-xs text-text-secondary">
                   Nuestros planes tienen un compromiso mínimo de {DURACION_MINIMA_MESES} meses: es el
                   tiempo real que toma ver resultados.
                 </p>
@@ -273,9 +278,50 @@ function PlanDetalleTarjeta({
                       autoComplete="organization"
                     />
                   </div>
+
+                  <label className="flex items-start gap-2.5 text-xs text-text-secondary">
+                    <input
+                      type="checkbox"
+                      checked={aceptaContrato}
+                      onChange={(e) => setAceptaContrato(e.target.checked)}
+                      className="mt-0.5 h-4 w-4 shrink-0 accent-accent"
+                    />
+                    <span>
+                      Acepto el{" "}
+                      <Link href="/contrato" target="_blank" className="text-accent underline hover:text-white">
+                        contrato y los términos y condiciones
+                      </Link>{" "}
+                      de este plan.
+                    </span>
+                  </label>
+                  <label className="flex items-start gap-2.5 text-xs text-text-secondary">
+                    <input
+                      type="checkbox"
+                      checked={aceptaDatos}
+                      onChange={(e) => setAceptaDatos(e.target.checked)}
+                      className="mt-0.5 h-4 w-4 shrink-0 accent-accent"
+                    />
+                    <span>
+                      Autorizo el tratamiento de mis datos personales según la{" "}
+                      <Link
+                        href="/politica-datos"
+                        target="_blank"
+                        className="text-accent underline hover:text-white"
+                      >
+                        política de datos
+                      </Link>
+                      .
+                    </span>
+                  </label>
+
                   {error && <p className="text-sm text-red-400">{error}</p>}
-                  <Button size="lg" className="w-full" onClick={comprar} disabled={enviando}>
-                    {enviando ? "Enviando..." : `Confirmar compra · ${formatMoneda(totalSeisMeses, moneda)}`}
+                  <Button
+                    size="lg"
+                    className="w-full"
+                    onClick={comprar}
+                    disabled={enviando || !aceptaContrato || !aceptaDatos}
+                  >
+                    {enviando ? "Enviando..." : "Confirmar compra"}
                   </Button>
                 </div>
               )}

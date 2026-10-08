@@ -20,8 +20,12 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     nichoMercado?: string;
     seguimiento?: string | null;
     fechaUltimoSeguimiento?: string | null;
+    paqueteAdquirido?: string | null;
+    costoPaquete?: number | null;
+    costoPaqueteMoneda?: "COP" | "USD" | null;
+    contratoAceptado?: boolean;
   } = await request.json();
-  const patch: Record<string, string | null> = {};
+  const patch: Record<string, string | number | boolean | null> = {};
 
   if (body.categoria !== undefined) {
     if (!CATEGORIAS_VALIDAS.includes(body.categoria)) {
@@ -37,6 +41,19 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
   if (body.fechaUltimoSeguimiento !== undefined) {
     patch.fecha_ultimo_seguimiento = body.fechaUltimoSeguimiento || null;
+  }
+  if (body.paqueteAdquirido !== undefined) {
+    patch.paquete_adquirido = body.paqueteAdquirido?.trim() || null;
+  }
+  if (body.costoPaquete !== undefined) {
+    patch.costo_paquete = body.costoPaquete;
+  }
+  if (body.costoPaqueteMoneda !== undefined) {
+    patch.costo_paquete_moneda = body.costoPaqueteMoneda;
+  }
+  if (body.contratoAceptado !== undefined) {
+    patch.contrato_aceptado = body.contratoAceptado;
+    patch.contrato_aceptado_en = body.contratoAceptado ? new Date().toISOString() : null;
   }
 
   if (Object.keys(patch).length === 0) {
