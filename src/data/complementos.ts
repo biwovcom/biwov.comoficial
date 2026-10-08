@@ -8,13 +8,14 @@ export interface Complemento {
   detalle: string;
   items?: ComplementoItem[];
   nota?: string;
+  tipo?: "produccion";
 }
 
 export const COMPLEMENTOS: Complemento[] = [
   {
     titulo: "Producción de contenido",
-    detalle: "8 videos grabados y editados profesionalmente para redes. Se cotiza aparte.",
-    items: [{ label: "Paquete de 8 videos: grabación + edición, listo para publicar", precio: "$2.000.000 COP · pago único" }],
+    detalle: "Fotografía y video profesional para tu marca, en 3 niveles según tu necesidad.",
+    tipo: "produccion",
   },
   {
     titulo: "Páginas adicionales",

@@ -7,6 +7,7 @@ import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { COMPLEMENTOS } from "@/data/complementos";
+import { ProduccionContenidoDetalle } from "./ProduccionContenidoDetalle";
 import { cn } from "@/lib/utils";
 
 export function Complementos() {
@@ -19,7 +20,7 @@ export function Complementos() {
 
         <div className="mt-12 grid gap-5 sm:grid-cols-2">
           {COMPLEMENTOS.map((item, i) => {
-            const tieneDetalle = Boolean(item.items?.length);
+            const tieneDetalle = Boolean(item.items?.length) || item.tipo === "produccion";
             const estaAbierto = abierto === item.titulo;
             return (
               <motion.div
@@ -28,6 +29,7 @@ export function Complementos() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.06 }}
+                className={cn(item.tipo === "produccion" && "sm:col-span-2")}
               >
                 <GlassCard
                   className={cn("h-full p-6", tieneDetalle && "cursor-pointer")}
@@ -55,14 +57,20 @@ export function Complementos() {
                         transition={{ duration: 0.25 }}
                         className="overflow-hidden"
                       >
-                        <ul className="mt-4 space-y-3 border-t border-border-glass pt-4">
-                          {item.items!.map((it) => (
-                            <li key={it.label} className="text-sm">
-                              <p className="text-white/90">{it.label}</p>
-                              <p className="mt-0.5 text-xs font-medium text-accent">{it.precio}</p>
-                            </li>
-                          ))}
-                        </ul>
+                        {item.tipo === "produccion" ? (
+                          <div className="mt-4 border-t border-border-glass pt-4">
+                            <ProduccionContenidoDetalle />
+                          </div>
+                        ) : (
+                          <ul className="mt-4 space-y-3 border-t border-border-glass pt-4">
+                            {item.items!.map((it) => (
+                              <li key={it.label} className="text-sm">
+                                <p className="text-white/90">{it.label}</p>
+                                <p className="mt-0.5 text-xs font-medium text-accent">{it.precio}</p>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
                         {item.nota && (
                           <p className="mt-3 text-xs text-text-secondary">{item.nota}</p>
                         )}
