@@ -18,22 +18,24 @@ export function RoadmapStart() {
         <SectionHeading eyebrow="Cómo avanza tu negocio" title="Así se ven tus primeros meses" />
 
         <div className="mx-auto mt-12 max-w-3xl">
-          <div className="flex gap-2 overflow-x-auto scrollbar-none sm:grid sm:grid-cols-4 sm:gap-3">
-            {COMO_AVANZA.map((f, i) => (
-              <button
-                key={f.momento}
-                type="button"
-                onClick={() => setActivo(i)}
-                className={cn(
-                  "shrink-0 rounded-xl border px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide transition-colors sm:shrink",
-                  activo === i
-                    ? "border-accent bg-accent/10 text-accent"
-                    : "border-border-glass text-text-secondary hover:border-accent/40 hover:text-white",
-                )}
-              >
-                {f.momento}
-              </button>
-            ))}
+          <div className="-mx-6 overflow-x-auto px-6 scrollbar-none sm:mx-0 sm:overflow-visible sm:px-0 [mask-image:linear-gradient(to_right,black,black_88%,transparent)] sm:[mask-image:none]">
+            <div className="flex w-max gap-2 sm:grid sm:w-full sm:grid-cols-4 sm:gap-3">
+              {COMO_AVANZA.map((f, i) => (
+                <button
+                  key={f.momento}
+                  type="button"
+                  onClick={() => setActivo(i)}
+                  className={cn(
+                    "shrink-0 whitespace-nowrap rounded-xl border px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide transition-colors sm:shrink sm:whitespace-normal",
+                    activo === i
+                      ? "border-accent bg-accent/10 text-accent"
+                      : "border-border-glass text-text-secondary hover:border-accent/40 hover:text-white",
+                  )}
+                >
+                  {f.momento}
+                </button>
+              ))}
+            </div>
           </div>
 
           <AnimatePresence mode="wait">
