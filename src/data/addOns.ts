@@ -51,7 +51,7 @@ export const NIVELES_PRODUCCION: NivelProduccion[] = [
   {
     id: "professional",
     nombre: "Professional",
-    precio: { cop: 2000000, usd: 500 },
+    precio: { cop: 1959000, usd: 490 },
     camara: "Sony + Lente",
     audio: "Hollyland",
     iluminacion: "Kit de iluminación",
@@ -66,7 +66,7 @@ export const NIVELES_PRODUCCION: NivelProduccion[] = [
   {
     id: "signature",
     nombre: "Signature",
-    precio: { cop: 2950000, usd: 738 },
+    precio: { cop: 2999000, usd: 750 },
     camara: "Sony + Lente Cine",
     audio: "Hollyland + grabadora",
     iluminacion: "Iluminación completa",
