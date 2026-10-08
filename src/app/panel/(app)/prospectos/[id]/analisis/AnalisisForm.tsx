@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { Download } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Select } from "@/components/ui/Select";
 import { PAQUETES_INFO, type AnalisisIA } from "@/lib/panel/ia/schema";
+import { AnalisisImprimible } from "./AnalisisImprimible";
 
 interface FilaAnalisis {
   id: string;
@@ -98,12 +100,28 @@ function CampoPuntaje({
   );
 }
 
+function BotonDescargarPDF() {
+  return (
+    <button
+      type="button"
+      onClick={() => window.print()}
+      className="flex items-center gap-2 rounded-xl border border-border-glass px-4 py-2.5 text-sm text-text-secondary transition-colors hover:border-accent/40 hover:text-white"
+    >
+      <Download size={16} /> Descargar en PDF
+    </button>
+  );
+}
+
 export function AnalisisForm({
   prospectoId,
+  prospectoNombre,
+  empresa,
   analisisInicial,
   diagnosticoDisponible,
 }: {
   prospectoId: string;
+  prospectoNombre: string;
+  empresa: string | null;
   analisisInicial: FilaAnalisis | null;
   diagnosticoDisponible: boolean;
 }) {
@@ -234,32 +252,45 @@ export function AnalisisForm({
 
   if (analisisFila.origen === "manual") {
     return (
-      <div className="max-w-3xl space-y-5">
-        <Badge variant={analisisFila.estado === "aprobado" ? "verde" : "neutral"}>
-          {analisisFila.estado === "aprobado" ? "Aprobado" : "Borrador"} — versión {analisisFila.version} (pegado a mano)
-        </Badge>
+      <>
+        <div className="max-w-3xl space-y-5 print:hidden">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <Badge variant={analisisFila.estado === "aprobado" ? "verde" : "neutral"}>
+              {analisisFila.estado === "aprobado" ? "Aprobado" : "Borrador"} — versión {analisisFila.version} (pegado a mano)
+            </Badge>
+            <BotonDescargarPDF />
+          </div>
 
-        <GlassCard className="p-5">
-          <p className="mb-2 text-sm font-semibold text-white">Análisis</p>
-          <textarea
-            rows={16}
-            className="w-full resize-y rounded-xl border border-border-glass bg-white/[0.03] px-4 py-3 text-sm text-white outline-none focus:border-accent"
-            value={textoManual}
-            onChange={(e) => setTextoManual(e.target.value)}
-          />
-        </GlassCard>
+          <GlassCard className="p-5">
+            <p className="mb-2 text-sm font-semibold text-white">Análisis</p>
+            <textarea
+              rows={16}
+              className="w-full resize-y rounded-xl border border-border-glass bg-white/[0.03] px-4 py-3 text-sm text-white outline-none focus:border-accent"
+              value={textoManual}
+              onChange={(e) => setTextoManual(e.target.value)}
+            />
+          </GlassCard>
 
-        {error && <p className="text-sm text-red-400">{error}</p>}
+          {error && <p className="text-sm text-red-400">{error}</p>}
 
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <Button variant="secondary" size="lg" onClick={() => guardar(false)} disabled={guardando}>
-            {guardando ? "Guardando..." : "Guardar cambios"}
-          </Button>
-          <Button size="lg" onClick={() => guardar(true)} disabled={guardando}>
-            {guardando ? "Guardando..." : "Aprobar análisis"}
-          </Button>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Button variant="secondary" size="lg" onClick={() => guardar(false)} disabled={guardando}>
+              {guardando ? "Guardando..." : "Guardar cambios"}
+            </Button>
+            <Button size="lg" onClick={() => guardar(true)} disabled={guardando}>
+              {guardando ? "Guardando..." : "Aprobar análisis"}
+            </Button>
+          </div>
         </div>
-      </div>
+        <div className="hidden print:block">
+          <AnalisisImprimible
+            prospectoNombre={prospectoNombre}
+            empresa={empresa}
+            contenido={null}
+            textoManual={textoManual}
+          />
+        </div>
+      </>
     );
   }
 
@@ -268,14 +299,18 @@ export function AnalisisForm({
   }
 
   return (
-    <div className="max-w-3xl space-y-5">
+    <>
+    <div className="max-w-3xl space-y-5 print:hidden">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Badge variant={analisisFila?.estado === "aprobado" ? "verde" : "neutral"}>
           {analisisFila?.estado === "aprobado" ? "Aprobado" : "Borrador"} — versión {analisisFila?.version}
         </Badge>
-        <Button variant="secondary" onClick={generar} disabled={generando}>
-          {generando ? "Generando..." : "Generar de nuevo (nueva versión)"}
-        </Button>
+        <div className="flex items-center gap-3">
+          <BotonDescargarPDF />
+          <Button variant="secondary" onClick={generar} disabled={generando}>
+            {generando ? "Generando..." : "Generar de nuevo (nueva versión)"}
+          </Button>
+        </div>
       </div>
 
       <GlassCard className="space-y-4 p-5">
@@ -441,5 +476,14 @@ export function AnalisisForm({
         </Button>
       </div>
     </div>
+    <div className="hidden print:block">
+      <AnalisisImprimible
+        prospectoNombre={prospectoNombre}
+        empresa={empresa}
+        contenido={contenido}
+        textoManual={null}
+      />
+    </div>
+    </>
   );
 }

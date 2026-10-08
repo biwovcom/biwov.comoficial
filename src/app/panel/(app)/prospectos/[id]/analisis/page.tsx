@@ -36,13 +36,13 @@ export default async function AnalisisPage({ params }: { params: Promise<{ id: s
     <div>
       <Link
         href={`/panel/prospectos/${id}`}
-        className="text-sm text-text-secondary hover:text-white"
+        className="text-sm text-text-secondary hover:text-white print:hidden"
       >
         ← Volver a {prospecto.nombre}
       </Link>
 
-      <h1 className="mt-4 text-2xl font-semibold text-white">Análisis con IA</h1>
-      <p className="mt-1 text-sm text-text-secondary">
+      <h1 className="mt-4 text-2xl font-semibold text-white print:hidden">Análisis con IA</h1>
+      <p className="mt-1 text-sm text-text-secondary print:hidden">
         Analiza el diagnóstico de {prospecto.nombre} e identifica el cuello de botella de su
         negocio. Puedes editar cualquier parte antes de usarla en la propuesta.
       </p>
@@ -50,6 +50,8 @@ export default async function AnalisisPage({ params }: { params: Promise<{ id: s
       <div className="mt-8">
         <AnalisisForm
           prospectoId={id}
+          prospectoNombre={prospecto.nombre}
+          empresa={prospecto.empresa}
           analisisInicial={analisis ?? null}
           diagnosticoDisponible={Boolean(diagnostico)}
         />
