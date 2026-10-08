@@ -66,8 +66,7 @@ export const MENSAJES_WHATSAPP = {
       `Hola ${ctx.nombrePila}, ¿cómo vas? 🙌\n\n` +
       `Va a ser un placer ayudarte a generar más ventas${negocio ? ` ${negocio}` : ""}.\n\n` +
       `Vi en tus respuestas que tu objetivo es ${meta}, y que ahora mismo estás batallando con que no tienes ${desafio}.\n\n` +
-      `Si te parece bien, dime y nos podemos unir hoy en la tarde o mañana temprano para conocernos — que me cuentes un poco más de tu negocio y te dé algunas recomendaciones de lo que creo que te podría sumar. De ahí aprovechamos y te cuento cómo podríamos trabajar juntos.\n\n` +
-      `¿Te queda mejor hoy en la tarde o mañana temprano?`
+      `Si te parece bien, agenda aquí el espacio que mejor te quede y nos reunimos para conocernos, que me cuentes un poco más de tu negocio y te dé algunas recomendaciones de lo que creo que te podría sumar: ${link(LINKS_PANEL.calendario, "link para agendar")}`
     );
   },
   amarillo: ({ nombrePila }: ContextoMensaje) =>

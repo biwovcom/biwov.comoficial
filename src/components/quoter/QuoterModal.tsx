@@ -16,6 +16,7 @@ import { respuestasCompletas, planSugerido, type RespuestasFiltro } from "@/lib/
 import { PAISES, monedaDesdePais } from "@/lib/panel/paises";
 import { linkWhatsApp } from "@/lib/panel/whatsapp";
 import { WHATSAPP_BIWOV } from "@/lib/contacto";
+import { LINKS_PANEL } from "@/lib/panel/panelConfig";
 import { PLANES } from "@/data/planes";
 
 interface Contacto {
@@ -311,23 +312,32 @@ export function QuoterModal() {
                   </div>
 
                   <p className="mt-5 text-sm text-text-secondary">
-                    Este es un primer resultado automático. Kathe va a revisar tus respuestas y te
-                    escribe por WhatsApp para confirmarlo y agendar tu asesoría.
+                    Este es un primer resultado automático. Agenda tu asesoría ya mismo — Kathe
+                    revisa tus respuestas antes de la reunión para llegar con recomendaciones
+                    concretas para tu negocio.
                   </p>
 
-                  <a
-                    href={linkWhatsApp(
-                      WHATSAPP_BIWOV,
-                      `¡Hola! Acabo de hacer el diagnóstico en la página biwov.com y me sugirieron el plan ${plan.nombre}. Quiero agendar una asesoría.`,
-                    )}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-6 block"
-                  >
-                    <Button size="lg" className="w-full">
-                      Agendar por WhatsApp
-                    </Button>
-                  </a>
+                  {LINKS_PANEL.calendario ? (
+                    <a href={LINKS_PANEL.calendario} target="_blank" rel="noopener noreferrer" className="mt-6 block">
+                      <Button size="lg" className="w-full">
+                        Agendar mi asesoría
+                      </Button>
+                    </a>
+                  ) : (
+                    <a
+                      href={linkWhatsApp(
+                        WHATSAPP_BIWOV,
+                        `¡Hola! Acabo de hacer el diagnóstico en la página biwov.com y me sugirieron el plan ${plan.nombre}. Quiero agendar una asesoría.`,
+                      )}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-6 block"
+                    >
+                      <Button size="lg" className="w-full">
+                        Agendar por WhatsApp
+                      </Button>
+                    </a>
+                  )}
                   <Button size="lg" variant="secondary" className="mt-3 w-full" onClick={handleClose}>
                     Cerrar
                   </Button>

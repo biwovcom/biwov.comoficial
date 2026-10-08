@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, CalendarPlus } from "lucide-react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Badge } from "@/components/ui/Badge";
@@ -16,6 +16,7 @@ import { estaVencido } from "@/lib/panel/seguimiento";
 import { resumenRespuestasFiltro, type RespuestasFiltro } from "@/lib/panel/filtroRapido";
 import { monedaDesdePais } from "@/lib/panel/paises";
 import { linkWhatsApp } from "@/lib/panel/whatsapp";
+import { LINKS_PANEL } from "@/lib/panel/panelConfig";
 import { CopyLinkButton } from "@/components/panel/CopyLinkButton";
 import { MensajeSugeridoWhatsApp } from "@/components/panel/MensajeSugeridoWhatsApp";
 import { EliminarProspectoButton } from "@/components/panel/EliminarProspectoButton";
@@ -115,6 +116,17 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
       </div>
 
       <div className="mt-4 flex flex-wrap gap-3">
+        {LINKS_PANEL.calendario && (
+          <a href={LINKS_PANEL.calendario} target="_blank" rel="noopener noreferrer">
+            <button
+              type="button"
+              className="flex items-center gap-2 rounded-xl border border-accent/40 bg-accent/10 px-4 py-2.5 text-sm font-medium text-accent transition-colors hover:bg-accent/20"
+            >
+              <CalendarPlus size={16} />
+              Agendar reunión
+            </button>
+          </a>
+        )}
         <EliminarProspectoButton prospectoId={prospecto.id} nombre={prospecto.nombre} />
       </div>
 

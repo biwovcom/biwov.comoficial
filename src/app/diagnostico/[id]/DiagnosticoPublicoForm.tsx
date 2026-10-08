@@ -3,9 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { GlassCard } from "@/components/ui/GlassCard";
+import { Button } from "@/components/ui/Button";
 import { PreguntasFiltro } from "@/components/panel/PreguntasFiltro";
 import { respuestasCompletas, type RespuestasFiltro } from "@/lib/panel/filtroRapido";
-import type { Moneda } from "@/lib/panel/panelConfig";
+import { LINKS_PANEL, type Moneda } from "@/lib/panel/panelConfig";
 
 export function DiagnosticoPublicoForm({
   prospectoId,
@@ -54,8 +55,17 @@ export function DiagnosticoPublicoForm({
         <p className="text-2xl">✅</p>
         <h2 className="mt-3 text-lg font-semibold text-white">¡Gracias por responder!</h2>
         <p className="mt-2 text-sm text-text-secondary">
-          Ya recibimos tu información. Nos vamos a poner en contacto contigo pronto.
+          {LINKS_PANEL.calendario
+            ? "Ya recibimos tu información. Agenda tu asesoría ya mismo para que te contemos lo que encontramos."
+            : "Ya recibimos tu información. Nos vamos a poner en contacto contigo pronto."}
         </p>
+        {LINKS_PANEL.calendario && (
+          <a href={LINKS_PANEL.calendario} target="_blank" rel="noopener noreferrer" className="mt-5 block">
+            <Button size="lg" className="w-full">
+              Agendar mi asesoría
+            </Button>
+          </a>
+        )}
       </GlassCard>
     );
   }
