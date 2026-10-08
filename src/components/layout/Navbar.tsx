@@ -7,6 +7,7 @@ import { Menu, X } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { useQuoter } from "@/components/quoter/QuoterProvider";
+import { LINKS_PANEL } from "@/lib/panel/panelConfig";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
@@ -28,7 +29,7 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const cerrarYAgendar = () => {
+  const cerrarYDiagnostico = () => {
     setMenuAbierto(false);
     open();
   };
@@ -61,9 +62,9 @@ export function Navbar() {
           <Button size="md" variant="secondary" onClick={() => open()}>
             Diagnóstico gratis
           </Button>
-          <Button size="md" onClick={() => open()}>
-            Agenda una asesoría
-          </Button>
+          <a href={LINKS_PANEL.calendario} target="_blank" rel="noopener noreferrer">
+            <Button size="md">Agenda una asesoría</Button>
+          </a>
         </div>
         <button
           type="button"
@@ -95,12 +96,19 @@ export function Navbar() {
                   {link.label}
                 </a>
               ))}
-              <Button size="md" variant="secondary" className="mt-2 w-full" onClick={cerrarYAgendar}>
+              <Button size="md" variant="secondary" className="mt-2 w-full" onClick={cerrarYDiagnostico}>
                 Diagnóstico gratis
               </Button>
-              <Button size="md" className="mt-2 w-full" onClick={cerrarYAgendar}>
-                Agenda una asesoría
-              </Button>
+              <a
+                href={LINKS_PANEL.calendario}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMenuAbierto(false)}
+              >
+                <Button size="md" className="mt-2 w-full">
+                  Agenda una asesoría
+                </Button>
+              </a>
             </Container>
           </motion.div>
         )}

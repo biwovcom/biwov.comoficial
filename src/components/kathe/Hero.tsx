@@ -4,13 +4,12 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
-import { useQuoter } from "@/components/quoter/QuoterProvider";
 import { linkWhatsApp } from "@/lib/panel/whatsapp";
 import { WHATSAPP_BIWOV } from "@/lib/contacto";
+import { LINKS_PANEL } from "@/lib/panel/panelConfig";
 import { DescargarPdfButton } from "./DescargarPdfButton";
 
 export function Hero() {
-  const { open } = useQuoter();
 
   return (
     <section className="relative flex min-h-[90vh] items-center overflow-hidden bg-[#0b0f14] pt-28 pb-16">
@@ -48,9 +47,9 @@ export function Hero() {
             &ldquo;Convierto ideas en sistemas que funcionan.&rdquo;
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row lg:justify-start">
-            <Button size="lg" onClick={() => open()}>
-              Agenda una asesoría
-            </Button>
+            <a href={LINKS_PANEL.calendario} target="_blank" rel="noopener noreferrer">
+              <Button size="lg">Agenda una asesoría</Button>
+            </a>
             <a href={linkWhatsApp(WHATSAPP_BIWOV)} target="_blank" rel="noopener noreferrer">
               <Button size="lg" variant="secondary">
                 Escríbeme por WhatsApp

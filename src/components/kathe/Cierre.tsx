@@ -3,12 +3,11 @@
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
-import { useQuoter } from "@/components/quoter/QuoterProvider";
 import { linkWhatsApp } from "@/lib/panel/whatsapp";
 import { WHATSAPP_BIWOV, INSTAGRAM_KATHE } from "@/lib/contacto";
+import { LINKS_PANEL } from "@/lib/panel/panelConfig";
 
 export function Cierre() {
-  const { open } = useQuoter();
 
   return (
     <section className="py-16 md:py-20">
@@ -44,9 +43,9 @@ export function Cierre() {
                 Instagram
               </Button>
             </a>
-            <Button size="lg" onClick={() => open()}>
-              Agenda una asesoría
-            </Button>
+            <a href={LINKS_PANEL.calendario} target="_blank" rel="noopener noreferrer">
+              <Button size="lg">Agenda una asesoría</Button>
+            </a>
           </div>
         </motion.div>
       </Container>

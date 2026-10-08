@@ -5,18 +5,24 @@ import { CopiarMensajeEnganche } from "@/components/panel/CopiarMensajeEnganche"
 const PASOS_CIERRE = [
   {
     numero: 1,
-    titulo: "El enganche inicial",
+    titulo: "Agenda primero, con día y hora fijos",
     detalle:
-      "Cuando te escriban mostrando interés, responde de inmediato pidiendo que llenen el formulario de diagnóstico. Así llegas a la reunión ya con información, en vez de perder tiempo preguntando desde cero.",
+      'Cuando alguien muestre interés, agenda la reunión en ese mismo momento — no mandes el formulario todavía. Ofrece dos opciones de horario ("¿martes a las 10 o jueves a las 3?"): se responde en una palabra. "¿Cuándo puedes?" abre una conversación eterna y ahí se pierde la gente.',
   },
   {
     numero: 2,
+    titulo: "El formulario, como preparación para la reunión",
+    detalle:
+      'Apenas quede agendada la cita, manda el formulario con una fecha límite real: "Para llegar con tu plan listo, llénalo antes de la reunión." Así la reunión ya existe aunque el formulario no llegue, y el formulario tiene un motivo claro para responderlo ya.',
+  },
+  {
+    numero: 3,
     titulo: "El análisis previo",
     detalle:
       "Cuando veas el formulario respondido, haz una radiografía rápida (20-30 minutos). Prepara 2 o 3 hallazgos clave de su situación actual que demuestren que estudiaste su caso.",
   },
   {
-    numero: 3,
+    numero: 4,
     titulo: "La reunión de propuesta (cierre)",
     detalle:
       'En la llamada no le preguntas qué necesita, sino que le dices: "Analicé tus respuestas y detecté esto... Para solucionarlo, diseñé este plan..." y presentas tu solución empaquetada.',

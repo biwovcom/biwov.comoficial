@@ -30,7 +30,7 @@ export const RANGOS_PRESUPUESTO: Record<Moneda, RangoPresupuestoPanel[]> = {
 /** ⚠️ Pendiente: pega aquí tus links reales. */
 export const LINKS_PANEL = {
   formulario: "",
-  calendario: "",
+  calendario: "https://calendar.app.google/axxmw4mjpv5YBCqBA",
   comunidad: "",
   contenidoGratuito: "",
 };
