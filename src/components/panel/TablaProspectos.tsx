@@ -101,12 +101,12 @@ export function TablaProspectos({
               className="h-4 w-4 accent-accent"
             />
           </Th>
+          <Th>Etiqueta</Th>
           <Th>Fecha</Th>
           <Th>Nombre</Th>
           <Th>Negocio</Th>
           <Th>Nicho</Th>
           <Th>WhatsApp</Th>
-          <Th>Etiqueta</Th>
           <Th>Semáforo</Th>
           <Th>Resumen del filtro</Th>
           <Th>Paso</Th>
@@ -129,6 +129,15 @@ export function TablaProspectos({
                   aria-label={`Seleccionar a ${p.nombre}`}
                   className="h-4 w-4 accent-accent"
                 />
+              </Td>
+              <Td>
+                {p.categoria ? (
+                  <Badge variant={BADGE_VARIANTE_CATEGORIA[p.categoria]}>
+                    {NOMBRES_CATEGORIA[p.categoria]}
+                  </Badge>
+                ) : (
+                  "—"
+                )}
               </Td>
               <Td>
                 <Link href={`/panel/prospectos/${p.id}`} className="block">
@@ -171,15 +180,6 @@ export function TablaProspectos({
                 >
                   {p.whatsapp}
                 </a>
-              </Td>
-              <Td>
-                {p.categoria ? (
-                  <Badge variant={BADGE_VARIANTE_CATEGORIA[p.categoria]}>
-                    {NOMBRES_CATEGORIA[p.categoria]}
-                  </Badge>
-                ) : (
-                  "—"
-                )}
               </Td>
               <Td>
                 {p.semaforo ? (
