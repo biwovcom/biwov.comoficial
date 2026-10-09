@@ -6,6 +6,7 @@ import type { PlanCreativoEntrada } from "@/lib/panel/planCreativos";
 import type { PlanCampana } from "@/lib/panel/planCampanas";
 import type { Reunion } from "@/lib/panel/reuniones";
 import type { RedHistorialEntrada } from "@/lib/panel/redesHistorial";
+import type { NegocioCliente, NegocioHistorialEntrada } from "@/lib/panel/negocioCliente";
 import { PlanAccionTabs } from "@/components/panel/PlanAccionTabs";
 
 export default async function PlanAccionPage({ params }: { params: Promise<{ id: string }> }) {
@@ -41,6 +42,19 @@ export default async function PlanAccionPage({ params }: { params: Promise<{ id:
     .eq("prospecto_id", id)
     .order("fecha", { ascending: false })
     .returns<RedHistorialEntrada[]>();
+
+  const { data: negocioBase } = await supabase
+    .from("negocio_cliente")
+    .select("*")
+    .eq("prospecto_id", id)
+    .maybeSingle<NegocioCliente>();
+
+  const { data: negocioHistorial } = await supabase
+    .from("negocio_historial")
+    .select("*")
+    .eq("prospecto_id", id)
+    .order("fecha", { ascending: false })
+    .returns<NegocioHistorialEntrada[]>();
 
   const { data: reuniones } = await supabase
     .from("reuniones")
@@ -79,6 +93,8 @@ export default async function PlanAccionPage({ params }: { params: Promise<{ id:
           analisisIniciales={analisis}
           campanasIniciales={campanas ?? []}
           redesIniciales={redes ?? []}
+          negocioBaseInicial={negocioBase ?? null}
+          negocioHistorialInicial={negocioHistorial ?? []}
           reunionesIniciales={reuniones ?? []}
         />
       </div>

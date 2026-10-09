@@ -1,4 +1,4 @@
-export type EstadoCreativo = "por_hacer" | "en_progreso" | "hecho";
+export type EstadoCreativo = "idea" | "por_hacer" | "en_progreso" | "hecho";
 export type SubcategoriaCreativo = "historia" | "reel" | "feed";
 export type EtapaEmbudo = "tofu" | "mofu" | "bofu";
 
@@ -43,7 +43,8 @@ export const TIPOS_ANALISIS_SUGERIDOS = [
   "Aprendizaje / insight",
 ];
 
-export const ESTADOS_CREATIVO: Record<EstadoCreativo, { label: string; badge: "neutral" | "amarillo" | "verde" }> = {
+export const ESTADOS_CREATIVO: Record<EstadoCreativo, { label: string; badge: "neutral" | "amarillo" | "verde" | "accent" }> = {
+  idea: { label: "Idea", badge: "accent" },
   por_hacer: { label: "Por hacer", badge: "neutral" },
   en_progreso: { label: "En progreso", badge: "amarillo" },
   hecho: { label: "Hecho", badge: "verde" },
@@ -52,7 +53,7 @@ export const ESTADOS_CREATIVO: Record<EstadoCreativo, { label: string; badge: "n
 export const SUBCATEGORIAS_CREATIVO: Record<SubcategoriaCreativo, string> = {
   historia: "Historia",
   reel: "Reel",
-  feed: "Feed",
+  feed: "Carruseles",
 };
 
 /** Colores vivos para identificar de un vistazo qué tipo de pieza es, en el calendario y las tarjetas. */

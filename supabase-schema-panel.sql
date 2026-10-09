@@ -693,3 +693,62 @@ alter table redes_historial add column if not exists pct_no_seguidores numeric;
 -- =========================================================
 alter table plan_creativos add column if not exists etapa_embudo text
   check (etapa_embudo in ('tofu','mofu','bofu'));
+
+-- =========================================================
+-- NEGOCIO DEL CLIENTE: línea base (1 por prospecto) + historial de
+-- actualizaciones en el tiempo, para comparar "cómo empezó" contra "cómo va"
+-- con datos que el cliente puede dar sin problema (no financieros sensibles).
+-- =========================================================
+create table if not exists negocio_cliente (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  prospecto_id uuid not null unique references prospectos(id) on delete cascade,
+
+  fecha_inicio date,
+  clientes_linea_base int,
+  ventas_mensuales_linea_base int,
+  ticket_promedio_linea_base numeric,
+  moneda text check (moneda in ('COP','USD')),
+  notas text
+);
+
+drop trigger if exists negocio_cliente_set_updated_at on negocio_cliente;
+create trigger negocio_cliente_set_updated_at
+  before update on negocio_cliente for each row execute function set_updated_at();
+
+alter table negocio_cliente enable row level security;
+drop policy if exists "equipo autenticado - todo" on negocio_cliente;
+create policy "equipo autenticado - todo" on negocio_cliente
+  for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+create table if not exists negocio_historial (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  created_by uuid references auth.users(id) default auth.uid(),
+  prospecto_id uuid not null references prospectos(id) on delete cascade,
+
+  fecha date not null default current_date,
+  clientes_actuales int,
+  ventas_mensuales int,
+  ticket_promedio numeric,
+  costo_por_cliente numeric,
+  moneda text check (moneda in ('COP','USD')),
+  notas text
+);
+
+create index if not exists idx_negocio_historial_prospecto on negocio_historial(prospecto_id, fecha desc);
+
+alter table negocio_historial enable row level security;
+drop policy if exists "equipo autenticado - todo" on negocio_historial;
+create policy "equipo autenticado - todo" on negocio_historial
+  for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+-- =========================================================
+-- NUEVO ESTADO "idea": antes de "Por hacer", para guardar ideas sueltas que
+-- todavía no arrancan proceso. Se amplía el check de plan_creativos.estado.
+-- =========================================================
+alter table plan_creativos drop constraint if exists plan_creativos_estado_check;
+alter table plan_creativos add constraint plan_creativos_estado_check
+  check (estado in ('idea','por_hacer','en_progreso','hecho'));
+alter table plan_creativos alter column estado set default 'idea';

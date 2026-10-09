@@ -42,7 +42,7 @@ export async function POST(request: Request) {
       contenido: body.contenido?.trim() || null,
       link: body.link?.trim() || null,
       fecha: body.fecha?.trim() || null,
-      estado: body.estado?.trim() || "por_hacer",
+      estado: body.estado?.trim() || "idea",
       subcategoria: body.subcategoria?.trim() || null,
       etapa_embudo: body.etapaEmbudo?.trim() || null,
     })

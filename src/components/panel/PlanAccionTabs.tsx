@@ -13,18 +13,27 @@ import {
 import { primerDiaDelMes, type PlanCampana } from "@/lib/panel/planCampanas";
 import type { Reunion } from "@/lib/panel/reuniones";
 import type { RedHistorialEntrada } from "@/lib/panel/redesHistorial";
+import type { NegocioCliente, NegocioHistorialEntrada } from "@/lib/panel/negocioCliente";
 import { PlanCreativos } from "./PlanCreativos";
 import { CalendarioMes } from "./CalendarioMes";
 import { TableroCreativos } from "./TableroCreativos";
 import { BriefCampana } from "./BriefCampana";
 import { RedesHistorialProspecto } from "./RedesHistorialProspecto";
 import { TemperaturaEmbudo } from "./TemperaturaEmbudo";
+import { NegocioClienteProspecto } from "./NegocioClienteProspecto";
 import { ReunionesProspecto } from "./ReunionesProspecto";
 import { PlanAccionImprimible, type ModoImprimible } from "./PlanAccionImprimible";
 import { SelectorMes } from "./SelectorMes";
 import { cn } from "@/lib/utils";
 
-const PESTANAS = ["Creativos", "Embudo y campaña", "Redes y crecimiento", "Análisis y resultados", "Reuniones"] as const;
+const PESTANAS = [
+  "Creativos",
+  "Embudo y campaña",
+  "Redes y crecimiento",
+  "Negocio del cliente",
+  "Análisis y resultados",
+  "Reuniones",
+] as const;
 type Pestana = (typeof PESTANAS)[number];
 
 const VISTAS_CREATIVOS = ["Calendario", "Tablero", "Lista"] as const;
@@ -41,6 +50,8 @@ export function PlanAccionTabs({
   analisisIniciales,
   campanasIniciales,
   redesIniciales,
+  negocioBaseInicial,
+  negocioHistorialInicial,
   reunionesIniciales,
 }: {
   prospectoId: string;
@@ -51,6 +62,8 @@ export function PlanAccionTabs({
   analisisIniciales: PlanCreativoEntrada[];
   campanasIniciales: PlanCampana[];
   redesIniciales: RedHistorialEntrada[];
+  negocioBaseInicial: NegocioCliente | null;
+  negocioHistorialInicial: NegocioHistorialEntrada[];
   reunionesIniciales: Reunion[];
 }) {
   const [activa, setActiva] = useState<Pestana>("Creativos");
@@ -152,7 +165,7 @@ export function PlanAccionTabs({
                   <h2 className="text-sm font-semibold uppercase tracking-wide text-text-secondary">Creativos</h2>
                   <p className="mt-1 text-xs text-text-secondary">
                     Ideas de contenido y referentes, historias, guiones, copys y textos de oferta — organizados por
-                    mes y por estado, en Historias o en Feed.
+                    mes y por estado, en Historias o en Carruseles.
                   </p>
                 </div>
                 <button
@@ -278,6 +291,15 @@ export function PlanAccionTabs({
               setHasta={setHasta}
               visibles={redesVisibles}
               onDescargarPestana={() => descargarPestana("redes")}
+            />
+          )}
+
+          {activa === "Negocio del cliente" && (
+            <NegocioClienteProspecto
+              prospectoId={prospectoId}
+              baseInicial={negocioBaseInicial}
+              historialInicial={negocioHistorialInicial}
+              redesHistorial={redes}
             />
           )}
 

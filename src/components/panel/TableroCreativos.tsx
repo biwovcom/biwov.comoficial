@@ -9,7 +9,7 @@ const FILTROS = [
   { valor: "todas", label: "Todas" },
   { valor: "historia", label: "Historias" },
   { valor: "reel", label: "Reels" },
-  { valor: "feed", label: "Feed" },
+  { valor: "feed", label: "Carruseles" },
 ] as const;
 
 export function TableroCreativos({
@@ -57,7 +57,7 @@ export function TableroCreativos({
         ))}
       </div>
 
-      <div className="mt-4 grid gap-4 md:grid-cols-3">
+      <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {(Object.keys(ESTADOS_CREATIVO) as EstadoCreativo[]).map((estado) => {
           const items = visibles.filter((e) => e.estado === estado);
           return (
