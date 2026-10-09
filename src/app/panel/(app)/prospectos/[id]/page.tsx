@@ -127,23 +127,23 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
             Datos de contacto
           </h2>
           <dl className="mt-4 space-y-2 text-sm">
-            <div className="flex justify-between gap-4">
-              <dt className="text-text-secondary">Negocio</dt>
-              <dd className="text-white">{prospecto.empresa ?? "—"}</dd>
+            <div className="flex flex-col gap-0.5 sm:flex-row sm:justify-between sm:gap-4">
+              <dt className="shrink-0 text-text-secondary">Negocio</dt>
+              <dd className="min-w-0 break-words text-white sm:text-right">{prospecto.empresa ?? "—"}</dd>
             </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-text-secondary">Nicho de mercado</dt>
-              <dd className="text-white">{prospecto.nicho_mercado ?? "—"}</dd>
+            <div className="flex flex-col gap-0.5 sm:flex-row sm:justify-between sm:gap-4">
+              <dt className="shrink-0 text-text-secondary">Nicho de mercado</dt>
+              <dd className="min-w-0 break-words text-white sm:text-right">{prospecto.nicho_mercado ?? "—"}</dd>
             </div>
-            <div className="flex justify-between gap-4">
+            <div className="flex flex-col gap-0.5 sm:flex-row sm:justify-between sm:gap-4">
               <dt className="shrink-0 text-text-secondary">Redes sociales</dt>
-              <dd className="max-w-[65%] text-right">
+              <dd className="min-w-0 sm:max-w-[65%] sm:text-right">
                 <RedesSocialesLinks texto={prospecto.redes_sociales} />
               </dd>
             </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-text-secondary">WhatsApp</dt>
-              <dd className="text-white">
+            <div className="flex flex-col gap-0.5 sm:flex-row sm:justify-between sm:gap-4">
+              <dt className="shrink-0 text-text-secondary">WhatsApp</dt>
+              <dd className="min-w-0 break-words text-white sm:text-right">
                 <a
                   href={linkWhatsApp(prospecto.whatsapp)}
                   target="_blank"
@@ -154,24 +154,24 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
                 </a>
               </dd>
             </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-text-secondary">Correo</dt>
-              <dd className="text-white">{prospecto.email ?? "—"}</dd>
+            <div className="flex flex-col gap-0.5 sm:flex-row sm:justify-between sm:gap-4">
+              <dt className="shrink-0 text-text-secondary">Correo</dt>
+              <dd className="min-w-0 break-words text-white sm:text-right">{prospecto.email ?? "—"}</dd>
             </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-text-secondary">País / Ciudad</dt>
-              <dd className="text-white">
+            <div className="flex flex-col gap-0.5 sm:flex-row sm:justify-between sm:gap-4">
+              <dt className="shrink-0 text-text-secondary">País / Ciudad</dt>
+              <dd className="min-w-0 break-words text-white sm:text-right">
                 {[prospecto.pais, prospecto.ciudad].filter(Boolean).join(" / ") || "—"}
               </dd>
             </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-text-secondary">Origen</dt>
-              <dd className="text-white">{prospecto.canal_origen ?? "—"}</dd>
+            <div className="flex flex-col gap-0.5 sm:flex-row sm:justify-between sm:gap-4">
+              <dt className="shrink-0 text-text-secondary">Origen</dt>
+              <dd className="min-w-0 break-words text-white sm:text-right">{prospecto.canal_origen ?? "—"}</dd>
             </div>
             {prospecto.link_redes_prospecto && (
-              <div className="flex justify-between gap-4">
-                <dt className="text-text-secondary">Instagram / web</dt>
-                <dd className="truncate text-white">{prospecto.link_redes_prospecto}</dd>
+              <div className="flex flex-col gap-0.5 sm:flex-row sm:justify-between sm:gap-4">
+                <dt className="shrink-0 text-text-secondary">Instagram / web</dt>
+                <dd className="min-w-0 break-words text-white sm:text-right">{prospecto.link_redes_prospecto}</dd>
               </div>
             )}
           </dl>

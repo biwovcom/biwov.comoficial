@@ -11,7 +11,7 @@ export function RedesSocialesLinks({ texto }: { texto: string | null | undefined
   return (
     <ul className="space-y-1.5">
       {enlaces.map((enlace, i) => (
-        <li key={i} className="flex items-center gap-1.5 text-sm">
+        <li key={i} className="flex flex-wrap items-center gap-1.5 text-sm sm:justify-end">
           {enlace.etiqueta && (
             <span className="text-text-secondary">{enlace.etiqueta}:</span>
           )}
@@ -20,13 +20,13 @@ export function RedesSocialesLinks({ texto }: { texto: string | null | undefined
               href={enlace.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-accent hover:underline"
+              className="inline-flex max-w-full items-center gap-1 break-all text-accent hover:underline"
             >
-              {enlace.valor}
-              <ExternalLink size={12} />
+              <span className="break-all">{enlace.valor}</span>
+              <ExternalLink size={12} className="shrink-0" />
             </a>
           ) : (
-            <span className="text-white">{enlace.valor}</span>
+            <span className="break-all text-white">{enlace.valor}</span>
           )}
         </li>
       ))}
