@@ -2,16 +2,20 @@
 
 import { useState } from "react";
 import { Plus } from "lucide-react";
-import { ESTADOS_CREATIVO, type PlanCreativoEntrada } from "@/lib/panel/planCreativos";
+import {
+  COLOR_SUBCATEGORIA,
+  SUBCATEGORIAS_CREATIVO,
+  type PlanCreativoEntrada,
+  type SubcategoriaCreativo,
+} from "@/lib/panel/planCreativos";
 import { TarjetaCreativo } from "./PlanCreativos";
 import { cn } from "@/lib/utils";
 
 const DIAS_SEMANA = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
-const COLOR_ESTADO: Record<string, string> = {
-  por_hacer: "bg-white/30",
-  en_progreso: "bg-amber-400",
-  hecho: "bg-emerald-400",
-};
+
+function colorDe(item: PlanCreativoEntrada) {
+  return COLOR_SUBCATEGORIA[item.subcategoria ?? "sin_seccion"];
+}
 
 function diasDelMes(anio: number, mes: number): (number | null)[] {
   const primerDia = new Date(anio, mes - 1, 1);
@@ -63,6 +67,10 @@ export function CalendarioMes({
   const fechaSeleccionada =
     diaSeleccionado !== null ? `${anio}-${mesTexto}-${String(diaSeleccionado).padStart(2, "0")}` : undefined;
 
+  const itemsDia = diaSeleccionado !== null ? itemsPorDia(diaSeleccionado) : [];
+  const historiasDia = itemsDia.filter((i) => i.subcategoria === "historia");
+  const otrosDia = itemsDia.filter((i) => i.subcategoria !== "historia");
+
   return (
     <div>
       <div className="grid grid-cols-7 gap-1.5 text-center text-[11px] font-semibold uppercase tracking-wide text-text-secondary">
@@ -90,15 +98,12 @@ export function CalendarioMes({
               )}
             >
               <span className="text-xs text-white/80">{dia}</span>
-              <div className="flex flex-wrap gap-0.5">
-                {items.slice(0, 3).map((item) => (
-                  <span
-                    key={item.id}
-                    className={cn("h-1.5 w-1.5 rounded-full", COLOR_ESTADO[item.estado])}
-                  />
+              <div className="flex flex-wrap gap-1">
+                {items.slice(0, 4).map((item) => (
+                  <span key={item.id} className={cn("h-2 w-2 rounded-full", colorDe(item).dot)} />
                 ))}
-                {items.length > 3 && (
-                  <span className="text-[9px] text-text-secondary">+{items.length - 3}</span>
+                {items.length > 4 && (
+                  <span className="text-[9px] text-text-secondary">+{items.length - 4}</span>
                 )}
               </div>
             </button>
@@ -107,7 +112,7 @@ export function CalendarioMes({
       </div>
 
       {diaSeleccionado !== null && (
-        <div className="mt-5 space-y-3 border-t border-border-glass pt-4">
+        <div className="mt-5 space-y-4 border-t border-border-glass pt-4">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-white">
               {diaSeleccionado} de {new Date(anio, mes - 1, 1).toLocaleDateString("es-CO", { month: "long" })}
@@ -133,27 +138,55 @@ export function CalendarioMes({
             />
           )}
 
-          {itemsPorDia(diaSeleccionado).length === 0 && !agregando && (
+          {itemsDia.length === 0 && !agregando && (
             <p className="text-sm text-text-secondary">Nada planeado para este día todavía.</p>
           )}
-          {itemsPorDia(diaSeleccionado).map((item) => (
-            <TarjetaCreativo
-              key={item.id}
-              entrada={item}
-              tiposSugeridos={tiposSugeridos}
-              onEliminar={eliminar}
-              onActualizar={actualizarEnLista}
-            />
-          ))}
+
+          {historiasDia.length > 0 && (
+            <div>
+              <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-fuchsia-300">
+                Secuencia de historias ({historiasDia.length})
+              </p>
+              <div className="scrollbar-none flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory [mask-image:linear-gradient(to_right,black,black_90%,transparent)]">
+                {historiasDia.map((item) => (
+                  <div key={item.id} className="w-[250px] shrink-0 snap-start">
+                    <TarjetaCreativo
+                      entrada={item}
+                      tiposSugeridos={tiposSugeridos}
+                      onEliminar={eliminar}
+                      onActualizar={actualizarEnLista}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {otrosDia.length > 0 && (
+            <div className="space-y-3">
+              {otrosDia.map((item) => (
+                <TarjetaCreativo
+                  key={item.id}
+                  entrada={item}
+                  tiposSugeridos={tiposSugeridos}
+                  onEliminar={eliminar}
+                  onActualizar={actualizarEnLista}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
 
       <div className="mt-4 flex flex-wrap gap-3 text-[11px] text-text-secondary">
-        {Object.entries(ESTADOS_CREATIVO).map(([valor, info]) => (
+        {(Object.keys(SUBCATEGORIAS_CREATIVO) as SubcategoriaCreativo[]).map((valor) => (
           <span key={valor} className="flex items-center gap-1.5">
-            <span className={cn("h-1.5 w-1.5 rounded-full", COLOR_ESTADO[valor])} /> {info.label}
+            <span className={cn("h-2 w-2 rounded-full", COLOR_SUBCATEGORIA[valor].dot)} /> {SUBCATEGORIAS_CREATIVO[valor]}
           </span>
         ))}
+        <span className="flex items-center gap-1.5">
+          <span className={cn("h-2 w-2 rounded-full", COLOR_SUBCATEGORIA.sin_seccion.dot)} /> Sin sección
+        </span>
       </div>
     </div>
   );
@@ -171,6 +204,7 @@ function FormularioAltaDia({
   onAgregado: (entrada: PlanCreativoEntrada) => void;
 }) {
   const [tipo, setTipo] = useState("");
+  const [subcategoria, setSubcategoria] = useState<SubcategoriaCreativo | "">("");
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -184,7 +218,7 @@ function FormularioAltaDia({
     const res = await fetch("/api/panel/plan-creativos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prospectoId, categoria: "creativo", tipo: tipo.trim(), fecha }),
+      body: JSON.stringify({ prospectoId, categoria: "creativo", tipo: tipo.trim(), fecha, subcategoria }),
     });
     setEnviando(false);
     if (!res.ok) {
@@ -194,30 +228,45 @@ function FormularioAltaDia({
     const data = await res.json();
     onAgregado(data.entrada);
     setTipo("");
+    setSubcategoria("");
   };
 
   return (
-    <div className="flex gap-2 rounded-xl border border-dashed border-border-glass p-3">
-      <input
-        value={tipo}
-        onChange={(e) => setTipo(e.target.value)}
-        list="tipos-plan-sugeridos-dia"
-        placeholder="Ej: Historia, Guion, Copy..."
-        className="w-full rounded-xl border border-border-glass bg-white/[0.03] px-3 py-1.5 text-sm text-white placeholder:text-text-secondary/60 outline-none focus:border-accent"
-      />
-      <datalist id="tipos-plan-sugeridos-dia">
-        {tiposSugeridos.map((t) => (
-          <option key={t} value={t} />
-        ))}
-      </datalist>
-      <button
-        type="button"
-        onClick={agregar}
-        disabled={enviando}
-        className="shrink-0 rounded-xl bg-gradient-brand px-4 text-sm font-semibold text-white"
-      >
-        {enviando ? "..." : "Agregar"}
-      </button>
+    <div className="space-y-2 rounded-xl border border-dashed border-border-glass p-3">
+      <div className="flex flex-wrap gap-2">
+        <input
+          value={tipo}
+          onChange={(e) => setTipo(e.target.value)}
+          list="tipos-plan-sugeridos-dia"
+          placeholder="Ej: Historia, Guion, Copy..."
+          className="min-w-[160px] flex-1 rounded-xl border border-border-glass bg-white/[0.03] px-3 py-1.5 text-sm text-white placeholder:text-text-secondary/60 outline-none focus:border-accent"
+        />
+        <datalist id="tipos-plan-sugeridos-dia">
+          {tiposSugeridos.map((t) => (
+            <option key={t} value={t} />
+          ))}
+        </datalist>
+        <select
+          value={subcategoria}
+          onChange={(e) => setSubcategoria(e.target.value as SubcategoriaCreativo | "")}
+          className="rounded-xl border border-border-glass bg-white/[0.03] px-3 py-1.5 text-sm text-white outline-none focus:border-accent [&>option]:bg-bg-base"
+        >
+          <option value="">Sin sección</option>
+          {Object.entries(SUBCATEGORIAS_CREATIVO).map(([valor, label]) => (
+            <option key={valor} value={valor}>
+              {label}
+            </option>
+          ))}
+        </select>
+        <button
+          type="button"
+          onClick={agregar}
+          disabled={enviando}
+          className="shrink-0 rounded-xl bg-gradient-brand px-4 text-sm font-semibold text-white"
+        >
+          {enviando ? "..." : "Agregar"}
+        </button>
+      </div>
       {error && <p className="text-xs text-red-400">{error}</p>}
     </div>
   );

@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 const FILTROS = [
   { valor: "todas", label: "Todas" },
   { valor: "historia", label: "Historias" },
+  { valor: "reel", label: "Reels" },
   { valor: "feed", label: "Feed" },
 ] as const;
 

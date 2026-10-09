@@ -594,8 +594,10 @@ alter table plan_creativos add constraint plan_creativos_categoria_check
 alter table plan_creativos add column if not exists fecha date;
 alter table plan_creativos add column if not exists estado text not null default 'por_hacer'
   check (estado in ('por_hacer','en_progreso','hecho'));
-alter table plan_creativos add column if not exists subcategoria text
-  check (subcategoria in ('historia','feed'));
+alter table plan_creativos add column if not exists subcategoria text;
+alter table plan_creativos drop constraint if exists plan_creativos_subcategoria_check;
+alter table plan_creativos add constraint plan_creativos_subcategoria_check
+  check (subcategoria in ('historia','reel','feed'));
 
 create index if not exists idx_plan_creativos_fecha on plan_creativos(prospecto_id, fecha);
 

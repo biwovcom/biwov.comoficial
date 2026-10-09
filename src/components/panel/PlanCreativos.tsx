@@ -5,8 +5,8 @@ import { Trash2, Plus, ChevronDown, Copy, Check, Pencil, Link as LinkIcon } from
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
-import { Badge } from "@/components/ui/Badge";
 import {
+  COLOR_SUBCATEGORIA,
   ESTADOS_CREATIVO,
   SUBCATEGORIAS_CREATIVO,
   type EstadoCreativo,
@@ -166,7 +166,15 @@ export function TarjetaCreativo({
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs font-semibold uppercase tracking-wide text-accent">{entrada.tipo}</span>
             {entrada.subcategoria && (
-              <Badge variant="neutral">{SUBCATEGORIAS_CREATIVO[entrada.subcategoria]}</Badge>
+              <span
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold",
+                  COLOR_SUBCATEGORIA[entrada.subcategoria].badge,
+                )}
+              >
+                <span className={cn("h-1.5 w-1.5 rounded-full", COLOR_SUBCATEGORIA[entrada.subcategoria].dot)} />
+                {SUBCATEGORIAS_CREATIVO[entrada.subcategoria]}
+              </span>
             )}
             {entrada.fecha && (
               <span className="text-[11px] text-text-secondary">
