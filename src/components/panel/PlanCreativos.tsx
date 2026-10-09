@@ -4,12 +4,22 @@ import { useState } from "react";
 import { Trash2, Plus, ChevronDown, Copy, Check, Pencil, Link as LinkIcon } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
-import type { PlanCreativoEntrada } from "@/lib/panel/planCreativos";
+import { Select } from "@/components/ui/Select";
+import { Badge } from "@/components/ui/Badge";
+import {
+  ESTADOS_CREATIVO,
+  SUBCATEGORIAS_CREATIVO,
+  type EstadoCreativo,
+  type PlanCreativoEntrada,
+  type SubcategoriaCreativo,
+} from "@/lib/panel/planCreativos";
 import { cn } from "@/lib/utils";
 
-async function actualizarEntrada(
+export async function actualizarEntradaCreativo(
   id: string,
-  cambios: Partial<Pick<PlanCreativoEntrada, "tipo" | "titulo" | "contenido" | "link" | "aprobado">>,
+  cambios: Partial<
+    Pick<PlanCreativoEntrada, "tipo" | "titulo" | "contenido" | "link" | "fecha" | "estado" | "subcategoria" | "aprobado">
+  >,
 ) {
   const res = await fetch("/api/panel/plan-creativos", {
     method: "PATCH",
@@ -48,19 +58,28 @@ function FormularioEdicion({
 }: {
   entrada: PlanCreativoEntrada;
   tiposSugeridos: string[];
-  onGuardar: (cambios: { tipo: string; titulo: string; link: string; contenido: string }) => Promise<void>;
+  onGuardar: (cambios: {
+    tipo: string;
+    titulo: string;
+    link: string;
+    contenido: string;
+    fecha: string;
+    subcategoria: string;
+  }) => Promise<void>;
   onCancelar: () => void;
 }) {
   const [tipo, setTipo] = useState(entrada.tipo);
   const [titulo, setTitulo] = useState(entrada.titulo ?? "");
   const [link, setLink] = useState(entrada.link ?? "");
   const [contenido, setContenido] = useState(entrada.contenido ?? "");
+  const [fecha, setFecha] = useState(entrada.fecha ?? "");
+  const [subcategoria, setSubcategoria] = useState(entrada.subcategoria ?? "");
   const [guardando, setGuardando] = useState(false);
 
   const guardar = async () => {
     if (!tipo.trim()) return;
     setGuardando(true);
-    await onGuardar({ tipo: tipo.trim(), titulo, link, contenido });
+    await onGuardar({ tipo: tipo.trim(), titulo, link, contenido, fecha, subcategoria });
     setGuardando(false);
   };
 
@@ -76,6 +95,19 @@ function FormularioEdicion({
           </datalist>
         </div>
         <Input placeholder="Título (opcional)" value={titulo} onChange={(e) => setTitulo(e.target.value)} />
+      </div>
+      <div className="grid gap-2 sm:grid-cols-2">
+        <Input type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} />
+        {entrada.categoria === "creativo" && (
+          <Select value={subcategoria} onChange={(e) => setSubcategoria(e.target.value)}>
+            <option value="">Sin sección</option>
+            {Object.entries(SUBCATEGORIAS_CREATIVO).map(([valor, label]) => (
+              <option key={valor} value={valor}>
+                {label}
+              </option>
+            ))}
+          </Select>
+        )}
       </div>
       <Input placeholder="Link de referencia (opcional)" value={link} onChange={(e) => setLink(e.target.value)} />
       <textarea
@@ -96,7 +128,7 @@ function FormularioEdicion({
   );
 }
 
-function TarjetaCreativo({
+export function TarjetaCreativo({
   entrada,
   tiposSugeridos,
   onEliminar,
@@ -114,8 +146,13 @@ function TarjetaCreativo({
   const toggleAprobado = async (e: React.MouseEvent) => {
     e.stopPropagation();
     setMarcando(true);
-    const actualizada = await actualizarEntrada(entrada.id, { aprobado: !entrada.aprobado });
+    const actualizada = await actualizarEntradaCreativo(entrada.id, { aprobado: !entrada.aprobado });
     setMarcando(false);
+    if (actualizada) onActualizar(actualizada);
+  };
+
+  const cambiarEstado = async (estado: EstadoCreativo) => {
+    const actualizada = await actualizarEntradaCreativo(entrada.id, { estado });
     if (actualizada) onActualizar(actualizada);
   };
 
@@ -128,6 +165,17 @@ function TarjetaCreativo({
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs font-semibold uppercase tracking-wide text-accent">{entrada.tipo}</span>
+            {entrada.subcategoria && (
+              <Badge variant="neutral">{SUBCATEGORIAS_CREATIVO[entrada.subcategoria]}</Badge>
+            )}
+            {entrada.fecha && (
+              <span className="text-[11px] text-text-secondary">
+                {new Date(`${entrada.fecha}T00:00:00`).toLocaleDateString("es-CO", {
+                  day: "numeric",
+                  month: "short",
+                })}
+              </span>
+            )}
             {entrada.aprobado && (
               <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
                 <Check size={11} /> Aprobado
@@ -140,6 +188,20 @@ function TarjetaCreativo({
           )}
         </div>
         <div className="flex shrink-0 items-center gap-3">
+          {entrada.categoria === "creativo" && (
+            <select
+              value={entrada.estado}
+              onClick={(e) => e.stopPropagation()}
+              onChange={(e) => cambiarEstado(e.target.value as EstadoCreativo)}
+              className="rounded-full border border-border-glass bg-white/[0.03] px-2 py-1 text-[11px] text-white outline-none focus:border-accent [&>option]:bg-bg-base"
+            >
+              {Object.entries(ESTADOS_CREATIVO).map(([valor, info]) => (
+                <option key={valor} value={valor}>
+                  {info.label}
+                </option>
+              ))}
+            </select>
+          )}
           {entrada.contenido && <BotonCopiar texto={entrada.contenido} />}
           {abierto && (
             <button
@@ -212,7 +274,11 @@ function TarjetaCreativo({
             tiposSugeridos={tiposSugeridos}
             onCancelar={() => setEditando(false)}
             onGuardar={async (cambios) => {
-              const actualizada = await actualizarEntrada(entrada.id, cambios);
+              const actualizada = await actualizarEntradaCreativo(entrada.id, {
+                ...cambios,
+                fecha: cambios.fecha || null,
+                subcategoria: (cambios.subcategoria || null) as SubcategoriaCreativo | null,
+              });
               if (actualizada) {
                 onActualizar(actualizada);
                 setEditando(false);
@@ -225,27 +291,25 @@ function TarjetaCreativo({
   );
 }
 
-export function PlanCreativos({
+function FormularioAlta({
   prospectoId,
   categoria,
-  titulo,
-  descripcion,
   tiposSugeridos,
-  entradas,
-  onEntradasChange,
+  fechaFija,
+  onAgregado,
 }: {
   prospectoId: string;
-  categoria: "creativo" | "embudo";
-  titulo: string;
-  descripcion: string;
+  categoria: "creativo" | "embudo" | "analisis";
   tiposSugeridos: string[];
-  entradas: PlanCreativoEntrada[];
-  onEntradasChange: (entradas: PlanCreativoEntrada[]) => void;
+  fechaFija?: string;
+  onAgregado: (entrada: PlanCreativoEntrada) => void;
 }) {
   const [tipo, setTipo] = useState("");
   const [tituloNuevo, setTituloNuevo] = useState("");
   const [link, setLink] = useState("");
   const [contenido, setContenido] = useState("");
+  const [fecha, setFecha] = useState(fechaFija ?? "");
+  const [subcategoria, setSubcategoria] = useState<SubcategoriaCreativo | "">("");
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -266,6 +330,8 @@ export function PlanCreativos({
         titulo: tituloNuevo.trim(),
         link: link.trim(),
         contenido: contenido.trim(),
+        fecha,
+        subcategoria,
       }),
     });
     setEnviando(false);
@@ -274,13 +340,114 @@ export function PlanCreativos({
       return;
     }
     const data = await res.json();
-    onEntradasChange([data.entrada, ...entradas]);
+    onAgregado(data.entrada);
     setTipo("");
     setTituloNuevo("");
     setLink("");
     setContenido("");
+    setFecha(fechaFija ?? "");
+    setSubcategoria("");
   };
 
+  const idDatalist = `tipos-plan-sugeridos-${categoria}`;
+
+  return (
+    <div className="space-y-2 rounded-xl border border-dashed border-border-glass p-3">
+      <div className="grid gap-2 sm:grid-cols-2">
+        <div>
+          <Label htmlFor={`tipo-${categoria}`}>Tipo</Label>
+          <Input
+            id={`tipo-${categoria}`}
+            list={idDatalist}
+            placeholder="Ej: Historia, Guion, Copy..."
+            value={tipo}
+            onChange={(e) => setTipo(e.target.value)}
+          />
+          <datalist id={idDatalist}>
+            {tiposSugeridos.map((t) => (
+              <option key={t} value={t} />
+            ))}
+          </datalist>
+        </div>
+        <div>
+          <Label htmlFor={`titulo-${categoria}`}>Título (opcional)</Label>
+          <Input
+            id={`titulo-${categoria}`}
+            placeholder="Ej: Historia 1"
+            value={tituloNuevo}
+            onChange={(e) => setTituloNuevo(e.target.value)}
+          />
+        </div>
+      </div>
+      <div className="grid gap-2 sm:grid-cols-2">
+        <div>
+          <Label htmlFor={`fecha-${categoria}`}>Fecha (opcional)</Label>
+          <Input id={`fecha-${categoria}`} type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} />
+        </div>
+        {categoria === "creativo" && (
+          <div>
+            <Label htmlFor={`subcategoria-${categoria}`}>Sección</Label>
+            <Select
+              id={`subcategoria-${categoria}`}
+              value={subcategoria}
+              onChange={(e) => setSubcategoria(e.target.value as SubcategoriaCreativo | "")}
+            >
+              <option value="">Sin sección</option>
+              {Object.entries(SUBCATEGORIAS_CREATIVO).map(([valor, label]) => (
+                <option key={valor} value={valor}>
+                  {label}
+                </option>
+              ))}
+            </Select>
+          </div>
+        )}
+      </div>
+      <div>
+        <Label htmlFor={`link-${categoria}`}>Link de referencia (opcional)</Label>
+        <Input
+          id={`link-${categoria}`}
+          placeholder="https://..."
+          value={link}
+          onChange={(e) => setLink(e.target.value)}
+        />
+      </div>
+      <div>
+        <Label htmlFor={`contenido-${categoria}`}>Contenido / guion / descripción</Label>
+        <textarea
+          id={`contenido-${categoria}`}
+          value={contenido}
+          onChange={(e) => setContenido(e.target.value)}
+          rows={3}
+          className="w-full rounded-xl border border-border-glass bg-white/[0.03] px-3 py-2 text-sm text-white placeholder:text-text-secondary/60 outline-none focus:border-accent"
+          placeholder="Escribe el guion, el copy o la idea..."
+        />
+      </div>
+      {error && <p className="text-xs text-red-400">{error}</p>}
+      <Button size="md" onClick={agregar} disabled={enviando}>
+        <Plus size={15} />
+        {enviando ? "Guardando..." : "Agregar"}
+      </Button>
+    </div>
+  );
+}
+
+export function PlanCreativos({
+  prospectoId,
+  categoria,
+  titulo,
+  descripcion,
+  tiposSugeridos,
+  entradas,
+  onEntradasChange,
+}: {
+  prospectoId: string;
+  categoria: "creativo" | "embudo" | "analisis";
+  titulo: string;
+  descripcion: string;
+  tiposSugeridos: string[];
+  entradas: PlanCreativoEntrada[];
+  onEntradasChange: (entradas: PlanCreativoEntrada[]) => void;
+}) {
   const eliminar = async (id: string) => {
     const confirmado = window.confirm("¿Eliminar este ítem?");
     if (!confirmado) return;
@@ -296,65 +463,18 @@ export function PlanCreativos({
     onEntradasChange(entradas.map((e) => (e.id === actualizada.id ? actualizada : e)));
   };
 
-  const idDatalist = `tipos-plan-sugeridos-${categoria}`;
-
   return (
     <div>
       <h2 className="text-sm font-semibold uppercase tracking-wide text-text-secondary">{titulo}</h2>
       <p className="mt-1 text-xs text-text-secondary">{descripcion}</p>
 
-      <div className="mt-4 space-y-2 rounded-xl border border-dashed border-border-glass p-3">
-        <div className="grid gap-2 sm:grid-cols-2">
-          <div>
-            <Label htmlFor={`tipo-${categoria}`}>Tipo</Label>
-            <Input
-              id={`tipo-${categoria}`}
-              list={idDatalist}
-              placeholder="Ej: Historia, Guion, Copy..."
-              value={tipo}
-              onChange={(e) => setTipo(e.target.value)}
-            />
-            <datalist id={idDatalist}>
-              {tiposSugeridos.map((t) => (
-                <option key={t} value={t} />
-              ))}
-            </datalist>
-          </div>
-          <div>
-            <Label htmlFor={`titulo-${categoria}`}>Título (opcional)</Label>
-            <Input
-              id={`titulo-${categoria}`}
-              placeholder="Ej: Historia 1"
-              value={tituloNuevo}
-              onChange={(e) => setTituloNuevo(e.target.value)}
-            />
-          </div>
-        </div>
-        <div>
-          <Label htmlFor={`link-${categoria}`}>Link de referencia (opcional)</Label>
-          <Input
-            id={`link-${categoria}`}
-            placeholder="https://..."
-            value={link}
-            onChange={(e) => setLink(e.target.value)}
-          />
-        </div>
-        <div>
-          <Label htmlFor={`contenido-${categoria}`}>Contenido / guion / descripción</Label>
-          <textarea
-            id={`contenido-${categoria}`}
-            value={contenido}
-            onChange={(e) => setContenido(e.target.value)}
-            rows={3}
-            className="w-full rounded-xl border border-border-glass bg-white/[0.03] px-3 py-2 text-sm text-white placeholder:text-text-secondary/60 outline-none focus:border-accent"
-            placeholder="Escribe el guion, el copy o la idea..."
-          />
-        </div>
-        {error && <p className="text-xs text-red-400">{error}</p>}
-        <Button size="md" onClick={agregar} disabled={enviando}>
-          <Plus size={15} />
-          {enviando ? "Guardando..." : "Agregar"}
-        </Button>
+      <div className="mt-4">
+        <FormularioAlta
+          prospectoId={prospectoId}
+          categoria={categoria}
+          tiposSugeridos={tiposSugeridos}
+          onAgregado={(nueva) => onEntradasChange([nueva, ...entradas])}
+        />
       </div>
 
       <div className="mt-5 space-y-3">
@@ -374,3 +494,5 @@ export function PlanCreativos({
     </div>
   );
 }
+
+export { FormularioAlta };

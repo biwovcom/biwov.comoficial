@@ -583,3 +583,86 @@ alter table reuniones enable row level security;
 drop policy if exists "equipo autenticado - todo" on reuniones;
 create policy "equipo autenticado - todo" on reuniones
   for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+-- =========================================================
+-- PLAN DE ACCIÓN v2: calendario/tablero de creativos + categoría "análisis"
+-- =========================================================
+alter table plan_creativos drop constraint if exists plan_creativos_categoria_check;
+alter table plan_creativos add constraint plan_creativos_categoria_check
+  check (categoria in ('creativo','embudo','analisis'));
+
+alter table plan_creativos add column if not exists fecha date;
+alter table plan_creativos add column if not exists estado text not null default 'por_hacer'
+  check (estado in ('por_hacer','en_progreso','hecho'));
+alter table plan_creativos add column if not exists subcategoria text
+  check (subcategoria in ('historia','feed'));
+
+create index if not exists idx_plan_creativos_fecha on plan_creativos(prospecto_id, fecha);
+
+-- =========================================================
+-- BRIEF DE CAMPAÑA PUBLICITARIA (1 fila por mes por prospecto)
+-- Campos fijos siguiendo el plano de media + estructura Andrômeda, para no
+-- olvidar nada al montar la campaña.
+-- =========================================================
+create table if not exists plan_campanas (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  created_by uuid references auth.users(id) default auth.uid(),
+  prospecto_id uuid not null references prospectos(id) on delete cascade,
+
+  mes date not null, -- siempre día 1 del mes, ej. 2026-09-01
+
+  ticket_promedio numeric,
+  moneda text check (moneda in ('COP','USD')),
+  objetivo_conversion text,
+  presupuesto_diario numeric,
+  presupuesto_mensual numeric,
+  cpa_maximo numeric,
+  num_conjuntos int,
+  num_creativos_objetivo int,
+  publico text,
+  evento_calificacion text,
+  oferta_principal text,
+  objetivo_mes text,
+  resultado_mes text,
+
+  aprobado boolean not null default false,
+  aprobado_en timestamptz,
+  aprobado_por uuid references auth.users(id),
+
+  unique (prospecto_id, mes)
+);
+
+drop trigger if exists plan_campanas_set_updated_at on plan_campanas;
+create trigger plan_campanas_set_updated_at
+  before update on plan_campanas for each row execute function set_updated_at();
+
+alter table plan_campanas enable row level security;
+drop policy if exists "equipo autenticado - todo" on plan_campanas;
+create policy "equipo autenticado - todo" on plan_campanas
+  for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+-- =========================================================
+-- REGISTRO DE CRECIMIENTO DE REDES SOCIALES
+-- =========================================================
+create table if not exists redes_historial (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  created_by uuid references auth.users(id) default auth.uid(),
+  prospecto_id uuid not null references prospectos(id) on delete cascade,
+
+  fecha date not null default current_date,
+  red_social text not null,
+  seguidores int,
+  alcance_promedio int,
+  engagement_rate numeric,
+  notas text
+);
+
+create index if not exists idx_redes_historial_prospecto on redes_historial(prospecto_id, fecha desc);
+
+alter table redes_historial enable row level security;
+drop policy if exists "equipo autenticado - todo" on redes_historial;
+create policy "equipo autenticado - todo" on redes_historial
+  for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');

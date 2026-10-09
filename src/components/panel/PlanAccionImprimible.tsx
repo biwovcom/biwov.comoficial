@@ -1,4 +1,45 @@
 import type { PlanCreativoEntrada } from "@/lib/panel/planCreativos";
+import type { PlanCampana } from "@/lib/panel/planCampanas";
+
+function SeccionCampana({ campana }: { campana: PlanCampana }) {
+  const filas: [string, string | null][] = [
+    ["Objetivo de conversión", campana.objetivo_conversion],
+    [
+      "Presupuesto",
+      campana.presupuesto_mensual
+        ? `${campana.presupuesto_mensual} ${campana.moneda ?? ""} al mes (${campana.presupuesto_diario ?? "—"} diario)`
+        : null,
+    ],
+    ["CPA máximo", campana.cpa_maximo ? `${campana.cpa_maximo} ${campana.moneda ?? ""}` : null],
+    ["Conjuntos / creativos objetivo", `${campana.num_conjuntos ?? "—"} conjuntos / ${campana.num_creativos_objetivo ?? "—"} creativos`],
+    ["Público", campana.publico],
+    ["Evento de calificación", campana.evento_calificacion],
+    ["Oferta principal", campana.oferta_principal],
+    ["Objetivo del mes", campana.objetivo_mes],
+  ];
+
+  return (
+    <div className="mb-6 break-inside-avoid">
+      <div className="flex items-center gap-2">
+        <h2 className="text-sm font-bold uppercase tracking-wide text-[#0d3b66]">Brief de la campaña</h2>
+        {campana.aprobado && (
+          <span className="rounded-full bg-[#dcfce7] px-2 py-0.5 text-[10px] font-semibold text-[#15803d]">
+            ✓ Aprobado{campana.aprobado_en ? ` el ${new Date(campana.aprobado_en).toLocaleDateString("es-CO")}` : ""}
+          </span>
+        )}
+      </div>
+      <dl className="mt-2 space-y-1 text-sm text-[#111827]">
+        {filas
+          .filter(([, valor]) => valor)
+          .map(([label, valor]) => (
+            <p key={label}>
+              <span className="font-semibold">{label}:</span> {valor}
+            </p>
+          ))}
+      </dl>
+    </div>
+  );
+}
 
 function Seccion({ titulo, items }: { titulo: string; items: PlanCreativoEntrada[] }) {
   if (items.length === 0) return null;
@@ -35,11 +76,13 @@ export function PlanAccionImprimible({
   empresa,
   creativos,
   embudo,
+  campana,
 }: {
   prospectoNombre: string;
   empresa: string | null;
   creativos: PlanCreativoEntrada[];
   embudo: PlanCreativoEntrada[];
+  campana?: PlanCampana | null;
 }) {
   const fecha = new Date().toLocaleDateString("es-CO", { year: "numeric", month: "long", day: "numeric" });
 
@@ -57,8 +100,9 @@ export function PlanAccionImprimible({
 
       <div className="mt-6 border-t border-[#d1d5db] pt-6">
         <Seccion titulo="Creativos" items={creativos} />
+        {campana?.aprobado && <SeccionCampana campana={campana} />}
         <Seccion titulo="Embudo y campaña" items={embudo} />
-        {creativos.length === 0 && embudo.length === 0 && (
+        {creativos.length === 0 && embudo.length === 0 && !campana?.aprobado && (
           <p className="text-sm text-[#4b5563]">Todavía no hay ítems en el plan de acción.</p>
         )}
       </div>

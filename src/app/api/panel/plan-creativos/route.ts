@@ -13,11 +13,14 @@ export async function POST(request: Request) {
 
   const body: {
     prospectoId?: string;
-    categoria?: "creativo" | "embudo";
+    categoria?: "creativo" | "embudo" | "analisis";
     tipo?: string;
     titulo?: string;
     contenido?: string;
     link?: string;
+    fecha?: string;
+    estado?: string;
+    subcategoria?: string;
   } = await request.json().catch(() => ({}));
 
   const prospectoId = body.prospectoId?.trim();
@@ -37,6 +40,9 @@ export async function POST(request: Request) {
       titulo: body.titulo?.trim() || null,
       contenido: body.contenido?.trim() || null,
       link: body.link?.trim() || null,
+      fecha: body.fecha?.trim() || null,
+      estado: body.estado?.trim() || "por_hacer",
+      subcategoria: body.subcategoria?.trim() || null,
     })
     .select("*")
     .single();
@@ -64,6 +70,9 @@ export async function PATCH(request: Request) {
     titulo?: string;
     contenido?: string;
     link?: string;
+    fecha?: string | null;
+    estado?: string;
+    subcategoria?: string | null;
     aprobado?: boolean;
   } = await request.json().catch(() => ({}));
 
@@ -77,6 +86,9 @@ export async function PATCH(request: Request) {
   if (body.titulo !== undefined) cambios.titulo = body.titulo.trim() || null;
   if (body.contenido !== undefined) cambios.contenido = body.contenido.trim() || null;
   if (body.link !== undefined) cambios.link = body.link.trim() || null;
+  if (body.fecha !== undefined) cambios.fecha = body.fecha?.trim() || null;
+  if (body.estado !== undefined) cambios.estado = body.estado;
+  if (body.subcategoria !== undefined) cambios.subcategoria = body.subcategoria?.trim() || null;
   if (body.aprobado !== undefined) {
     cambios.aprobado = body.aprobado;
     cambios.aprobado_en = body.aprobado ? new Date().toISOString() : null;
