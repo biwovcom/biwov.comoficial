@@ -386,6 +386,39 @@ function TarjetaMedicion({
       {abierto && !editando && (
         <div className="mt-4 space-y-4 border-t border-border-glass pt-4">
           <div>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-secondary">
+              Datos que registraste
+            </p>
+            <div className="grid grid-cols-2 gap-2 rounded-xl bg-white/[0.02] p-3 sm:grid-cols-4">
+              {(
+                [
+                  ["Visualizaciones", entrada.visualizaciones],
+                  ["Espectadores (alcance)", entrada.alcance_promedio],
+                  ["Interacciones", entrada.interacciones],
+                  ["Cuentas que interactuaron", entrada.cuentas_interactuaron],
+                  ["Seguidores", entrada.seguidores],
+                  ["Seguidos", entrada.seguidos],
+                  ["Visitas al perfil", entrada.visitas_perfil],
+                  ["Suma de vistas de piezas", entrada.suma_vistas_piezas],
+                  ["Número de piezas", entrada.num_piezas],
+                  ["% Reels", entrada.pct_reels],
+                  ["% Historias", entrada.pct_historias],
+                  ["% Publicaciones", entrada.pct_publicaciones],
+                  ["% de no seguidores", entrada.pct_no_seguidores],
+                ] as [string, number | null][]
+              )
+                .filter(([, valor]) => valor !== null && valor !== undefined)
+                .map(([label, valor]) => (
+                  <div key={label}>
+                    <p className="text-[10px] text-text-secondary">{label}</p>
+                    <p className="text-sm font-semibold text-white">
+                      {valor!.toLocaleString("es-CO", { maximumFractionDigits: 1 })}
+                    </p>
+                  </div>
+                ))}
+            </div>
+          </div>
+          <div>
             <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-secondary">Análisis</p>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {filas.map((fila) => (
