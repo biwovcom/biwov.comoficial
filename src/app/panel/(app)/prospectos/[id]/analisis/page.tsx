@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Prospecto } from "@/lib/panel/prospectos";
 import type { HistorialEntrada } from "@/lib/panel/historial";
 import { HistorialProspecto } from "@/components/panel/HistorialProspecto";
+import { CopiarPromptAuditoriaBoton } from "@/components/panel/CopiarPromptAuditoriaBoton";
 import { AnalisisForm } from "./AnalisisForm";
 
 export default async function AnalisisPage({ params }: { params: Promise<{ id: string }> }) {
@@ -57,6 +58,16 @@ export default async function AnalisisPage({ params }: { params: Promise<{ id: s
       </p>
 
       <div className="print:hidden">
+        <div className="max-w-xl">
+          <CopiarPromptAuditoriaBoton
+            nombreProspecto={prospecto.nombre}
+            empresa={prospecto.empresa}
+            nichoMercado={prospecto.nicho_mercado}
+            redesSociales={prospecto.redes_sociales}
+            linkRedesProspecto={prospecto.link_redes_prospecto}
+            queQuiereResolver={prospecto.que_quiere_resolver}
+          />
+        </div>
         <HistorialProspecto prospectoId={id} entradasIniciales={historial ?? []} />
       </div>
 

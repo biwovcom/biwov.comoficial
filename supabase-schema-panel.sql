@@ -525,3 +525,61 @@ alter table prospectos add column if not exists contrato_aceptado_en timestamptz
 
 alter table plan_compras add column if not exists acepta_contrato boolean not null default false;
 alter table plan_compras add column if not exists acepta_datos boolean not null default false;
+
+-- =========================================================
+-- PLAN DE ACCIÓN: CREATIVOS Y ESTRUCTURA DE EMBUDO/CAMPAÑA
+-- Filas libres (como prospecto_historial): "categoria" separa la pestaña de
+-- Creativos (ideas, historias, guiones, copys, ofertas, referentes) de la de
+-- Embudo y campaña (estructura de campaña, estrategia de contenido) que se
+-- le muestra al cliente para su aprobación antes de montar/grabar.
+-- =========================================================
+create table if not exists plan_creativos (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  created_by uuid references auth.users(id) default auth.uid(),
+  prospecto_id uuid not null references prospectos(id) on delete cascade,
+
+  categoria text not null check (categoria in ('creativo','embudo')),
+  tipo text not null,       -- libre, con sugerencias por categoría en el frontend
+  titulo text,              -- ej. "Historia 1", "Reel: unboxing"
+  contenido text,           -- guion / copy / descripción / texto libre
+  link text,                -- url de referencia/inspiración, opcional
+
+  aprobado boolean not null default false,
+  aprobado_en timestamptz,
+  aprobado_por uuid references auth.users(id)
+);
+
+create index if not exists idx_plan_creativos_prospecto on plan_creativos(prospecto_id, categoria, created_at);
+
+alter table plan_creativos enable row level security;
+drop policy if exists "equipo autenticado - todo" on plan_creativos;
+create policy "equipo autenticado - todo" on plan_creativos
+  for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+-- =========================================================
+-- REGISTRO DE REUNIONES
+-- Una fila por reunión: notas, el plan de trabajo que salió de ahí, y dos
+-- checklists de tareas (cliente / Kathe) como jsonb [{id, texto, hecho}],
+-- igual de simple que el resto del esquema — el PATCH reemplaza el array.
+-- =========================================================
+create table if not exists reuniones (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  created_by uuid references auth.users(id) default auth.uid(),
+  prospecto_id uuid not null references prospectos(id) on delete cascade,
+
+  fecha date not null default current_date,
+  hora time,
+  notas text,
+  plan_trabajo text,
+  tareas_cliente jsonb not null default '[]'::jsonb,
+  tareas_kathe jsonb not null default '[]'::jsonb
+);
+
+create index if not exists idx_reuniones_prospecto on reuniones(prospecto_id, fecha desc);
+
+alter table reuniones enable row level security;
+drop policy if exists "equipo autenticado - todo" on reuniones;
+create policy "equipo autenticado - todo" on reuniones
+  for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');

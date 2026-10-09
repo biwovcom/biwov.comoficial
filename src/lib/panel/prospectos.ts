@@ -40,7 +40,7 @@ export const NOMBRES_PASO: Record<PasoActual, string> = {
   llamada: "Llamada agendada",
   diagnostico: "Diagnóstico",
   analisis: "Análisis IA",
-  propuesta_enviada: "Propuesta enviada",
+  propuesta_enviada: "Plan enviado",
   ganado: "Ganado",
   perdido: "Perdido",
 };

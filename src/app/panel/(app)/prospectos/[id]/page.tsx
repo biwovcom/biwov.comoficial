@@ -24,9 +24,7 @@ import { CopiarParaIABoton } from "@/components/panel/CopiarParaIABoton";
 import { RedesSocialesLinks } from "@/components/panel/RedesSocialesLinks";
 import { EditarClasificacion } from "@/components/panel/EditarClasificacion";
 import { PaqueteClienteForm } from "@/components/panel/PaqueteClienteForm";
-import { HistorialProspecto } from "@/components/panel/HistorialProspecto";
 import type { RespuestasDiagnosticoLargo } from "@/lib/panel/diagnosticoLargo";
-import type { HistorialEntrada } from "@/lib/panel/historial";
 
 interface FiltroRespuestaFila {
   respuestas: RespuestasFiltro;
@@ -37,9 +35,9 @@ interface FiltroRespuestaFila {
 
 const PROXIMOS_PASOS = [
   { label: "Filtro rápido", ruta: "filtro" },
-  { label: "Diagnóstico profundo (onboarding, después de la venta)", ruta: "diagnostico" },
   { label: "Análisis con IA", ruta: "analisis" },
-  { label: "Propuesta", ruta: null },
+  { label: "Diagnóstico profundo (onboarding, después de la venta)", ruta: "diagnostico" },
+  { label: "Plan de acción", ruta: "plan" },
 ];
 
 export default async function ProspectoPage({ params }: { params: Promise<{ id: string }> }) {
@@ -72,13 +70,6 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
     .select("completado, respuestas")
     .eq("prospecto_id", id)
     .maybeSingle<{ completado: boolean; respuestas: RespuestasDiagnosticoLargo }>();
-
-  const { data: historial } = await supabase
-    .from("prospecto_historial")
-    .select("id, prospecto_id, parent_id, tipo, contenido, created_at")
-    .eq("prospecto_id", id)
-    .order("created_at", { ascending: false })
-    .returns<HistorialEntrada[]>();
 
   return (
     <div>
@@ -309,8 +300,6 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
           </div>
         </GlassCard>
       )}
-
-      <HistorialProspecto prospectoId={prospecto.id} entradasIniciales={historial ?? []} />
     </div>
   );
 }
