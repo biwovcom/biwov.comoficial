@@ -18,6 +18,7 @@ import { CalendarioMes } from "./CalendarioMes";
 import { TableroCreativos } from "./TableroCreativos";
 import { BriefCampana } from "./BriefCampana";
 import { RedesHistorialProspecto } from "./RedesHistorialProspecto";
+import { TemperaturaEmbudo } from "./TemperaturaEmbudo";
 import { ReunionesProspecto } from "./ReunionesProspecto";
 import { PlanAccionImprimible, type ModoImprimible } from "./PlanAccionImprimible";
 import { SelectorMes } from "./SelectorMes";
@@ -162,6 +163,10 @@ export function PlanAccionTabs({
                   Descargar esta pestaña (PDF)
                 </button>
               </div>
+              <div className="mt-4">
+                <TemperaturaEmbudo items={creativosDelMes} />
+              </div>
+
               <div className="mt-4 flex gap-1.5">
                 {VISTAS_CREATIVOS.map((v) => (
                   <button

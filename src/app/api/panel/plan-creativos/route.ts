@@ -21,6 +21,7 @@ export async function POST(request: Request) {
     fecha?: string;
     estado?: string;
     subcategoria?: string;
+    etapaEmbudo?: string;
   } = await request.json().catch(() => ({}));
 
   const prospectoId = body.prospectoId?.trim();
@@ -43,6 +44,7 @@ export async function POST(request: Request) {
       fecha: body.fecha?.trim() || null,
       estado: body.estado?.trim() || "por_hacer",
       subcategoria: body.subcategoria?.trim() || null,
+      etapa_embudo: body.etapaEmbudo?.trim() || null,
     })
     .select("*")
     .single();
@@ -73,6 +75,7 @@ export async function PATCH(request: Request) {
     fecha?: string | null;
     estado?: string;
     subcategoria?: string | null;
+    etapaEmbudo?: string | null;
     aprobado?: boolean;
   } = await request.json().catch(() => ({}));
 
@@ -89,6 +92,7 @@ export async function PATCH(request: Request) {
   if (body.fecha !== undefined) cambios.fecha = body.fecha?.trim() || null;
   if (body.estado !== undefined) cambios.estado = body.estado;
   if (body.subcategoria !== undefined) cambios.subcategoria = body.subcategoria?.trim() || null;
+  if (body.etapaEmbudo !== undefined) cambios.etapa_embudo = body.etapaEmbudo?.trim() || null;
   if (body.aprobado !== undefined) {
     cambios.aprobado = body.aprobado;
     cambios.aprobado_en = body.aprobado ? new Date().toISOString() : null;

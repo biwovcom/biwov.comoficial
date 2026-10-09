@@ -1,8 +1,43 @@
-import type { PlanCreativoEntrada } from "@/lib/panel/planCreativos";
+import { ETAPAS_EMBUDO, type EtapaEmbudo, type PlanCreativoEntrada } from "@/lib/panel/planCreativos";
 import type { PlanCampana } from "@/lib/panel/planCampanas";
 import { filasFormulas, type RedHistorialEntrada } from "@/lib/panel/redesHistorial";
 
 export type ModoImprimible = "todo" | "creativos" | "embudo" | "redes" | "analisis";
+
+function SeccionTemperatura({ items }: { items: PlanCreativoEntrada[] }) {
+  const clasificados = items.filter((i) => i.etapa_embudo);
+  if (clasificados.length === 0) return null;
+
+  const conteos: Record<EtapaEmbudo, number> = { tofu: 0, mofu: 0, bofu: 0 };
+  for (const item of clasificados) {
+    if (item.etapa_embudo) conteos[item.etapa_embudo]++;
+  }
+  const total = clasificados.length;
+
+  return (
+    <div className="mb-6 break-inside-avoid">
+      <h2 className="text-sm font-bold uppercase tracking-wide text-[#0d3b66]">Temperatura del embudo</h2>
+      <p className="mt-1 text-xs text-[#5b6677]">
+        Mezcla ideal: 60-70% TOFU, 20-30% MOFU, ~10% BOFU.
+      </p>
+      <div className="mt-2 grid grid-cols-3 gap-3">
+        {(Object.keys(ETAPAS_EMBUDO) as EtapaEmbudo[]).map((etapa) => {
+          const pct = (conteos[etapa] / total) * 100;
+          return (
+            <div key={etapa} className="text-xs text-[#111827]">
+              <p className="font-semibold">
+                {ETAPAS_EMBUDO[etapa].label}: {pct.toFixed(0)}% ({conteos[etapa]})
+              </p>
+              <p className="text-[#5b6677]">
+                Ideal {ETAPAS_EMBUDO[etapa].idealMin}-{ETAPAS_EMBUDO[etapa].idealMax}%
+              </p>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 function SeccionCampana({ campana }: { campana: PlanCampana }) {
   const filas: [string, string | null][] = [
@@ -55,6 +90,11 @@ function Seccion({ titulo, items }: { titulo: string; items: PlanCreativoEntrada
           <div key={item.id} className="break-inside-avoid border-t border-[#e5e7eb] pt-3">
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs font-semibold uppercase tracking-wide text-[#0d3b66]">{item.tipo}</span>
+              {item.etapa_embudo && (
+                <span className="rounded-full bg-[#eef2ff] px-2 py-0.5 text-[10px] font-semibold text-[#3730a3]">
+                  {ETAPAS_EMBUDO[item.etapa_embudo].label}
+                </span>
+              )}
               {item.fecha && (
                 <span className="text-[10px] text-[#5b6677]">
                   {new Date(`${item.fecha}T00:00:00`).toLocaleDateString("es-CO")}
@@ -174,6 +214,7 @@ export function PlanAccionImprimible({
       <p className="mt-1 text-xs text-[#5b6677]">{fecha}</p>
 
       <div className="mt-6 border-t border-[#d1d5db] pt-6">
+        {mostrarCreativos && <SeccionTemperatura items={creativos} />}
         {mostrarCreativos && <Seccion titulo="Creativos" items={creativos} />}
         {mostrarEmbudo && campana?.aprobado && <SeccionCampana campana={campana} />}
         {mostrarEmbudo && <Seccion titulo="Notas de embudo y campaña" items={embudo} />}

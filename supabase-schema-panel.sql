@@ -686,3 +686,10 @@ alter table redes_historial add column if not exists pct_reels numeric;
 alter table redes_historial add column if not exists pct_historias numeric;
 alter table redes_historial add column if not exists pct_publicaciones numeric;
 alter table redes_historial add column if not exists pct_no_seguidores numeric;
+
+-- =========================================================
+-- ETAPA DE EMBUDO DE CADA CREATIVO (TOFU / MOFU / BOFU)
+-- Mezcla ideal del mes: 60-70% TOFU, 20-30% MOFU, ~10% BOFU.
+-- =========================================================
+alter table plan_creativos add column if not exists etapa_embudo text
+  check (etapa_embudo in ('tofu','mofu','bofu'));

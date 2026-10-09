@@ -4,7 +4,9 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 import {
   COLOR_SUBCATEGORIA,
+  ETAPAS_EMBUDO,
   SUBCATEGORIAS_CREATIVO,
+  type EtapaEmbudo,
   type PlanCreativoEntrada,
   type SubcategoriaCreativo,
 } from "@/lib/panel/planCreativos";
@@ -205,6 +207,7 @@ function FormularioAltaDia({
 }) {
   const [tipo, setTipo] = useState("");
   const [subcategoria, setSubcategoria] = useState<SubcategoriaCreativo | "">("");
+  const [etapaEmbudo, setEtapaEmbudo] = useState<EtapaEmbudo | "">("");
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -218,7 +221,7 @@ function FormularioAltaDia({
     const res = await fetch("/api/panel/plan-creativos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prospectoId, categoria: "creativo", tipo: tipo.trim(), fecha, subcategoria }),
+      body: JSON.stringify({ prospectoId, categoria: "creativo", tipo: tipo.trim(), fecha, subcategoria, etapaEmbudo }),
     });
     setEnviando(false);
     if (!res.ok) {
@@ -229,6 +232,7 @@ function FormularioAltaDia({
     onAgregado(data.entrada);
     setTipo("");
     setSubcategoria("");
+    setEtapaEmbudo("");
   };
 
   return (
@@ -255,6 +259,18 @@ function FormularioAltaDia({
           {Object.entries(SUBCATEGORIAS_CREATIVO).map(([valor, label]) => (
             <option key={valor} value={valor}>
               {label}
+            </option>
+          ))}
+        </select>
+        <select
+          value={etapaEmbudo}
+          onChange={(e) => setEtapaEmbudo(e.target.value as EtapaEmbudo | "")}
+          className="rounded-xl border border-border-glass bg-white/[0.03] px-3 py-1.5 text-sm text-white outline-none focus:border-accent [&>option]:bg-bg-base"
+        >
+          <option value="">Sin etapa</option>
+          {Object.entries(ETAPAS_EMBUDO).map(([valor, info]) => (
+            <option key={valor} value={valor}>
+              {info.label}
             </option>
           ))}
         </select>

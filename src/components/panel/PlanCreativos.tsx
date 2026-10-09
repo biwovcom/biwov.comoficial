@@ -6,10 +6,13 @@ import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import {
+  COLOR_ETAPA_EMBUDO,
   COLOR_SUBCATEGORIA,
   ESTADOS_CREATIVO,
+  ETAPAS_EMBUDO,
   SUBCATEGORIAS_CREATIVO,
   type EstadoCreativo,
+  type EtapaEmbudo,
   type PlanCreativoEntrada,
   type SubcategoriaCreativo,
 } from "@/lib/panel/planCreativos";
@@ -18,7 +21,10 @@ import { cn } from "@/lib/utils";
 export async function actualizarEntradaCreativo(
   id: string,
   cambios: Partial<
-    Pick<PlanCreativoEntrada, "tipo" | "titulo" | "contenido" | "link" | "fecha" | "estado" | "subcategoria" | "aprobado">
+    Pick<
+      PlanCreativoEntrada,
+      "tipo" | "titulo" | "contenido" | "link" | "fecha" | "estado" | "subcategoria" | "etapa_embudo" | "aprobado"
+    >
   >,
 ) {
   const res = await fetch("/api/panel/plan-creativos", {
@@ -65,6 +71,7 @@ function FormularioEdicion({
     contenido: string;
     fecha: string;
     subcategoria: string;
+    etapaEmbudo: string;
   }) => Promise<void>;
   onCancelar: () => void;
 }) {
@@ -74,12 +81,13 @@ function FormularioEdicion({
   const [contenido, setContenido] = useState(entrada.contenido ?? "");
   const [fecha, setFecha] = useState(entrada.fecha ?? "");
   const [subcategoria, setSubcategoria] = useState(entrada.subcategoria ?? "");
+  const [etapaEmbudo, setEtapaEmbudo] = useState(entrada.etapa_embudo ?? "");
   const [guardando, setGuardando] = useState(false);
 
   const guardar = async () => {
     if (!tipo.trim()) return;
     setGuardando(true);
-    await onGuardar({ tipo: tipo.trim(), titulo, link, contenido, fecha, subcategoria });
+    await onGuardar({ tipo: tipo.trim(), titulo, link, contenido, fecha, subcategoria, etapaEmbudo });
     setGuardando(false);
   };
 
@@ -109,6 +117,16 @@ function FormularioEdicion({
           </Select>
         )}
       </div>
+      {entrada.categoria === "creativo" && (
+        <Select value={etapaEmbudo} onChange={(e) => setEtapaEmbudo(e.target.value)}>
+          <option value="">Sin etapa de embudo</option>
+          {Object.entries(ETAPAS_EMBUDO).map(([valor, info]) => (
+            <option key={valor} value={valor}>
+              {info.label} — {info.descripcion}
+            </option>
+          ))}
+        </Select>
+      )}
       <Input placeholder="Link de referencia (opcional)" value={link} onChange={(e) => setLink(e.target.value)} />
       <textarea
         value={contenido}
@@ -174,6 +192,18 @@ export function TarjetaCreativo({
               >
                 <span className={cn("h-1.5 w-1.5 rounded-full", COLOR_SUBCATEGORIA[entrada.subcategoria].dot)} />
                 {SUBCATEGORIAS_CREATIVO[entrada.subcategoria]}
+              </span>
+            )}
+            {entrada.etapa_embudo && (
+              <span
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold",
+                  COLOR_ETAPA_EMBUDO[entrada.etapa_embudo].badge,
+                )}
+                title={ETAPAS_EMBUDO[entrada.etapa_embudo].descripcion}
+              >
+                <span className={cn("h-1.5 w-1.5 rounded-full", COLOR_ETAPA_EMBUDO[entrada.etapa_embudo].dot)} />
+                {ETAPAS_EMBUDO[entrada.etapa_embudo].label}
               </span>
             )}
             {entrada.fecha && (
@@ -283,9 +313,13 @@ export function TarjetaCreativo({
             onCancelar={() => setEditando(false)}
             onGuardar={async (cambios) => {
               const actualizada = await actualizarEntradaCreativo(entrada.id, {
-                ...cambios,
+                tipo: cambios.tipo,
+                titulo: cambios.titulo,
+                link: cambios.link,
+                contenido: cambios.contenido,
                 fecha: cambios.fecha || null,
                 subcategoria: (cambios.subcategoria || null) as SubcategoriaCreativo | null,
+                etapa_embudo: (cambios.etapaEmbudo || null) as EtapaEmbudo | null,
               });
               if (actualizada) {
                 onActualizar(actualizada);
@@ -318,6 +352,7 @@ function FormularioAlta({
   const [contenido, setContenido] = useState("");
   const [fecha, setFecha] = useState(fechaFija ?? "");
   const [subcategoria, setSubcategoria] = useState<SubcategoriaCreativo | "">("");
+  const [etapaEmbudo, setEtapaEmbudo] = useState<EtapaEmbudo | "">("");
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -340,6 +375,7 @@ function FormularioAlta({
         contenido: contenido.trim(),
         fecha,
         subcategoria,
+        etapaEmbudo,
       }),
     });
     setEnviando(false);
@@ -355,6 +391,7 @@ function FormularioAlta({
     setContenido("");
     setFecha(fechaFija ?? "");
     setSubcategoria("");
+    setEtapaEmbudo("");
   };
 
   const idDatalist = `tipos-plan-sugeridos-${categoria}`;
@@ -410,6 +447,23 @@ function FormularioAlta({
           </div>
         )}
       </div>
+      {categoria === "creativo" && (
+        <div>
+          <Label htmlFor={`etapa-${categoria}`}>Etapa del embudo (TOFU / MOFU / BOFU)</Label>
+          <Select
+            id={`etapa-${categoria}`}
+            value={etapaEmbudo}
+            onChange={(e) => setEtapaEmbudo(e.target.value as EtapaEmbudo | "")}
+          >
+            <option value="">Sin etapa</option>
+            {Object.entries(ETAPAS_EMBUDO).map(([valor, info]) => (
+              <option key={valor} value={valor}>
+                {info.label} — {info.descripcion}
+              </option>
+            ))}
+          </Select>
+        </div>
+      )}
       <div>
         <Label htmlFor={`link-${categoria}`}>Link de referencia (opcional)</Label>
         <Input
