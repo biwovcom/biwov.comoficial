@@ -91,6 +91,8 @@ export const COLOR_SEMAFORO: Record<NivelSemaforo, { dot: string; text: string; 
 export interface Medidor {
   nivel: NivelSemaforo;
   referencia: string;
+  /** La escala completa de cortes, para mostrarla siempre como referencia (no solo el nivel en el que caíste). */
+  escala: { nivel: NivelSemaforo; texto: string }[];
 }
 
 /**
@@ -99,11 +101,12 @@ export interface Medidor {
  * grande. Cuando no hay un corte estándar conocido, la fórmula no trae medidor.
  */
 function medidor(valor: number, cortes: [number, NivelSemaforo][], mensajes: string[]): Medidor {
+  const escala = cortes.map((c, i) => ({ nivel: c[1], texto: mensajes[i] }));
   for (let i = 0; i < cortes.length; i++) {
-    if (valor < cortes[i][0]) return { nivel: cortes[i][1], referencia: mensajes[i] };
+    if (valor < cortes[i][0]) return { nivel: cortes[i][1], referencia: mensajes[i], escala };
   }
   const ultimo = cortes[cortes.length - 1];
-  return { nivel: ultimo[1], referencia: mensajes[mensajes.length - 1] };
+  return { nivel: ultimo[1], referencia: mensajes[mensajes.length - 1], escala };
 }
 
 const medidorEngagementSeguidores = (v: number) =>
@@ -159,10 +162,16 @@ const medidorEngagementVisualizaciones = (v: number) =>
 
 /** Aquí "menos" es mejor, así que se evalúa en orden inverso. */
 function medidorSeguidosSeguidores(v: number): Medidor {
-  if (v > 5) return { nivel: "rojo", referencia: "Más de 5 veces: se ve como \"pidiendo seguidores\"." };
-  if (v > 2) return { nivel: "naranja", referencia: "Entre 2 y 5 veces: alto, cuídalo." };
-  if (v > 1) return { nivel: "amarillo", referencia: "Entre 1 y 2 veces: en el límite." };
-  return { nivel: "verde", referencia: "1 o menos: sano." };
+  const escala: Medidor["escala"] = [
+    { nivel: "verde", texto: "1 o menos: sano." },
+    { nivel: "amarillo", texto: "Entre 1 y 2 veces: en el límite." },
+    { nivel: "naranja", texto: "Entre 2 y 5 veces: alto, cuídalo." },
+    { nivel: "rojo", texto: 'Más de 5 veces: se ve como "pidiendo seguidores".' },
+  ];
+  if (v > 5) return { nivel: "rojo", referencia: escala[3].texto, escala };
+  if (v > 2) return { nivel: "naranja", referencia: escala[2].texto, escala };
+  if (v > 1) return { nivel: "amarillo", referencia: escala[1].texto, escala };
+  return { nivel: "verde", referencia: escala[0].texto, escala };
 }
 
 const medidorNoSeguidores = (v: number) =>
@@ -187,10 +196,11 @@ export interface FilaFormula {
   valor: number | null;
   unidad: string;
   explicacion: string;
+  formula: string;
   medidor?: Medidor;
 }
 
-/** Arma las filas listas para mostrar, con la explicación en simple de cada fórmula. */
+/** Arma las filas listas para mostrar, con la fórmula y la explicación en simple de cada una. */
 export function filasFormulas(e: RedHistorialEntrada): FilaFormula[] {
   const m = calcularMetricas(e);
   const filas: FilaFormula[] = [
@@ -198,12 +208,14 @@ export function filasFormulas(e: RedHistorialEntrada): FilaFormula[] {
       label: "Alcance diario promedio",
       valor: m.alcanceDiario,
       unidad: "personas/día",
+      formula: "Alcance ÷ días del periodo",
       explicacion: "Cuántas personas distintas te ven cada día, en promedio. Depende del tamaño de tu cuenta, sin corte único.",
     },
     {
       label: "Alcance mensual estimado",
       valor: m.alcanceMensual90,
       unidad: "personas/mes",
+      formula: "Alcance (90 días) ÷ 3",
       explicacion:
         "Solo con datos de 90 días. Es aproximado: si alguien te vio en dos meses distintos, Instagram lo cuenta una sola vez.",
     },
@@ -211,12 +223,14 @@ export function filasFormulas(e: RedHistorialEntrada): FilaFormula[] {
       label: "Vistas promedio por pieza",
       valor: m.vistasPromedioPorPieza,
       unidad: "vistas",
+      formula: "Suma de vistas de las piezas ÷ número de piezas",
       explicacion: "En promedio, cuánto ve cada publicación o historia que subes. Sin corte único: compáralo contigo mismo en el tiempo.",
     },
     {
       label: "Engagement sobre alcance",
       valor: m.engagementSobreAlcance,
       unidad: "%",
+      formula: "(Interacciones ÷ Alcance) × 100",
       explicacion: "De cada 100 personas que te vieron, cuántas interacciones obtuviste.",
       medidor: m.engagementSobreAlcance !== null ? medidorEngagementAlcance(m.engagementSobreAlcance) : undefined,
     },
@@ -224,6 +238,7 @@ export function filasFormulas(e: RedHistorialEntrada): FilaFormula[] {
       label: "Engagement sobre visualizaciones",
       valor: m.engagementSobreVisualizaciones,
       unidad: "%",
+      formula: "(Interacciones ÷ Visualizaciones) × 100",
       explicacion: "De cada 100 veces que se vio tu contenido, cuántas veces alguien interactuó.",
       medidor:
         m.engagementSobreVisualizaciones !== null
@@ -234,12 +249,14 @@ export function filasFormulas(e: RedHistorialEntrada): FilaFormula[] {
       label: "Interacciones por pieza",
       valor: m.interaccionesPorPieza,
       unidad: "interacciones",
+      formula: "Interacciones ÷ número de piezas",
       explicacion: "En promedio, cuántas interacciones recibe cada publicación. Sin corte único.",
     },
     {
       label: "Engagement por publicación sobre seguidores",
       valor: m.engagementPorPublicacionSobreSeguidores,
       unidad: "%",
+      formula: "(Interacciones por pieza ÷ Seguidores) × 100",
       explicacion: "El estándar de la industria para comparar cuentas entre sí (hasta desde afuera).",
       medidor:
         m.engagementPorPublicacionSobreSeguidores !== null
@@ -250,6 +267,7 @@ export function filasFormulas(e: RedHistorialEntrada): FilaFormula[] {
       label: "Seguidos ÷ seguidores",
       valor: m.proporcionSeguidosSeguidores,
       unidad: "x",
+      formula: "Seguidos ÷ Seguidores",
       explicacion: "Lo sano es menos de 1, como mucho 2. Más que eso se ve como \"pidiendo seguidores\".",
       medidor:
         m.proporcionSeguidosSeguidores !== null ? medidorSeguidosSeguidores(m.proporcionSeguidosSeguidores) : undefined,
@@ -258,6 +276,7 @@ export function filasFormulas(e: RedHistorialEntrada): FilaFormula[] {
       label: "Frecuencia",
       valor: m.frecuencia,
       unidad: "veces",
+      formula: "Visualizaciones ÷ Espectadores (alcance)",
       explicacion: "Cuántas veces en promedio te vio cada persona (visualizaciones ÷ espectadores).",
     },
   ];
@@ -267,6 +286,7 @@ export function filasFormulas(e: RedHistorialEntrada): FilaFormula[] {
       label: "% de vistas de no seguidores",
       valor: e.pct_no_seguidores,
       unidad: "%",
+      formula: "Dato directo del panel (Estadísticas → Audiencia)",
       explicacion: "Qué tanto te está mostrando Instagram a gente nueva que todavía no te sigue.",
       medidor: medidorNoSeguidores(e.pct_no_seguidores),
     });

@@ -11,6 +11,7 @@ import {
   GLOSARIO_TERMINOS_MARKETING,
   REDES_SUGERIDAS,
   filasFormulas,
+  type Medidor,
   type RedHistorialEntrada,
 } from "@/lib/panel/redesHistorial";
 import { cn } from "@/lib/utils";
@@ -222,13 +223,15 @@ function MedidorFila({
   valor,
   unidad,
   explicacion,
+  formula,
   medidor,
 }: {
   label: string;
   valor: number | null;
   unidad: string;
   explicacion: string;
-  medidor?: { nivel: "rojo" | "naranja" | "amarillo" | "verde"; referencia: string };
+  formula: string;
+  medidor?: Medidor;
 }) {
   if (valor === null) return null;
   return (
@@ -251,7 +254,26 @@ function MedidorFila({
         {valor.toLocaleString("es-CO", { maximumFractionDigits: 1 })} <span className="text-xs font-normal text-text-secondary">{unidad}</span>
       </p>
       <p className="mt-1 text-xs text-text-secondary">{explicacion}</p>
-      {medidor && <p className="mt-1 text-[11px] text-text-secondary">Referencia: {medidor.referencia}</p>}
+      <p className="mt-1 text-[11px] italic text-text-secondary/80">Fórmula: {formula}</p>
+      {medidor && (
+        <div className="mt-2 space-y-1 border-t border-white/10 pt-2">
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-text-secondary">
+            Escala de referencia
+          </p>
+          {medidor.escala.map((banda) => (
+            <p
+              key={banda.texto}
+              className={cn(
+                "flex items-start gap-1.5 text-[11px]",
+                banda.nivel === medidor.nivel ? "font-semibold text-white" : "text-text-secondary",
+              )}
+            >
+              <span className={cn("mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full", COLOR_SEMAFORO[banda.nivel].dot)} />
+              {banda.texto}
+            </p>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -391,30 +413,35 @@ function TarjetaMedicion({
 
 export function RedesHistorialProspecto({
   prospectoId,
-  entradasIniciales,
+  entradas,
+  onEntradasChange,
+  filtroRed,
+  setFiltroRed,
+  desde,
+  setDesde,
+  hasta,
+  setHasta,
+  visibles,
+  onDescargarPestana,
 }: {
   prospectoId: string;
-  entradasIniciales: RedHistorialEntrada[];
+  entradas: RedHistorialEntrada[];
+  onEntradasChange: (entradas: RedHistorialEntrada[]) => void;
+  filtroRed: string;
+  setFiltroRed: (v: string) => void;
+  desde: string;
+  setDesde: (v: string) => void;
+  hasta: string;
+  setHasta: (v: string) => void;
+  visibles: RedHistorialEntrada[];
+  onDescargarPestana?: () => void;
 }) {
-  const [entradas, setEntradas] = useState(
-    [...entradasIniciales].sort((a, b) => (a.fecha < b.fecha ? 1 : -1)),
-  );
   const [mostrarForm, setMostrarForm] = useState(false);
-  const [filtroRed, setFiltroRed] = useState("todas");
-  const [desde, setDesde] = useState("");
-  const [hasta, setHasta] = useState("");
 
   const redesDisponibles = useMemo(
     () => Array.from(new Set(entradas.map((e) => e.red_social))),
     [entradas],
   );
-
-  const visibles = entradas.filter((e) => {
-    if (filtroRed !== "todas" && e.red_social !== filtroRed) return false;
-    if (desde && e.fecha < desde) return false;
-    if (hasta && e.fecha > hasta) return false;
-    return true;
-  });
 
   const agregar = async (valores: FormularioValores) => {
     const res = await fetch("/api/panel/redes-historial", {
@@ -427,7 +454,7 @@ export function RedesHistorialProspecto({
       return;
     }
     const data = await res.json();
-    setEntradas((prev) => [data.entrada, ...prev]);
+    onEntradasChange([data.entrada, ...entradas]);
     setMostrarForm(false);
   };
 
@@ -439,21 +466,32 @@ export function RedesHistorialProspecto({
       window.alert("No se pudo eliminar.");
       return;
     }
-    setEntradas((prev) => prev.filter((e) => e.id !== id));
+    onEntradasChange(entradas.filter((e) => e.id !== id));
   };
 
   const actualizarEnLista = (actualizada: RedHistorialEntrada) => {
-    setEntradas((prev) => prev.map((e) => (e.id === actualizada.id ? actualizada : e)));
+    onEntradasChange(entradas.map((e) => (e.id === actualizada.id ? actualizada : e)));
   };
 
   return (
     <div className="space-y-5">
-      <div>
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-text-secondary">Redes y crecimiento</h2>
-        <p className="mt-1 text-xs text-text-secondary">
-          Copia los números del Panel profesional de Instagram (Estadísticas → Cuenta y Estadísticas → Contenido) y
-          aquí se calculan solas las fórmulas de alcance y engagement, con un medidor de qué tan bien va cada una.
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-text-secondary">Redes y crecimiento</h2>
+          <p className="mt-1 text-xs text-text-secondary">
+            Copia los números del Panel profesional de Instagram (Estadísticas → Cuenta y Estadísticas → Contenido) y
+            aquí se calculan solas las fórmulas de alcance y engagement, con un medidor de qué tan bien va cada una.
+          </p>
+        </div>
+        {onDescargarPestana && (
+          <button
+            type="button"
+            onClick={onDescargarPestana}
+            className="shrink-0 rounded-full border border-border-glass px-3 py-1.5 text-xs text-text-secondary hover:border-accent/40 hover:text-white"
+          >
+            Descargar esta pestaña (PDF)
+          </button>
+        )}
       </div>
 
       <GlosarioRedes />

@@ -1,5 +1,8 @@
 import type { PlanCreativoEntrada } from "@/lib/panel/planCreativos";
 import type { PlanCampana } from "@/lib/panel/planCampanas";
+import { filasFormulas, type RedHistorialEntrada } from "@/lib/panel/redesHistorial";
+
+export type ModoImprimible = "todo" | "creativos" | "embudo" | "redes" | "analisis";
 
 function SeccionCampana({ campana }: { campana: PlanCampana }) {
   const filas: [string, string | null][] = [
@@ -16,6 +19,7 @@ function SeccionCampana({ campana }: { campana: PlanCampana }) {
     ["Evento de calificación", campana.evento_calificacion],
     ["Oferta principal", campana.oferta_principal],
     ["Objetivo del mes", campana.objetivo_mes],
+    ["Resultado del mes", campana.resultado_mes],
   ];
 
   return (
@@ -51,6 +55,11 @@ function Seccion({ titulo, items }: { titulo: string; items: PlanCreativoEntrada
           <div key={item.id} className="break-inside-avoid border-t border-[#e5e7eb] pt-3">
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs font-semibold uppercase tracking-wide text-[#0d3b66]">{item.tipo}</span>
+              {item.fecha && (
+                <span className="text-[10px] text-[#5b6677]">
+                  {new Date(`${item.fecha}T00:00:00`).toLocaleDateString("es-CO")}
+                </span>
+              )}
               {item.aprobado && (
                 <span className="rounded-full bg-[#dcfce7] px-2 py-0.5 text-[10px] font-semibold text-[#15803d]">
                   ✓ Aprobado{item.aprobado_en ? ` el ${new Date(item.aprobado_en).toLocaleDateString("es-CO")}` : ""}
@@ -71,20 +80,86 @@ function Seccion({ titulo, items }: { titulo: string; items: PlanCreativoEntrada
   );
 }
 
+function SeccionRedes({ items }: { items: RedHistorialEntrada[] }) {
+  if (items.length === 0) return null;
+  return (
+    <div className="mb-6 break-inside-avoid">
+      <h2 className="text-sm font-bold uppercase tracking-wide text-[#0d3b66]">Redes y crecimiento</h2>
+      <div className="mt-2 space-y-4">
+        {items.map((e) => (
+          <div key={e.id} className="break-inside-avoid border-t border-[#e5e7eb] pt-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[#0d3b66]">
+              {e.red_social} · {new Date(`${e.fecha}T00:00:00`).toLocaleDateString("es-CO")} · periodo de{" "}
+              {e.periodo_dias} días
+            </p>
+            <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {filasFormulas(e)
+                .filter((f) => f.valor !== null)
+                .map((f) => (
+                  <div key={f.label} className="text-xs text-[#111827]">
+                    <p className="font-semibold">
+                      {f.valor!.toLocaleString("es-CO", { maximumFractionDigits: 1 })} {f.unidad}
+                    </p>
+                    <p className="text-[#5b6677]">{f.label}</p>
+                    {f.medidor && (
+                      <p className="text-[#5b6677]">
+                        {f.medidor.nivel === "verde"
+                          ? "✓ Cumple"
+                          : f.medidor.nivel === "rojo"
+                            ? "✗ Bajo"
+                            : "~ Promedio"}
+                      </p>
+                    )}
+                  </div>
+                ))}
+            </div>
+            {e.notas && <p className="mt-2 whitespace-pre-line text-xs text-[#111827]">{e.notas}</p>}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const TITULO_MODO: Record<ModoImprimible, string> = {
+  todo: "Plan de acción completo",
+  creativos: "Creativos",
+  embudo: "Embudo y campaña",
+  redes: "Redes y crecimiento",
+  analisis: "Análisis y resultados",
+};
+
 export function PlanAccionImprimible({
   prospectoNombre,
   empresa,
+  modo = "todo",
   creativos,
   embudo,
   campana,
+  redes,
+  analisis,
 }: {
   prospectoNombre: string;
   empresa: string | null;
+  modo?: ModoImprimible;
   creativos: PlanCreativoEntrada[];
   embudo: PlanCreativoEntrada[];
   campana?: PlanCampana | null;
+  redes: RedHistorialEntrada[];
+  analisis: PlanCreativoEntrada[];
 }) {
   const fecha = new Date().toLocaleDateString("es-CO", { year: "numeric", month: "long", day: "numeric" });
+
+  const mostrarCreativos = modo === "todo" || modo === "creativos";
+  const mostrarEmbudo = modo === "todo" || modo === "embudo";
+  const mostrarRedes = modo === "todo" || modo === "redes";
+  const mostrarAnalisis = modo === "todo" || modo === "analisis";
+
+  const vacio =
+    (!mostrarCreativos || creativos.length === 0) &&
+    (!mostrarEmbudo || (!campana?.aprobado && embudo.length === 0)) &&
+    (!mostrarRedes || redes.length === 0) &&
+    (!mostrarAnalisis || analisis.length === 0);
 
   return (
     <div className="bg-white p-8 text-[#111827]">
@@ -93,18 +168,18 @@ export function PlanAccionImprimible({
       <div className="mt-3 h-1 w-full rounded-full bg-gradient-to-r from-[#1d4772] to-[#3d98cc]" />
 
       <p className="mt-6 text-xs font-semibold uppercase tracking-wide text-[#0d3b66]">
-        Plan de acción · biwov_
+        {TITULO_MODO[modo]} · biwov_
       </p>
       <h1 className="mt-1 text-2xl font-bold text-[#0d1420]">{empresa || prospectoNombre}</h1>
       <p className="mt-1 text-xs text-[#5b6677]">{fecha}</p>
 
       <div className="mt-6 border-t border-[#d1d5db] pt-6">
-        <Seccion titulo="Creativos" items={creativos} />
-        {campana?.aprobado && <SeccionCampana campana={campana} />}
-        <Seccion titulo="Embudo y campaña" items={embudo} />
-        {creativos.length === 0 && embudo.length === 0 && !campana?.aprobado && (
-          <p className="text-sm text-[#4b5563]">Todavía no hay ítems en el plan de acción.</p>
-        )}
+        {mostrarCreativos && <Seccion titulo="Creativos" items={creativos} />}
+        {mostrarEmbudo && campana?.aprobado && <SeccionCampana campana={campana} />}
+        {mostrarEmbudo && <Seccion titulo="Notas de embudo y campaña" items={embudo} />}
+        {mostrarRedes && <SeccionRedes items={redes} />}
+        {mostrarAnalisis && <Seccion titulo="Análisis y resultados" items={analisis} />}
+        {vacio && <p className="text-sm text-[#4b5563]">Todavía no hay información para mostrar aquí.</p>}
       </div>
     </div>
   );

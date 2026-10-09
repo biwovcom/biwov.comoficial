@@ -447,6 +447,7 @@ export function PlanCreativos({
   tiposSugeridos,
   entradas,
   onEntradasChange,
+  onDescargarPestana,
 }: {
   prospectoId: string;
   categoria: "creativo" | "embudo" | "analisis";
@@ -455,6 +456,7 @@ export function PlanCreativos({
   tiposSugeridos: string[];
   entradas: PlanCreativoEntrada[];
   onEntradasChange: (entradas: PlanCreativoEntrada[]) => void;
+  onDescargarPestana?: () => void;
 }) {
   const eliminar = async (id: string) => {
     const confirmado = window.confirm("¿Eliminar este ítem?");
@@ -473,8 +475,21 @@ export function PlanCreativos({
 
   return (
     <div>
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-text-secondary">{titulo}</h2>
-      <p className="mt-1 text-xs text-text-secondary">{descripcion}</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-text-secondary">{titulo}</h2>
+          <p className="mt-1 text-xs text-text-secondary">{descripcion}</p>
+        </div>
+        {onDescargarPestana && (
+          <button
+            type="button"
+            onClick={onDescargarPestana}
+            className="shrink-0 rounded-full border border-border-glass px-3 py-1.5 text-xs text-text-secondary hover:border-accent/40 hover:text-white"
+          >
+            Descargar esta pestaña (PDF)
+          </button>
+        )}
+      </div>
 
       <div className="mt-4">
         <FormularioAlta

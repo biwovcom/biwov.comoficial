@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { flushSync } from "react-dom";
 import { Download } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import {
@@ -18,7 +19,7 @@ import { TableroCreativos } from "./TableroCreativos";
 import { BriefCampana } from "./BriefCampana";
 import { RedesHistorialProspecto } from "./RedesHistorialProspecto";
 import { ReunionesProspecto } from "./ReunionesProspecto";
-import { PlanAccionImprimible } from "./PlanAccionImprimible";
+import { PlanAccionImprimible, type ModoImprimible } from "./PlanAccionImprimible";
 import { SelectorMes } from "./SelectorMes";
 import { cn } from "@/lib/utils";
 
@@ -60,17 +61,52 @@ export function PlanAccionTabs({
   const [embudo, setEmbudo] = useState(embudoIniciales);
   const [analisis, setAnalisis] = useState(analisisIniciales);
   const [campanas, setCampanas] = useState(campanasIniciales);
+  const [redes, setRedes] = useState(redesIniciales);
+
+  const [filtroRed, setFiltroRed] = useState("todas");
+  const [desde, setDesde] = useState("");
+  const [hasta, setHasta] = useState("");
+
+  const [modoImprimir, setModoImprimir] = useState<ModoImprimible>("todo");
 
   const mesTexto = primerDiaDelMes(anio, mes);
   const creativosDelMes = creativos.filter((c) => c.fecha?.startsWith(mesTexto.slice(0, 7)));
   const embudoDelMes = embudo.filter((e) => !e.fecha || e.fecha.startsWith(mesTexto.slice(0, 7)));
   const campanaDelMes = campanas.find((c) => c.mes === mesTexto) ?? null;
 
+  const redesVisibles = [...redes]
+    .sort((a, b) => (a.fecha < b.fecha ? 1 : -1))
+    .filter((e) => {
+      if (filtroRed !== "todas" && e.red_social !== filtroRed) return false;
+      if (desde && e.fecha < desde) return false;
+      if (hasta && e.fecha > hasta) return false;
+      return true;
+    });
+
   const actualizarCampana = (actualizada: PlanCampana) => {
     setCampanas((prev) => {
       const existe = prev.some((c) => c.id === actualizada.id);
       return existe ? prev.map((c) => (c.id === actualizada.id ? actualizada : c)) : [...prev, actualizada];
     });
+  };
+
+  // flushSync obliga a que el cambio de modo se refleje en el DOM antes de
+  // llamar a print(), si no, print() imprime la vista anterior porque React
+  // agrupa el setState y aún no repintó cuando print() se ejecuta.
+  const descargarPestana = (modo: ModoImprimible) => {
+    flushSync(() => setModoImprimir(modo));
+    window.print();
+  };
+
+  // Lo que se envía a imprimir en cada modo respeta lo que está filtrado/
+  // seleccionado en pantalla (el mes elegido en Creativos/Embudo, los
+  // filtros de red social y fechas en Redes).
+  const datosImprimir = {
+    creativos: modoImprimir === "creativos" ? creativosDelMes : creativos,
+    embudo: modoImprimir === "embudo" ? embudoDelMes : embudo,
+    campana: campanaDelMes,
+    redes: modoImprimir === "redes" ? redesVisibles : redes,
+    analisis,
   };
 
   return (
@@ -94,10 +130,10 @@ export function PlanAccionTabs({
           </div>
           <button
             type="button"
-            onClick={() => window.print()}
+            onClick={() => descargarPestana("todo")}
             className="flex items-center gap-2 rounded-xl border border-border-glass px-4 py-2.5 text-sm text-text-secondary transition-colors hover:border-accent/40 hover:text-white"
           >
-            <Download size={16} /> Descargar en PDF
+            <Download size={16} /> Descargar todo (PDF)
           </button>
         </div>
 
@@ -110,11 +146,22 @@ export function PlanAccionTabs({
         <GlassCard className="mt-5 p-6">
           {activa === "Creativos" && (
             <div>
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-text-secondary">Creativos</h2>
-              <p className="mt-1 text-xs text-text-secondary">
-                Ideas de contenido y referentes, historias, guiones, copys y textos de oferta — organizados por
-                mes y por estado, en Historias o en Feed.
-              </p>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h2 className="text-sm font-semibold uppercase tracking-wide text-text-secondary">Creativos</h2>
+                  <p className="mt-1 text-xs text-text-secondary">
+                    Ideas de contenido y referentes, historias, guiones, copys y textos de oferta — organizados por
+                    mes y por estado, en Historias o en Feed.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => descargarPestana("creativos")}
+                  className="shrink-0 rounded-full border border-border-glass px-3 py-1.5 text-xs text-text-secondary hover:border-accent/40 hover:text-white"
+                >
+                  Descargar esta pestaña (PDF)
+                </button>
+              </div>
               <div className="mt-4 flex gap-1.5">
                 {VISTAS_CREATIVOS.map((v) => (
                   <button
@@ -168,13 +215,24 @@ export function PlanAccionTabs({
 
           {activa === "Embudo y campaña" && (
             <div>
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-text-secondary">
-                Embudo y campaña
-              </h2>
-              <p className="mt-1 text-xs text-text-secondary">
-                El brief de la campaña de este mes, para mostrárselo al cliente y que lo apruebe antes de
-                montar la campaña o de grabar/editar los videos.
-              </p>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h2 className="text-sm font-semibold uppercase tracking-wide text-text-secondary">
+                    Embudo y campaña
+                  </h2>
+                  <p className="mt-1 text-xs text-text-secondary">
+                    El brief de la campaña de este mes, para mostrárselo al cliente y que lo apruebe antes de
+                    montar la campaña o de grabar/editar los videos.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => descargarPestana("embudo")}
+                  className="shrink-0 rounded-full border border-border-glass px-3 py-1.5 text-xs text-text-secondary hover:border-accent/40 hover:text-white"
+                >
+                  Descargar esta pestaña (PDF)
+                </button>
+              </div>
               <div className="mt-4">
                 <BriefCampana
                   prospectoId={prospectoId}
@@ -203,7 +261,19 @@ export function PlanAccionTabs({
           )}
 
           {activa === "Redes y crecimiento" && (
-            <RedesHistorialProspecto prospectoId={prospectoId} entradasIniciales={redesIniciales} />
+            <RedesHistorialProspecto
+              prospectoId={prospectoId}
+              entradas={redes}
+              onEntradasChange={setRedes}
+              filtroRed={filtroRed}
+              setFiltroRed={setFiltroRed}
+              desde={desde}
+              setDesde={setDesde}
+              hasta={hasta}
+              setHasta={setHasta}
+              visibles={redesVisibles}
+              onDescargarPestana={() => descargarPestana("redes")}
+            />
           )}
 
           {activa === "Análisis y resultados" && (
@@ -215,6 +285,7 @@ export function PlanAccionTabs({
               tiposSugeridos={TIPOS_ANALISIS_SUGERIDOS}
               entradas={analisis}
               onEntradasChange={setAnalisis}
+              onDescargarPestana={() => descargarPestana("analisis")}
             />
           )}
 
@@ -228,9 +299,12 @@ export function PlanAccionTabs({
         <PlanAccionImprimible
           prospectoNombre={prospectoNombre}
           empresa={empresa}
-          creativos={creativos}
-          embudo={embudo}
-          campana={campanaDelMes}
+          modo={modoImprimir}
+          creativos={datosImprimir.creativos}
+          embudo={datosImprimir.embudo}
+          campana={datosImprimir.campana}
+          redes={datosImprimir.redes}
+          analisis={datosImprimir.analisis}
         />
       </div>
     </>
