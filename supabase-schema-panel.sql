@@ -668,3 +668,21 @@ alter table redes_historial enable row level security;
 drop policy if exists "equipo autenticado - todo" on redes_historial;
 create policy "equipo autenticado - todo" on redes_historial
   for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+-- =========================================================
+-- REDES Y CRECIMIENTO v2: datos crudos del panel de Instagram, para calcular
+-- las 8 fórmulas de alcance/engagement en vez de solo guardar un % a mano.
+-- =========================================================
+alter table redes_historial add column if not exists periodo_dias int not null default 30
+  check (periodo_dias in (30, 90));
+alter table redes_historial add column if not exists seguidos int;
+alter table redes_historial add column if not exists visualizaciones int;
+alter table redes_historial add column if not exists interacciones int;
+alter table redes_historial add column if not exists cuentas_interactuaron int;
+alter table redes_historial add column if not exists visitas_perfil int;
+alter table redes_historial add column if not exists suma_vistas_piezas int;
+alter table redes_historial add column if not exists num_piezas int;
+alter table redes_historial add column if not exists pct_reels numeric;
+alter table redes_historial add column if not exists pct_historias numeric;
+alter table redes_historial add column if not exists pct_publicaciones numeric;
+alter table redes_historial add column if not exists pct_no_seguidores numeric;
