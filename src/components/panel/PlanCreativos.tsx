@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Trash2, Plus, ChevronDown, Copy, Check, Pencil, Link as LinkIcon } from "lucide-react";
+import { Trash2, Plus, ChevronDown, Copy, Check, Pencil, Link as LinkIcon, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -226,6 +226,20 @@ export function TarjetaCreativo({
           )}
         </div>
         <div className="flex shrink-0 items-center gap-3">
+          {entrada.categoria === "creativo" && entrada.estado !== "idea" && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                cambiarEstado("idea");
+              }}
+              aria-label="Pasar a Idea"
+              title="Pasar a Idea"
+              className="text-text-secondary hover:text-accent"
+            >
+              <Lightbulb size={15} />
+            </button>
+          )}
           {entrada.categoria === "creativo" && (
             <select
               value={entrada.estado}
