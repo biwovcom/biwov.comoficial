@@ -47,7 +47,7 @@ export function Navbar() {
         <Link href="/" className="font-logo text-xl font-bold text-white">
           biwov
         </Link>
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav className="hidden items-center gap-5 md:flex lg:gap-8">
           {LINKS.map((link) => (
             <a
               key={link.href}
@@ -58,12 +58,19 @@ export function Navbar() {
             </a>
           ))}
         </nav>
-        <div className="hidden items-center gap-3 md:flex">
-          <Button size="md" variant="secondary" onClick={() => open()}>
+        <div className="hidden items-center gap-2 md:flex lg:gap-3">
+          <Button
+            size="md"
+            variant="secondary"
+            className="!px-3 !py-2 !text-xs lg:!px-5 lg:!py-2.5 lg:!text-sm"
+            onClick={() => open()}
+          >
             Diagnóstico gratis
           </Button>
           <a href={LINKS_PANEL.calendario} target="_blank" rel="noopener noreferrer">
-            <Button size="md">Agenda una asesoría</Button>
+            <Button size="md" className="!px-3 !py-2 !text-xs lg:!px-5 lg:!py-2.5 lg:!text-sm">
+              Agenda una asesoría
+            </Button>
           </a>
         </div>
         <button

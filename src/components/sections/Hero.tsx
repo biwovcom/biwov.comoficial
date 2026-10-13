@@ -10,7 +10,7 @@ export function Hero() {
   const { open } = useQuoter();
 
   return (
-    <section className="relative flex min-h-screen items-center overflow-hidden pt-28 pb-16">
+    <section className="relative flex min-h-dvh items-center overflow-hidden pt-28 pb-16 md:min-h-fit md:py-24 lg:min-h-dvh lg:pt-28 lg:pb-16">
       <div className="pointer-events-none absolute left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 rounded-full bg-accent/20 blur-[140px]" />
 
       <Container className="relative">

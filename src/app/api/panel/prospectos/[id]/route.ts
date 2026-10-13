@@ -24,8 +24,31 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     costoPaquete?: number | null;
     costoPaqueteMoneda?: "COP" | "USD" | null;
     contratoAceptado?: boolean;
+    empresa?: string;
+    tipoNegocio?: string;
+    redesSociales?: string;
+    linkRedesProspecto?: string;
+    whatsapp?: string;
+    email?: string;
+    pais?: string;
+    ciudad?: string;
+    canalOrigen?: string;
+    queQuiereResolver?: string;
+    notas?: string;
   } = await request.json();
   const patch: Record<string, string | number | boolean | null> = {};
+
+  if (body.empresa !== undefined) patch.empresa = body.empresa.trim() || null;
+  if (body.tipoNegocio !== undefined) patch.tipo_negocio = body.tipoNegocio.trim() || null;
+  if (body.redesSociales !== undefined) patch.redes_sociales = body.redesSociales.trim() || null;
+  if (body.linkRedesProspecto !== undefined) patch.link_redes_prospecto = body.linkRedesProspecto.trim() || null;
+  if (body.whatsapp !== undefined && body.whatsapp.trim()) patch.whatsapp = body.whatsapp.trim();
+  if (body.email !== undefined) patch.email = body.email.trim() || null;
+  if (body.pais !== undefined) patch.pais = body.pais.trim() || null;
+  if (body.ciudad !== undefined) patch.ciudad = body.ciudad.trim() || null;
+  if (body.canalOrigen !== undefined) patch.canal_origen = body.canalOrigen.trim() || null;
+  if (body.queQuiereResolver !== undefined) patch.que_quiere_resolver = body.queQuiereResolver.trim() || null;
+  if (body.notas !== undefined) patch.notas = body.notas.trim() || null;
 
   if (body.categoria !== undefined) {
     if (!CATEGORIAS_VALIDAS.includes(body.categoria)) {

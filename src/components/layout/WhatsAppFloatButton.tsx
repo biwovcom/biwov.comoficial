@@ -8,7 +8,8 @@ export function WhatsAppFloatButton() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Escríbenos por WhatsApp"
-      className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-black/40 transition-transform hover:scale-110"
+      className="fixed right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-black/40 transition-transform hover:scale-110"
+      style={{ bottom: "max(1.5rem, calc(env(safe-area-inset-bottom) + 0.75rem))" }}
     >
       <svg viewBox="0 0 24 24" fill="currentColor" className="h-7 w-7">
         <path d="M17.498 14.382c-.301-.15-1.767-.867-2.04-.966-.273-.1-.472-.15-.671.15-.197.295-.771.966-.944 1.164-.175.195-.349.21-.646.075-.3-.15-1.26-.465-2.4-1.485-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.149-.15.3-.344.449-.521.146-.149.198-.3.3-.52.1-.22.049-.42-.05-.624-.1-.197-.546-1.314-.75-1.796-.2-.473-.405-.408-.57-.408-.172-.015-.372-.015-.572-.015-.198 0-.52.074-.792.37-.272.297-1.04 1.016-1.04 2.478 0 1.462 1.065 2.875 1.213 3.075.149.198 2.052 3.133 4.967 4.27 2.916 1.137 2.916.757 3.439.71.52-.046 1.69-.69 1.927-1.36.235-.666.235-1.24.165-1.36-.07-.12-.26-.198-.558-.346z" />

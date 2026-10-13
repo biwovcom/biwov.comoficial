@@ -23,6 +23,7 @@ import { EliminarProspectoButton } from "@/components/panel/EliminarProspectoBut
 import { CopiarParaIABoton } from "@/components/panel/CopiarParaIABoton";
 import { RedesSocialesLinks } from "@/components/panel/RedesSocialesLinks";
 import { EditarClasificacion } from "@/components/panel/EditarClasificacion";
+import { EditarDatosContacto } from "@/components/panel/EditarDatosContacto";
 import { PaqueteClienteForm } from "@/components/panel/PaqueteClienteForm";
 import type { RespuestasDiagnosticoLargo } from "@/lib/panel/diagnosticoLargo";
 
@@ -186,6 +187,22 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
               {prospecto.notas}
             </p>
           )}
+          <EditarDatosContacto
+            prospectoId={prospecto.id}
+            datos={{
+              empresa: prospecto.empresa,
+              tipo_negocio: prospecto.tipo_negocio,
+              redes_sociales: prospecto.redes_sociales,
+              link_redes_prospecto: prospecto.link_redes_prospecto,
+              whatsapp: prospecto.whatsapp,
+              email: prospecto.email,
+              pais: prospecto.pais,
+              ciudad: prospecto.ciudad,
+              canal_origen: prospecto.canal_origen,
+              que_quiere_resolver: prospecto.que_quiere_resolver,
+              notas: prospecto.notas,
+            }}
+          />
           <div className="mt-4 border-t border-border-glass pt-4">
             <EditarClasificacion
               prospectoId={prospecto.id}
