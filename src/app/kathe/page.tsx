@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Hero } from "@/components/kathe/Hero";
 import { Cifras } from "@/components/kathe/Cifras";
+import { RedesSociales } from "@/components/kathe/RedesSociales";
 import { Historia } from "@/components/kathe/Historia";
 import { MisionVision } from "@/components/kathe/MisionVision";
 import { Trayectoria } from "@/components/kathe/Trayectoria";
@@ -37,6 +38,7 @@ export default function KathePage() {
     <div id="kathe-print">
       <Hero />
       <Cifras />
+      <RedesSociales />
       <Historia />
       <MisionVision />
       <Trayectoria />

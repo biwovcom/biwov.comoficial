@@ -9,3 +9,5 @@ export const MENSAJE_WHATSAPP_SOPORTE =
 export const INSTAGRAM_BIWOV = "https://www.instagram.com/biwov_/";
 
 export const INSTAGRAM_KATHE = "https://www.instagram.com/kathedigital__/";
+
+export const TIKTOK_KATHE = "https://www.tiktok.com/@kathedigital_";
