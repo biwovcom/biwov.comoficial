@@ -192,13 +192,25 @@ export default function ContratoPage() {
 
             <section>
               <h2 className="mb-2 text-lg font-semibold text-white">
-                11. Propiedad intelectual
+                11. Propiedad intelectual y uso del trabajo en el portafolio de biwov
               </h2>
               <p>
                 Los entregables finales (piezas gráficas, contenido, sitio web) serán propiedad
-                del Cliente una vez se realice el pago completo acordado. biwov conserva el
-                derecho de mostrar el trabajo realizado como parte de su portafolio, salvo acuerdo
-                expreso en contrario.
+                del Cliente una vez se realice el pago completo acordado.
+              </p>
+              <p className="mt-3">
+                biwov conserva el derecho de usar el trabajo realizado para el Cliente — incluyendo
+                videos, piezas gráficas, capturas de pantalla de lo implementado y resultados
+                obtenidos — en su publicidad y en sus redes sociales (biwov y Kathe Digital), con
+                el fin de mostrar trabajos realizados, armar portafolio y compartir testimonios e
+                historial de resultados. Este uso se limita a lo que no revele información interna
+                o confidencial del negocio del Cliente (cifras financieras, estrategias internas,
+                datos de sus propios clientes, accesos o credenciales); cuando el contenido sí
+                incluya información sensible, biwov la omite o la difumina antes de publicarla.
+              </p>
+              <p className="mt-3">
+                Si el Cliente prefiere que su proyecto no se use con fines de portafolio o
+                publicidad, debe indicarlo por escrito a biwov; en ese caso no se publicará.
               </p>
             </section>
 
