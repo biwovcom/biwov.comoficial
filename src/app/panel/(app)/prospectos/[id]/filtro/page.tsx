@@ -33,14 +33,7 @@ export default async function FiltroPage({ params }: { params: Promise<{ id: str
       </p>
 
       <div className="mt-8">
-        <FiltroWizard
-          prospectoId={prospecto.id}
-          nombre={prospecto.nombre}
-          whatsapp={prospecto.whatsapp}
-          empresa={prospecto.empresa}
-          tipoNegocio={prospecto.tipo_negocio}
-          moneda={monedaDesdePais(prospecto.pais)}
-        />
+        <FiltroWizard prospectoId={prospecto.id} moneda={monedaDesdePais(prospecto.pais)} />
       </div>
     </div>
   );

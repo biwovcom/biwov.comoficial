@@ -5,24 +5,15 @@ import { useRouter } from "next/navigation";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Badge } from "@/components/ui/Badge";
 import { PreguntasFiltro } from "@/components/panel/PreguntasFiltro";
-import { MensajeSugeridoWhatsApp } from "@/components/panel/MensajeSugeridoWhatsApp";
 import { respuestasCompletas, type RespuestasFiltro } from "@/lib/panel/filtroRapido";
 import type { Moneda } from "@/lib/panel/panelConfig";
 import type { Semaforo } from "@/lib/panel/prospectos";
 
 export function FiltroWizard({
   prospectoId,
-  nombre,
-  whatsapp,
-  empresa,
-  tipoNegocio,
   moneda,
 }: {
   prospectoId: string;
-  nombre: string;
-  whatsapp: string;
-  empresa?: string | null;
-  tipoNegocio?: string | null;
   moneda: Moneda;
 }) {
   const router = useRouter();
@@ -72,17 +63,6 @@ export function FiltroWizard({
           </h2>
         </div>
         <p className="mt-2 text-sm text-text-secondary">{resultado.razon}</p>
-
-        <div className="mt-6">
-          <MensajeSugeridoWhatsApp
-            semaforo={resultado.semaforo}
-            nombre={nombre}
-            whatsapp={whatsapp}
-            empresa={empresa}
-            tipoNegocio={tipoNegocio}
-            respuestasFiltro={respuestas}
-          />
-        </div>
 
         <button
           onClick={() => router.push(`/panel/prospectos/${prospectoId}`)}

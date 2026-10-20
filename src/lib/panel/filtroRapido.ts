@@ -64,34 +64,6 @@ export const OPCIONES_CUANDO_EMPEZAR: { id: CuandoEmpezar; label: string }[] = [
   { id: "proximos-meses", label: "En los próximos meses" },
 ];
 
-/** Fragmentos para encajar en "ahora mismo estás batallando con que no tienes ___". */
-const FRASES_DESAFIO: Record<Objetivo, string> = {
-  "sin-resultados": "buenos resultados con tu contenido",
-  "no-calificados": "gente calificada llegando por tus redes",
-  "sin-presencia": "presencia digital",
-  otro: "",
-};
-
-/** Fragmentos para encajar en "tu objetivo es ___". */
-const FRASES_META: Record<Meta, string> = {
-  "mas-clientes": "recibir más clientes",
-  "favorito-industria": "ser el favorito en tu industria",
-  "proceso-automatizado": "tener un proceso automatizado",
-  otro: "",
-};
-
-/** Frase lista para el mensaje de WhatsApp/guion de audio. */
-export function fraseDesafio(r: RespuestasFiltro): string {
-  if (r.objetivo === "otro") return r.objetivoOtro?.trim() || "algunos desafíos en tu negocio";
-  return r.objetivo ? FRASES_DESAFIO[r.objetivo] : "algunos desafíos en tu negocio";
-}
-
-/** Frase lista para el mensaje de WhatsApp/guion de audio. */
-export function fraseMeta(r: RespuestasFiltro): string {
-  if (r.meta === "otro") return r.metaOtro?.trim() || "hacer crecer tu negocio";
-  return r.meta ? FRASES_META[r.meta] : "hacer crecer tu negocio";
-}
-
 export interface RespuestaLegible {
   pregunta: string;
   respuesta: string;

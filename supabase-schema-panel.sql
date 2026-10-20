@@ -752,3 +752,42 @@ alter table plan_creativos drop constraint if exists plan_creativos_estado_check
 alter table plan_creativos add constraint plan_creativos_estado_check
   check (estado in ('idea','por_hacer','en_progreso','hecho'));
 alter table plan_creativos alter column estado set default 'idea';
+
+-- =========================================================
+-- PLANTILLAS Y GUIONES DE MENSAJES (no van por prospecto, es una biblioteca
+-- general que Kathe arma y edita: mensajes en frío, invitación a
+-- videollamada, preguntas para la reunión, seguimiento, cierre/objeciones).
+-- Reemplaza el mensaje automático por semáforo que había antes.
+-- =========================================================
+create table if not exists mensajes_plantilla (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  created_by uuid references auth.users(id) default auth.uid(),
+
+  etapa text not null,
+  titulo text,
+  contenido text not null
+);
+
+create index if not exists idx_mensajes_plantilla_etapa on mensajes_plantilla(etapa, created_at);
+
+alter table mensajes_plantilla enable row level security;
+drop policy if exists "equipo autenticado - todo" on mensajes_plantilla;
+create policy "equipo autenticado - todo" on mensajes_plantilla
+  for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+-- Semilla: el flujo de cierre que Kathe ya tenía, para no perderlo.
+insert into mensajes_plantilla (etapa, titulo, contenido)
+select
+  'Cierre / objeciones',
+  'Flujo de cierre tras enviar la propuesta (habla con los socios)',
+  $$Si logras la llamada, sigue este orden:
+
+1. Pregunta antes de hablar: "¿Qué fue lo que más te llamó la atención de la propuesta?". Que él diga en voz alta lo que le gustó.
+2. Busca la objeción real: "¿Qué los hace dudar?". Escucha sin defenderte.
+3. Si es el precio, separa las dos cosas: "¿Te preocupa el valor total o el flujo de caja mes a mes?". Si es el flujo de caja, la forma de pago quincenal ya ayuda. Si es el valor total, ofreces el Arranque.
+4. Cierra con una pregunta simple: "¿Con cuál de las dos opciones te sentirías más cómodo para empezar?". Así la pregunta ya no es "¿sí o no?", sino "¿cuál?".$$
+where not exists (
+  select 1 from mensajes_plantilla
+  where titulo = 'Flujo de cierre tras enviar la propuesta (habla con los socios)'
+);

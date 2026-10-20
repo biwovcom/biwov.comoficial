@@ -7,6 +7,7 @@ import {
   Calculator,
   Clock,
   CreditCard,
+  MessageSquareText,
   Menu,
   Package,
   Users2,
@@ -22,6 +23,7 @@ const LINKS = [
   { href: "/panel/paquetes", label: "Paquetes", icon: Package },
   { href: "/panel/compras", label: "Compras de planes", icon: CreditCard },
   { href: "/panel/guia", label: "Guía rápida", icon: BookOpen },
+  { href: "/panel/plantillas", label: "Plantillas y guiones", icon: MessageSquareText },
   { href: "/panel/tiempos", label: "Tiempos", icon: Clock },
 ];
 

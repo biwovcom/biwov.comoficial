@@ -18,7 +18,6 @@ import { monedaDesdePais } from "@/lib/panel/paises";
 import { linkWhatsApp } from "@/lib/panel/whatsapp";
 import { LINKS_PANEL } from "@/lib/panel/panelConfig";
 import { CopyLinkButton } from "@/components/panel/CopyLinkButton";
-import { MensajeSugeridoWhatsApp } from "@/components/panel/MensajeSugeridoWhatsApp";
 import { EliminarProspectoButton } from "@/components/panel/EliminarProspectoButton";
 import { CopiarParaIABoton } from "@/components/panel/CopiarParaIABoton";
 import { RedesSocialesLinks } from "@/components/panel/RedesSocialesLinks";
@@ -314,17 +313,6 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
               </div>
             ))}
           </dl>
-
-          <div className="mt-6 border-t border-border-glass pt-6">
-            <MensajeSugeridoWhatsApp
-              semaforo={filtro.semaforo}
-              nombre={prospecto.nombre}
-              whatsapp={prospecto.whatsapp}
-              empresa={prospecto.empresa}
-              tipoNegocio={prospecto.tipo_negocio}
-              respuestasFiltro={filtro.respuestas}
-            />
-          </div>
         </GlassCard>
       )}
     </div>
