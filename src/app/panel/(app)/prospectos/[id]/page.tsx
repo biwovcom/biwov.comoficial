@@ -129,6 +129,16 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
           </h2>
           <dl className="mt-4 space-y-2 text-sm">
             <div className="flex flex-col gap-0.5 sm:flex-row sm:justify-between sm:gap-4">
+              <dt className="shrink-0 text-text-secondary">Fecha de creación</dt>
+              <dd className="min-w-0 break-words text-white sm:text-right">
+                {new Date(prospecto.created_at).toLocaleDateString("es-CO", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </dd>
+            </div>
+            <div className="flex flex-col gap-0.5 sm:flex-row sm:justify-between sm:gap-4">
               <dt className="shrink-0 text-text-secondary">Negocio</dt>
               <dd className="min-w-0 break-words text-white sm:text-right">{prospecto.empresa ?? "—"}</dd>
             </div>
