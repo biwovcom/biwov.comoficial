@@ -1,8 +1,8 @@
-import { PRODUCCION_CONTENIDO, NIVELES_PRODUCCION } from "@/data/addOns";
-import { formatMoneda } from "@/lib/moneda";
+import { PRODUCCION_CONTENIDO, NIVELES_PRODUCCION, PRODUCCION_VIDEO } from "@/data/addOns";
+import { formatCopEnMoneda, type Moneda } from "@/lib/moneda";
 import { cn } from "@/lib/utils";
 
-export function ProduccionContenidoDetalle() {
+export function ProduccionContenidoDetalle({ moneda, trm }: { moneda: Moneda; trm: number }) {
   return (
     <div className="space-y-6">
       <p className="text-sm text-text-secondary">{PRODUCCION_CONTENIDO.descripcion}</p>
@@ -21,8 +21,22 @@ export function ProduccionContenidoDetalle() {
               </li>
             ))}
           </ul>
+          <p className="mt-2 text-[11px] font-semibold uppercase tracking-wide text-text-secondary">
+            No incluye
+          </p>
+          <ul className="mt-1.5 space-y-1">
+            {PRODUCCION_CONTENIDO.noIncluye.map((item) => (
+              <li key={item} className="text-xs text-text-secondary">
+                • {item}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
+
+      <p className="text-xs font-semibold uppercase tracking-wide text-text-secondary">
+        Paquete creativo completo (incluye guiones, copys y dirección)
+      </p>
 
       <div className="grid gap-3 sm:grid-cols-3">
         {NIVELES_PRODUCCION.map((nivel) => (
@@ -36,7 +50,9 @@ export function ProduccionContenidoDetalle() {
             )}
           >
             <p className="text-sm font-semibold text-white">{nivel.nombre}</p>
-            <p className="mt-0.5 text-base font-bold text-accent">{formatMoneda(nivel.precio, "COP")}</p>
+            <p className="mt-0.5 text-base font-bold text-accent">
+              {formatCopEnMoneda(nivel.precio.cop, moneda, trm)}
+            </p>
 
             <dl className="mt-3 space-y-1.5 text-xs">
               <div className="flex justify-between gap-2">
@@ -81,6 +97,32 @@ export function ProduccionContenidoDetalle() {
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="border-t border-border-glass pt-5">
+        <p className="text-xs font-semibold uppercase tracking-wide text-text-secondary">
+          Solo grabación y edición
+        </p>
+        <p className="mt-1 text-sm text-text-secondary">{PRODUCCION_VIDEO.descripcion}</p>
+        <p className="mt-1 text-xs text-text-secondary">{PRODUCCION_VIDEO.reglaJornada}</p>
+
+        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          {PRODUCCION_VIDEO.paquetes.map((paquete) => (
+            <div key={paquete.id} className="rounded-2xl border border-border-glass bg-white/[0.02] p-4">
+              <p className="text-sm font-semibold text-white">
+                {paquete.cantidadVideos} video{paquete.cantidadVideos === 1 ? "" : "s"}
+                {paquete.esMensual && " / mes"}
+              </p>
+              <p className="mt-0.5 text-base font-bold text-accent">
+                {formatCopEnMoneda(paquete.precio, moneda, trm)}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <p className="mt-3 text-xs text-text-secondary">
+          Mínimo {PRODUCCION_VIDEO.minimoVideos} videos por pedido. {PRODUCCION_VIDEO.notaPrecio}
+        </p>
       </div>
     </div>
   );

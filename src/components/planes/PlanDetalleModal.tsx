@@ -7,7 +7,7 @@ import { X, Printer, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
 import { DURACION_MINIMA_MESES, type ItemPlan, type Plan } from "@/data/planes";
-import { formatMoneda, sumarPrecios, multiplicarPrecio, type Moneda } from "@/lib/moneda";
+import { formatCopEnMoneda, sumarPrecios, multiplicarPrecio, type Moneda } from "@/lib/moneda";
 import { linkWhatsApp } from "@/lib/panel/whatsapp";
 import { WHATSAPP_BIWOV } from "@/lib/contacto";
 import { cn } from "@/lib/utils";
@@ -56,11 +56,13 @@ function FilaIncluye({ item }: { item: ItemPlan }) {
 export function PlanDetalleModal({
   plan,
   moneda,
+  trm,
   abrirEnCompra,
   onClose,
 }: {
   plan: Plan | null;
   moneda: Moneda;
+  trm: number;
   abrirEnCompra?: boolean;
   onClose: () => void;
 }) {
@@ -81,6 +83,7 @@ export function PlanDetalleModal({
             key={plan.id}
             plan={plan}
             moneda={moneda}
+            trm={trm}
             abrirEnCompraInicial={Boolean(abrirEnCompra)}
             onClose={onClose}
           />
@@ -93,11 +96,13 @@ export function PlanDetalleModal({
 function PlanDetalleTarjeta({
   plan,
   moneda,
+  trm,
   abrirEnCompraInicial,
   onClose,
 }: {
   plan: Plan;
   moneda: Moneda;
+  trm: number;
   abrirEnCompraInicial: boolean;
   onClose: () => void;
 }) {
@@ -137,7 +142,7 @@ function PlanDetalleTarjeta({
     // si se espera a que termine el fetch antes de abrir, el navegador lo
     // trata como pop-up y lo bloquea.
     const ventanaWhatsApp = window.open("", "_blank");
-    const monto = moneda === "USD" ? totalSeisMeses.usd : totalSeisMeses.cop;
+    const monto = moneda === "USD" ? Math.round(totalSeisMeses.cop / trm) : totalSeisMeses.cop;
     const res = await fetch("/api/plan-checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -157,7 +162,7 @@ function PlanDetalleTarjeta({
       setError("No se pudo enviar. Intenta de nuevo.");
       return;
     }
-    const mensaje = `¡Hola! 👋 Quiero comprar el Plan ${plan.nombre} (${formatMoneda(totalSeisMeses, moneda)} por ${DURACION_MINIMA_MESES} meses). Mi nombre es ${contacto.nombre}.`;
+    const mensaje = `¡Hola! 👋 Quiero comprar el Plan ${plan.nombre} (${formatCopEnMoneda(totalSeisMeses.cop, moneda, trm)} por ${DURACION_MINIMA_MESES} meses). Mi nombre es ${contacto.nombre}.`;
     const urlWhatsApp = linkWhatsApp(contacto.whatsapp || WHATSAPP_BIWOV, mensaje);
     if (ventanaWhatsApp) {
       ventanaWhatsApp.location.href = urlWhatsApp;
@@ -210,13 +215,13 @@ function PlanDetalleTarjeta({
 
             <div className="mt-6 rounded-2xl border border-border-glass bg-white/[0.02] p-5">
               <p className="text-base font-semibold text-white">
-                {formatMoneda(plan.precioDesde, moneda)} al mes
+                {formatCopEnMoneda(plan.precioDesde.cop, moneda, trm)} al mes
               </p>
               <p className="mt-1 text-xs text-text-secondary">
-                + montaje inicial de {formatMoneda(plan.montajeInicial, moneda)}
+                + montaje inicial de {formatCopEnMoneda(plan.montajeInicial.cop, moneda, trm)}
               </p>
               <p className="mt-1 text-xs text-text-secondary">
-                Publicidad aparte, sugerida desde {formatMoneda(plan.pautaSugerida, moneda)} al mes.
+                Publicidad aparte, sugerida desde {formatCopEnMoneda(plan.pautaSugerida.cop, moneda, trm)} al mes.
               </p>
 
               <div className="mt-4 border-t border-border-glass pt-4">
@@ -226,7 +231,7 @@ function PlanDetalleTarjeta({
                 </p>
                 <p className="mt-2 text-xs text-text-secondary">
                   ¿Prefieres diferir el montaje inicial? Puedes pagarlo en 2 cuotas iguales de{" "}
-                  {formatMoneda(cuotaMontaje, moneda)}, sin recargo: una al iniciar y otra al segundo mes.
+                  {formatCopEnMoneda(cuotaMontaje.cop, moneda, trm)}, sin recargo: una al iniciar y otra al segundo mes.
                 </p>
               </div>
             </div>

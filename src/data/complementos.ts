@@ -1,6 +1,8 @@
 export interface ComplementoItem {
   label: string;
   precio: string;
+  /** Si tiene valor, el precio se convierte en vivo a USD con la TRM del día (reemplaza a "precio" en pantalla). */
+  precioCop?: number;
 }
 
 export interface Complemento {
@@ -21,31 +23,46 @@ export const COMPLEMENTOS: Complemento[] = [
     tipo: "produccion",
   },
   {
-    titulo: "Páginas web adicionales",
+    titulo: "Páginas web y sitios web adicionales",
     detalle:
-      "Páginas web (landing pages, en inglés) para un nuevo producto, evento o lanzamiento: una sola pantalla enfocada en lograr una acción puntual.",
+      "Landing page (una sola pantalla enfocada en una acción puntual) o sitio web de varias páginas, según lo que necesites. Todos incluyen hosting y dominio.",
     items: [
       {
-        label: "Página web para recolectar base de datos (solo captura de leads)",
-        precio: "$1.000.000 COP (página) + $100.000 COP (dominio) + US$33/mes (herramienta)",
+        label: "Landing page (1 página, sin conexión API)",
+        precio: "$1.129.000 COP",
+        precioCop: 1129000,
       },
-      { label: "Página web de agendamiento", precio: "Costo por definir" },
-      { label: "Página web de ventas de producto", precio: "Costo por definir" },
+      {
+        label: "Sitio web de 5 páginas",
+        precio: "$1.799.000 COP",
+        precioCop: 1799000,
+      },
+      {
+        label: "Sitio web de 10 páginas",
+        precio: "$2.499.000 COP",
+        precioCop: 2499000,
+      },
+      {
+        label: "Conexión por API a la campaña publicitaria (add-on, se integra a cualquiera de los anteriores)",
+        precio: "$350.000 COP",
+        precioCop: 350000,
+      },
     ],
-    nota: "El valor de la herramienta mensual puede cambiar si el proveedor ajusta sus precios; queda estipulado en el contrato.",
+    nota: "Todos incluyen hosting y dominio. La conexión por API es solo la integración técnica para pasar los leads de la página a la campaña; no incluye el montaje completo de GHL ni la gestión de la campaña.",
   },
   {
-    titulo: "Creación de campaña publicitaria",
-    detalle: "Para cuando solo necesitas que te armemos y optimicemos la campaña, sin un plan completo.",
+    titulo: "Campaña publicitaria en Meta",
+    detalle: "Para cuando solo necesitas que te armemos y gestionemos la campaña, sin un plan completo.",
     items: [
       {
-        label:
-          "Montaje mínimo de 6 creativos o contenidos (tú nos pasas los videos; nosotros damos los lineamientos de los textos del anuncio)",
-        precio: "$400.000 COP",
+        label: "Gestión mensual (montaje, seguimiento, optimización, análisis e informe mensual)",
+        precio: "$400.000 COP/mes",
+        precioCop: 400000,
       },
-      { label: "Informe y análisis de la campaña (se comparte cada semana, al finalizar la semana)", precio: "Incluido" },
-      { label: "Optimización de la campaña publicitaria", precio: "Incluido" },
+      { label: "Requisito para arrancar: mínimo 6 piezas creativas (videos o imágenes)", precio: "A cargo del cliente" },
+      { label: "Permanencia mínima", precio: "3 meses" },
     ],
+    nota: "La inversión en pauta publicitaria la paga el cliente directamente a Meta; no está incluida en el valor de la gestión.",
   },
   {
     titulo: "Asesoría personalizada",

@@ -1,20 +1,19 @@
 export type Moneda = "COP" | "USD";
 
+/** Tasa de respaldo si la TRM en vivo (/api/trm) no responde o da un dato inválido. */
+export const TRM_FALLBACK = 4000;
+
+/** Convierte un valor en COP a la moneda elegida, usando la TRM del día (en vivo o de respaldo). */
+export function formatCopEnMoneda(cop: number, moneda: Moneda, trm: number): string {
+  if (moneda === "USD") {
+    return `US$${Math.round(cop / trm).toLocaleString("en-US")}`;
+  }
+  return `$${cop.toLocaleString("es-CO")} COP`;
+}
+
 export interface PrecioDual {
   cop: number;
   usd: number;
-}
-
-export function formatMoneda(valor: PrecioDual, moneda: Moneda): string {
-  if (moneda === "USD") {
-    return `US$${valor.usd.toLocaleString("en-US")}`;
-  }
-  return `$${valor.cop.toLocaleString("es-CO")} COP`;
-}
-
-/** Muestra ambas monedas a la vez, ej. "$900.000 COP (≈US$225)". */
-export function formatMonedaAmbas(valor: PrecioDual): string {
-  return `$${valor.cop.toLocaleString("es-CO")} COP (≈US$${valor.usd.toLocaleString("en-US")})`;
 }
 
 export function sumarPrecios(...valores: PrecioDual[]): PrecioDual {

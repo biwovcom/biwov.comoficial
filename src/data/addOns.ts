@@ -23,12 +23,39 @@ export const PRODUCCION_CONTENIDO = {
   incluye: [
     "Brief creativo y reunión de planeación",
     "Definición de objetivos y Shot List",
+    "Construcción de guiones y copys",
     "Dirección creativa y de poses/talento",
     "Producción fotográfica y audiovisual",
     "Iluminación",
     "Edición profesional y corrección de color",
     "Optimización para redes y organización",
   ],
+  noIncluye: ["La subida o publicación del contenido en tus redes sociales"],
+};
+
+export interface PaqueteProduccionVideo {
+  id: string;
+  cantidadVideos: number;
+  precio: number; // COP
+  esMensual?: boolean;
+}
+
+/**
+ * Servicio aparte de los niveles Start/Professional/Signature: aquí solo se
+ * va a grabar y editar, sin dirección creativa ni guiones. Se cotiza por
+ * cantidad de videos, no por jornada de producción completa.
+ */
+export const PRODUCCION_VIDEO = {
+  descripcion:
+    "Grabación y edición de video, sin dirección creativa ni guiones — solo ir a grabar y editar.",
+  minimoVideos: 3,
+  reglaJornada: "Cada media jornada de grabación dura 4 horas y rinde hasta 3 videos.",
+  notaPrecio: "Entre más videos, menor valor por video desde el cuarto.",
+  paquetes: [
+    { id: "3-videos", cantidadVideos: 3, precio: 360000 },
+    { id: "6-videos", cantidadVideos: 6, precio: 696000 },
+    { id: "12-videos-mes", cantidadVideos: 12, precio: 1344000, esMensual: true },
+  ] satisfies PaqueteProduccionVideo[],
 };
 
 // Valores en USD son una referencia aproximada (tasa ~4.000 COP/USD).

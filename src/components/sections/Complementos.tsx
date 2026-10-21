@@ -8,10 +8,19 @@ import { ComplementoPdfModal } from "./ComplementoPdfModal";
 import { Button } from "@/components/ui/Button";
 import { linkWhatsApp } from "@/lib/panel/whatsapp";
 import { WHATSAPP_BIWOV } from "@/lib/contacto";
+import { formatCopEnMoneda, type Moneda } from "@/lib/moneda";
 
-function DetalleComplemento({ item }: { item: (typeof COMPLEMENTOS)[number] }) {
+function DetalleComplemento({
+  item,
+  moneda,
+  trm,
+}: {
+  item: (typeof COMPLEMENTOS)[number];
+  moneda: Moneda;
+  trm: number;
+}) {
   if (item.tipo === "produccion") {
-    return <ProduccionContenidoDetalle />;
+    return <ProduccionContenidoDetalle moneda={moneda} trm={trm} />;
   }
   return (
     <>
@@ -19,7 +28,9 @@ function DetalleComplemento({ item }: { item: (typeof COMPLEMENTOS)[number] }) {
         {item.items!.map((it) => (
           <li key={it.label} className="text-sm">
             <p className="text-white/90">{it.label}</p>
-            <p className="mt-0.5 text-xs font-medium text-accent">{it.precio}</p>
+            <p className="mt-0.5 text-xs font-medium text-accent">
+              {it.precioCop !== undefined ? formatCopEnMoneda(it.precioCop, moneda, trm) : it.precio}
+            </p>
           </li>
         ))}
       </ul>
@@ -53,7 +64,7 @@ function BotonAccion({ item }: { item: (typeof COMPLEMENTOS)[number] }) {
   );
 }
 
-export function Complementos() {
+export function Complementos({ moneda, trm }: { moneda: Moneda; trm: number }) {
   const [modalAbierto, setModalAbierto] = useState<string | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
 
@@ -127,7 +138,7 @@ export function Complementos() {
       >
         {itemModal && (
           <>
-            <DetalleComplemento item={itemModal} />
+            <DetalleComplemento item={itemModal} moneda={moneda} trm={trm} />
             <div className="mt-6 flex gap-2 print:hidden">
               <BotonAccion item={itemModal} />
             </div>

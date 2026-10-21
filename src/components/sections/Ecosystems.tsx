@@ -7,7 +7,8 @@ import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Button } from "@/components/ui/Button";
 import { PLANES, type Plan } from "@/data/planes";
-import { formatMoneda, type Moneda } from "@/lib/moneda";
+import { formatCopEnMoneda, type Moneda } from "@/lib/moneda";
+import { useTRM } from "@/hooks/useTRM";
 import { PlanDetalleModal } from "@/components/planes/PlanDetalleModal";
 import { Complementos } from "./Complementos";
 import { cn } from "@/lib/utils";
@@ -16,6 +17,7 @@ export function Ecosystems() {
   const [planAbierto, setPlanAbierto] = useState<Plan | null>(null);
   const [abrirEnCompra, setAbrirEnCompra] = useState(false);
   const [moneda, setMoneda] = useState<Moneda>("COP");
+  const { trm } = useTRM();
 
   return (
     <section id="planes" className="bg-bg-light py-16 md:py-24">
@@ -83,7 +85,7 @@ export function Ecosystems() {
                   </div>
 
                   <p className="mt-6 text-base font-semibold text-white">
-                    Desde {formatMoneda(plan.precioDesde, moneda)} al mes
+                    Desde {formatCopEnMoneda(plan.precioDesde.cop, moneda, trm)} al mes
                   </p>
                   <p className="mt-1 text-xs text-text-secondary">Plan con compromiso mínimo de 6 meses.</p>
 
@@ -135,12 +137,18 @@ export function Ecosystems() {
         </p>
         </div>
 
-        <Complementos />
+        <Complementos moneda={moneda} trm={trm} />
+
+        <p className="mx-auto mt-10 max-w-2xl text-center text-xs text-text-on-light-secondary">
+          Valores netos. Si el cliente es agente retenedor, la retención en la fuente se asume
+          sobre el valor pactado.
+        </p>
       </Container>
 
       <PlanDetalleModal
         plan={planAbierto}
         moneda={moneda}
+        trm={trm}
         abrirEnCompra={abrirEnCompra}
         onClose={() => setPlanAbierto(null)}
       />

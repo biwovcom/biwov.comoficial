@@ -70,10 +70,13 @@ export default function ContratoPage() {
                 porcentaje específico por adelantado en contratos de prestación de servicios entre
                 particulares — eso se define libremente entre las partes. Lo que sí aplica es el{" "}
                 <strong>derecho de retracto</strong> de la Ley 1480 de 2011 (Estatuto del
-                Consumidor) para ventas por internet, explicado en la sección 10. Los precios no
-                incluyen IVA salvo que se indique lo contrario. El incumplimiento en el pago de dos
-                (2) mensualidades consecutivas faculta a biwov para suspender los servicios hasta
-                normalizar la cartera.
+                Consumidor) para ventas por internet, explicado en la sección 10. El incumplimiento
+                en el pago de dos (2) mensualidades consecutivas faculta a biwov para suspender los
+                servicios hasta normalizar la cartera.
+              </p>
+              <p className="mt-3 text-xs text-text-secondary">
+                Valores netos. Si el Cliente es agente retenedor, la retención en la fuente se
+                asume sobre el valor pactado.
               </p>
             </section>
 
