@@ -7,10 +7,12 @@ import { X, Printer, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
 import { DURACION_MINIMA_MESES, type ItemPlan, type Plan } from "@/data/planes";
+import { EXTRAS_COTIZABLES } from "@/data/extrasCotizables";
 import { formatCopEnMoneda, sumarPrecios, multiplicarPrecio, type Moneda } from "@/lib/moneda";
 import { linkWhatsApp } from "@/lib/panel/whatsapp";
 import { WHATSAPP_BIWOV } from "@/lib/contacto";
 import { cn } from "@/lib/utils";
+import { SelectorExtras } from "./SelectorExtras";
 
 const CONTACTO_INICIAL = { nombre: "", whatsapp: "", email: "", empresa: "" };
 
@@ -108,15 +110,22 @@ function PlanDetalleTarjeta({
 }) {
   const [mostrarCompra, setMostrarCompra] = useState(abrirEnCompraInicial);
   const [contacto, setContacto] = useState(CONTACTO_INICIAL);
+  const [extras, setExtras] = useState<string[]>([]);
   const [aceptaContrato, setAceptaContrato] = useState(false);
   const [aceptaDatos, setAceptaDatos] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [enviado, setEnviado] = useState(false);
 
+  const toggleExtra = (id: string) => {
+    setExtras((prev) => (prev.includes(id) ? prev.filter((e) => e !== id) : [...prev, id]));
+  };
+  const extrasSeleccionados = EXTRAS_COTIZABLES.filter((e) => extras.includes(e.id));
+
   const cerrar = () => {
     onClose();
     setContacto(CONTACTO_INICIAL);
+    setExtras([]);
     setError(null);
     setEnviado(false);
   };
@@ -153,7 +162,12 @@ function PlanDetalleTarjeta({
         monto,
         aceptaContrato,
         aceptaDatos,
-        snapshot: { nombre: plan.nombre, totalSeisMeses, moneda },
+        snapshot: {
+          nombre: plan.nombre,
+          totalSeisMeses,
+          moneda,
+          extras: extrasSeleccionados.map((e) => ({ nombre: e.nombre, precioCop: e.precioCop, periodicidad: e.periodicidad })),
+        },
       }),
     });
     setEnviando(false);
@@ -162,7 +176,10 @@ function PlanDetalleTarjeta({
       setError("No se pudo enviar. Intenta de nuevo.");
       return;
     }
-    const mensaje = `¡Hola! 👋 Quiero comprar el Plan ${plan.nombre} (${formatCopEnMoneda(totalSeisMeses.cop, moneda, trm)} por ${DURACION_MINIMA_MESES} meses). Mi nombre es ${contacto.nombre}.`;
+    const lineasExtras = extrasSeleccionados.map(
+      (e) => `+ ${e.nombre}: ${formatCopEnMoneda(e.precioCop, moneda, trm)}${e.periodicidad === "mensual" ? " /mes" : ""}`,
+    );
+    const mensaje = `¡Hola! 👋 Quiero comprar el Plan ${plan.nombre} (${formatCopEnMoneda(totalSeisMeses.cop, moneda, trm)} por ${DURACION_MINIMA_MESES} meses).${lineasExtras.length ? `\n\nTambién quiero sumar:\n${lineasExtras.join("\n")}\n\nTotal aproximado, lo confirmamos por aquí.` : ""} Mi nombre es ${contacto.nombre}.`;
     const urlWhatsApp = linkWhatsApp(contacto.whatsapp || WHATSAPP_BIWOV, mensaje);
     if (ventanaWhatsApp) {
       ventanaWhatsApp.location.href = urlWhatsApp;
@@ -221,7 +238,8 @@ function PlanDetalleTarjeta({
                 + montaje inicial de {formatCopEnMoneda(plan.montajeInicial.cop, moneda, trm)}
               </p>
               <p className="mt-1 text-xs text-text-secondary">
-                Publicidad aparte, sugerida desde {formatCopEnMoneda(plan.pautaSugerida.cop, moneda, trm)} al mes.
+                La inversión en pauta publicitaria (lo que le pagas directamente a Meta) va aparte; la
+                definimos juntos según tu negocio.
               </p>
 
               <div className="mt-4 border-t border-border-glass pt-4">
@@ -234,6 +252,16 @@ function PlanDetalleTarjeta({
                   {formatCopEnMoneda(cuotaMontaje.cop, moneda, trm)}, sin recargo: una al iniciar y otra al segundo mes.
                 </p>
               </div>
+            </div>
+
+            <div className="mt-6">
+              <SelectorExtras
+                moneda={moneda}
+                trm={trm}
+                seleccionados={extras}
+                onToggle={toggleExtra}
+                titulo="¿Quieres sumar algo más a tu plan? (opcional)"
+              />
             </div>
 
             <div className="mt-6 border-t border-border-glass pt-5 print:hidden">

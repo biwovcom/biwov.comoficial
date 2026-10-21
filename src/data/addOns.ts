@@ -47,10 +47,16 @@ export interface PaqueteProduccionVideo {
  */
 export const PRODUCCION_VIDEO = {
   descripcion:
-    "Grabación y edición de video, sin dirección creativa ni guiones — solo ir a grabar y editar.",
+    "Grabación y edición profesional de tus videos: nosotros ponemos la cámara, la luz y la edición; tú solo decides de qué quieres hablar.",
+  incluye: [
+    "Grabación con equipo profesional (cámara, audio e iluminación)",
+    "Edición y corrección de color",
+    "Entrega en formato vertical y horizontal, listos para publicar",
+  ],
+  noIncluye: ["Dirección creativa ni construcción de guiones (eso está incluido en Producción de contenido)"],
   minimoVideos: 3,
-  reglaJornada: "Cada media jornada de grabación dura 4 horas y rinde hasta 3 videos.",
-  notaPrecio: "Entre más videos, menor valor por video desde el cuarto.",
+  reglaJornada: "Una jornada de grabación de 4 horas rinde hasta 3 videos terminados.",
+  notaPrecio: "Mientras más videos grabes de una vez, menor es el costo por video a partir del cuarto.",
   paquetes: [
     { id: "3-videos", cantidadVideos: 3, precio: 360000 },
     { id: "6-videos", cantidadVideos: 6, precio: 696000 },

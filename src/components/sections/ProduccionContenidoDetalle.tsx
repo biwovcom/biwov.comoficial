@@ -104,7 +104,25 @@ export function ProduccionContenidoDetalle({ moneda, trm }: { moneda: Moneda; tr
           Solo grabación y edición
         </p>
         <p className="mt-1 text-sm text-text-secondary">{PRODUCCION_VIDEO.descripcion}</p>
-        <p className="mt-1 text-xs text-text-secondary">{PRODUCCION_VIDEO.reglaJornada}</p>
+
+        <div className="mt-3 grid gap-4 sm:grid-cols-2">
+          <ul className="space-y-1">
+            {PRODUCCION_VIDEO.incluye.map((item) => (
+              <li key={item} className="text-xs text-white/90">
+                • {item}
+              </li>
+            ))}
+          </ul>
+          <ul className="space-y-1">
+            {PRODUCCION_VIDEO.noIncluye.map((item) => (
+              <li key={item} className="text-xs text-text-secondary">
+                • {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <p className="mt-3 text-xs text-text-secondary">{PRODUCCION_VIDEO.reglaJornada}</p>
 
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           {PRODUCCION_VIDEO.paquetes.map((paquete) => (

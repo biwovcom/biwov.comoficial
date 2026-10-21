@@ -1,6 +1,6 @@
 export interface ComplementoItem {
   label: string;
-  precio: string;
+  precio?: string;
   /** Si tiene valor, el precio se convierte en vivo a USD con la TRM del día (reemplaza a "precio" en pantalla). */
   precioCop?: number;
 }
@@ -69,7 +69,7 @@ export const COMPLEMENTOS: Complemento[] = [
     detalle:
       "Una sesión 1 a 1 con Kathe si prefieres una guía puntual para ejecutar tú misma, en vez de un plan completo.",
     items: [
-      { label: "Sesión de asesoría personalizada (90 minutos)", precio: "US$97 · pago único" },
+      { label: "Sesión de asesoría personalizada (90 minutos)" },
       { label: "Análisis de tu negocio y tus redes antes de la sesión", precio: "Incluido" },
       { label: "Ideas de contenido para tu marca", precio: "Incluido" },
       { label: "Lineamientos y guía para implementar tú misma/o", precio: "Incluido" },

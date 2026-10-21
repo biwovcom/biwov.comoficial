@@ -14,7 +14,6 @@ export interface Plan {
   incluye: ItemPlan[];
   precioDesde: PrecioDual;
   montajeInicial: PrecioDual;
-  pautaSugerida: PrecioDual;
   /** Link de pago real (ej. Hotmart). Mientras no exista, "Comprar ahora" usa el flujo de WhatsApp. */
   linkPago?: string;
 }
@@ -47,7 +46,6 @@ export const PLANES: Plan[] = [
     ],
     precioDesde: { cop: 900000, usd: 225 },
     montajeInicial: { cop: 600000, usd: 150 },
-    pautaSugerida: { cop: 500000, usd: 125 },
     linkPago: "https://pay.hotmart.com/H107948359T?bid=1791493935287",
   },
   {
@@ -58,18 +56,25 @@ export const PLANES: Plan[] = [
     paraQuien:
       "Para negocios que ya tienen contenido o publicidad, pero les falta estrategia, orden y medir.",
     incluye: [
-      { label: "Todo lo del Plan Esencial" },
+      {
+        label: "Todo lo del Plan Esencial",
+        subitems: [
+          "Plan de trabajo con tareas semanales: diagnóstico de tu negocio, ideas y guiones para tus videos, y guías para ordenar tu WhatsApp, Instagram y Facebook",
+          "1 a 2 campañas de publicidad en Meta creadas y manejadas por nosotros",
+          "2 sesiones de acompañamiento al mes y reporte mensual",
+          "Guías y herramientas de IA para automatizar tus procesos",
+        ],
+      },
       {
         label: "1 página web hecha para que te escriban, agenden o dejen sus datos",
         subitems: [
-          "Una página web (landing page, en inglés) es una sola pantalla enfocada en una sola cosa: lograr que la persona te escriba, agende una cita o deje sus datos — no es tu sitio web completo, es una página diseñada para convertir visitas en contactos.",
+          "Una página web es una sola pantalla enfocada en una sola cosa: lograr que la persona te escriba, agende una cita o deje sus datos — no es tu sitio web completo, es una página diseñada para convertir visitas en contactos.",
         ],
       },
       { label: "Asistente con IA que filtra a los curiosos y te pasa los interesados" },
     ],
     precioDesde: { cop: 1900000, usd: 475 },
     montajeInicial: { cop: 1800000, usd: 450 },
-    pautaSugerida: { cop: 1000000, usd: 250 },
     linkPago: "https://pay.hotmart.com/H107949388O?bid=1791494825555",
   },
   {
@@ -80,19 +85,36 @@ export const PLANES: Plan[] = [
     paraQuien:
       "Para negocios que ya venden y quieren un sistema que atraiga, atienda y haga seguimiento.",
     incluye: [
-      { label: "Todo lo del Plan Crecimiento" },
       {
-        label: "Seguimiento automático por WhatsApp y correo",
-        subitems: ["Lista organizada de todos tus clientes con etapas de venta"],
+        label: "Todo lo del Plan Crecimiento",
+        subitems: [
+          "Plan de trabajo con tareas semanales: diagnóstico de tu negocio, ideas y guiones para tus videos, y guías para ordenar tu WhatsApp, Instagram y Facebook",
+          "1 a 2 campañas de publicidad en Meta creadas y manejadas por nosotros",
+          "2 sesiones de acompañamiento al mes y reporte mensual",
+          "Asistente con IA que filtra a los curiosos y te pasa los interesados",
+        ],
       },
-      { label: "Correos para que tus clientes vuelvan a comprar y te recomienden" },
-      { label: "Hasta 3 campañas activas y estrategia de remarketing" },
+      {
+        label: "2 páginas web (landing pages): una para tu oferta principal y otra para remarketing",
+        subitems: [
+          "Cada página está diseñada para una sola cosa: lograr que la persona te escriba, agende una cita o deje sus datos.",
+        ],
+      },
+      {
+        label: "Seguimiento automático por WhatsApp y correo, con 3 flujos ya armados",
+        subitems: [
+          "Flujo de bienvenida para quien te deja sus datos por primera vez",
+          "Flujo de recompra para que tus clientes vuelvan a comprarte",
+          "Flujo de remarketing para volver a buscar a quienes no compraron la primera vez",
+          "Lista organizada de todos tus clientes con etapas de venta",
+        ],
+      },
+      { label: "Hasta 3 campañas activas al mismo tiempo" },
       { label: "Reporte del camino completo, desde el anuncio hasta la venta" },
       { label: "Guías y herramientas de IA para automatizar tus procesos" },
     ],
     precioDesde: { cop: 2400000, usd: 600 },
     montajeInicial: { cop: 3800000, usd: 950 },
-    pautaSugerida: { cop: 2000000, usd: 500 },
     linkPago: "https://pay.hotmart.com/L107949454H?bid=1791495121348",
   },
 ];
