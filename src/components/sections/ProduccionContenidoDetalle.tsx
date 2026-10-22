@@ -1,3 +1,4 @@
+import { Printer } from "lucide-react";
 import { PRODUCCION_CONTENIDO, NIVELES_PRODUCCION, PRODUCCION_VIDEO } from "@/data/addOns";
 import { EXTRAS_COTIZABLES, type ExtraCotizable } from "@/data/extrasCotizables";
 import { formatCopEnMoneda, type Moneda } from "@/lib/moneda";
@@ -13,10 +14,12 @@ export function ProduccionContenidoDetalle({
   moneda,
   trm,
   onAdquirir,
+  onDescargarPdf,
 }: {
   moneda: Moneda;
   trm: number;
   onAdquirir: (item: ExtraCotizable) => void;
+  onDescargarPdf: (item: ExtraCotizable) => void;
 }) {
   return (
     <div className="space-y-6">
@@ -111,13 +114,24 @@ export function ProduccionContenidoDetalle({
               </p>
             </div>
 
-            <button
-              type="button"
-              onClick={() => onAdquirir(buscarExtra(`produccion-${nivel.id}`))}
-              className="mt-4 rounded-full bg-gradient-brand px-3 py-2 text-xs font-medium text-white transition-all hover:shadow-[0_0_20px_-5px_rgba(50,153,204,0.7)]"
-            >
-              Adquirir {nivel.nombre}
-            </button>
+            <div className="mt-4 flex gap-1.5">
+              <button
+                type="button"
+                onClick={() => onDescargarPdf(buscarExtra(`produccion-${nivel.id}`))}
+                aria-label={`Descargar PDF de ${nivel.nombre}`}
+                title="Descargar PDF (sin firmar)"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border-glass text-text-secondary transition-colors hover:border-accent/40 hover:text-white"
+              >
+                <Printer size={13} />
+              </button>
+              <button
+                type="button"
+                onClick={() => onAdquirir(buscarExtra(`produccion-${nivel.id}`))}
+                className="flex-1 rounded-full bg-gradient-brand px-3 py-2 text-xs font-medium text-white transition-all hover:shadow-[0_0_20px_-5px_rgba(50,153,204,0.7)]"
+              >
+                Adquirir {nivel.nombre}
+              </button>
+            </div>
           </div>
         ))}
       </div>
@@ -157,13 +171,24 @@ export function ProduccionContenidoDetalle({
               <p className="mt-0.5 text-base font-bold text-accent">
                 {formatCopEnMoneda(paquete.precio, moneda, trm)}
               </p>
-              <button
-                type="button"
-                onClick={() => onAdquirir(buscarExtra(`video-${paquete.id}`))}
-                className="mt-3 rounded-full bg-gradient-brand px-3 py-2 text-xs font-medium text-white transition-all hover:shadow-[0_0_20px_-5px_rgba(50,153,204,0.7)]"
-              >
-                Adquirir
-              </button>
+              <div className="mt-3 flex gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => onDescargarPdf(buscarExtra(`video-${paquete.id}`))}
+                  aria-label={`Descargar PDF de ${paquete.cantidadVideos} videos`}
+                  title="Descargar PDF (sin firmar)"
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border-glass text-text-secondary transition-colors hover:border-accent/40 hover:text-white"
+                >
+                  <Printer size={13} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onAdquirir(buscarExtra(`video-${paquete.id}`))}
+                  className="flex-1 rounded-full bg-gradient-brand px-3 py-2 text-xs font-medium text-white transition-all hover:shadow-[0_0_20px_-5px_rgba(50,153,204,0.7)]"
+                >
+                  Adquirir
+                </button>
+              </div>
             </div>
           ))}
         </div>

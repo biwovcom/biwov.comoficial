@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Printer } from "lucide-react";
 import { COMPLEMENTOS } from "@/data/complementos";
 import { EXTRAS_COTIZABLES, type ExtraCotizable } from "@/data/extrasCotizables";
 import { ProduccionContenidoDetalle } from "./ProduccionContenidoDetalle";
@@ -9,6 +9,7 @@ import { ComplementoPdfModal } from "./ComplementoPdfModal";
 import { Button } from "@/components/ui/Button";
 import { CompraItemModal } from "@/components/compras/CompraItemModal";
 import { PropuestaImprimible, type ItemPropuesta } from "@/components/propuestas/PropuestaImprimible";
+import { extraAItemPropuesta } from "@/lib/propuestas/itemPropuesta";
 import { formatCopEnMoneda, type Moneda } from "@/lib/moneda";
 
 function itemsPropuestaParaComplemento(
@@ -19,14 +20,7 @@ function itemsPropuestaParaComplemento(
   if (item.tipo === "produccion") {
     return EXTRAS_COTIZABLES.filter(
       (e) => e.categoria === "Producción de contenido" || e.categoria === "Grabación y edición de video",
-    ).map((e) => ({
-      nombre: e.nombre,
-      descripcion: e.descripcion,
-      incluye: e.incluye,
-      noIncluye: e.noIncluye,
-      precio: formatCopEnMoneda(e.precioCop, moneda, trm),
-      periodicidad: e.periodicidad,
-    }));
+    ).map((e) => extraAItemPropuesta(e, moneda, trm));
   }
   const prefijo =
     item.titulo === "Páginas web y sitios web adicionales"
@@ -36,15 +30,8 @@ function itemsPropuestaParaComplemento(
         : null;
   return (item.items ?? []).map((it) => {
     const extra = prefijo ? EXTRAS_COTIZABLES.find((e) => e.id === `${prefijo}-${it.label}`) : undefined;
-    return {
-      nombre: it.label,
-      descripcion: extra?.descripcion,
-      incluye: extra?.incluye,
-      noIncluye: extra?.noIncluye,
-      precio: extra
-        ? formatCopEnMoneda(extra.precioCop, moneda, trm) + (extra.periodicidad === "mensual" ? " /mes" : "")
-        : (it.precio ?? "Incluido"),
-    };
+    if (extra) return extraAItemPropuesta(extra, moneda, trm);
+    return { nombre: it.label, precio: it.precio ?? "Incluido" };
   });
 }
 
@@ -53,14 +40,18 @@ function DetalleComplemento({
   moneda,
   trm,
   onAdquirir,
+  onDescargarPdf,
 }: {
   item: (typeof COMPLEMENTOS)[number];
   moneda: Moneda;
   trm: number;
   onAdquirir: (extra: ExtraCotizable) => void;
+  onDescargarPdf: (extra: ExtraCotizable) => void;
 }) {
   if (item.tipo === "produccion") {
-    return <ProduccionContenidoDetalle moneda={moneda} trm={trm} onAdquirir={onAdquirir} />;
+    return (
+      <ProduccionContenidoDetalle moneda={moneda} trm={trm} onAdquirir={onAdquirir} onDescargarPdf={onDescargarPdf} />
+    );
   }
 
   const prefijo = item.titulo === "Páginas web y sitios web adicionales" ? "web" : "meta";
@@ -78,13 +69,24 @@ function DetalleComplemento({
                 {precio && <p className="mt-0.5 text-xs font-medium text-accent">{precio}</p>}
               </div>
               {extra && (
-                <button
-                  type="button"
-                  onClick={() => onAdquirir(extra)}
-                  className="shrink-0 rounded-full bg-gradient-brand px-3 py-1.5 text-xs font-medium whitespace-nowrap text-white transition-all hover:shadow-[0_0_20px_-5px_rgba(50,153,204,0.7)]"
-                >
-                  Adquirir
-                </button>
+                <div className="flex shrink-0 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => onDescargarPdf(extra)}
+                    aria-label={`Descargar PDF de ${extra.nombre}`}
+                    title="Descargar PDF (sin firmar)"
+                    className="flex h-7 w-7 items-center justify-center rounded-full border border-border-glass text-text-secondary transition-colors hover:border-accent/40 hover:text-white"
+                  >
+                    <Printer size={13} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onAdquirir(extra)}
+                    className="rounded-full bg-gradient-brand px-3 py-1.5 text-xs font-medium whitespace-nowrap text-white transition-all hover:shadow-[0_0_20px_-5px_rgba(50,153,204,0.7)]"
+                  >
+                    Adquirir
+                  </button>
+                </div>
               )}
             </li>
           );
@@ -109,12 +111,23 @@ function BotonAgendar({ item }: { item: (typeof COMPLEMENTOS)[number] }) {
 export function Complementos({ moneda, trm }: { moneda: Moneda; trm: number }) {
   const [modalAbierto, setModalAbierto] = useState<string | null>(null);
   const [itemCompra, setItemCompra] = useState<ExtraCotizable | null>(null);
+  const [itemDestacado, setItemDestacado] = useState<ExtraCotizable | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
 
   const itemModal = COMPLEMENTOS.find((c) => c.titulo === modalAbierto) ?? null;
 
   const desplazar = (dir: 1 | -1) => {
     trackRef.current?.scrollBy({ left: dir * 360, behavior: "smooth" });
+  };
+
+  const abrirModal = (titulo: string | null) => {
+    setModalAbierto(titulo);
+    setItemDestacado(null);
+  };
+
+  const descargarItemIndividual = (extra: ExtraCotizable) => {
+    setItemDestacado(extra);
+    requestAnimationFrame(() => window.print());
   };
 
   return (
@@ -164,7 +177,7 @@ export function Complementos({ moneda, trm }: { moneda: Moneda; trm: number }) {
               <Button
                 variant="secondary"
                 className="flex-1 !px-3 !py-2 !text-xs whitespace-nowrap"
-                onClick={() => setModalAbierto(item.titulo)}
+                onClick={() => abrirModal(item.titulo)}
               >
                 Más información
               </Button>
@@ -177,23 +190,33 @@ export function Complementos({ moneda, trm }: { moneda: Moneda; trm: number }) {
       <ComplementoPdfModal
         titulo={itemModal?.titulo ?? ""}
         abierto={Boolean(itemModal)}
-        onClose={() => setModalAbierto(null)}
+        onClose={() => abrirModal(null)}
         propuesta={
           itemModal && (
             <PropuestaImprimible
-              titulo={itemModal.titulo}
-              subtitulo={itemModal.detalle}
-              items={itemsPropuestaParaComplemento(itemModal, moneda, trm)}
-              totales={[]}
+              titulo={itemDestacado ? `${itemModal.titulo} — ${itemDestacado.nombre}` : itemModal.titulo}
+              subtitulo={itemDestacado ? undefined : itemModal.detalle}
+              items={itemDestacado ? [extraAItemPropuesta(itemDestacado, moneda, trm)] : itemsPropuestaParaComplemento(itemModal, moneda, trm)}
+              totales={
+                itemDestacado
+                  ? [{ label: "Total", valor: formatCopEnMoneda(itemDestacado.precioCop, moneda, trm) }]
+                  : []
+              }
               formasPago={["50% anticipado, 50% contra entrega (servicios únicos)", "Pago mensual por adelantado (servicios recurrentes)"]}
-              validez="Escríbenos cuál de estas opciones te interesa para confirmarla."
+              validez={itemDestacado ? "Esta propuesta tiene una validez de 15 días." : "Escríbenos cuál de estas opciones te interesa para confirmarla."}
             />
           )
         }
       >
         {itemModal && (
           <>
-            <DetalleComplemento item={itemModal} moneda={moneda} trm={trm} onAdquirir={setItemCompra} />
+            <DetalleComplemento
+              item={itemModal}
+              moneda={moneda}
+              trm={trm}
+              onAdquirir={setItemCompra}
+              onDescargarPdf={descargarItemIndividual}
+            />
             <div className="mt-6 flex gap-2">
               <BotonAgendar item={itemModal} />
             </div>

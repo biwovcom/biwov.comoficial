@@ -1,11 +1,12 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { X } from "lucide-react";
+import { X, Printer } from "lucide-react";
 import { EXTRAS_COTIZABLES } from "@/data/extrasCotizables";
 import { formatCopEnMoneda, type Moneda } from "@/lib/moneda";
 import { CompraFormulario } from "@/components/compras/CompraFormulario";
-import { PropuestaImprimible, type ItemPropuesta } from "@/components/propuestas/PropuestaImprimible";
+import { PropuestaImprimible } from "@/components/propuestas/PropuestaImprimible";
+import { extraAItemPropuesta } from "@/lib/propuestas/itemPropuesta";
 
 export function CotizacionCombinadaModal({
   abierto,
@@ -30,14 +31,7 @@ export function CotizacionCombinadaModal({
   );
   const mensajeWhatsApp = `¡Hola! 👋 Quiero esta cotización combinada:\n\n${lineasWhatsApp.join("\n")}\n\nYa firmé y confirmé desde el sitio. Quisiera coordinar los detalles.`;
 
-  const itemsPropuesta: ItemPropuesta[] = items.map((i) => ({
-    nombre: i.nombre,
-    descripcion: i.descripcion,
-    incluye: i.incluye,
-    noIncluye: i.noIncluye,
-    precio: formatCopEnMoneda(i.precioCop, moneda, trm),
-    periodicidad: i.periodicidad,
-  }));
+  const itemsPropuesta = items.map((i) => extraAItemPropuesta(i, moneda, trm));
 
   const montoFormateado = [
     totalUnico > 0 ? `${formatCopEnMoneda(totalUnico, moneda, trm)} único` : null,
@@ -137,7 +131,15 @@ export function CotizacionCombinadaModal({
                 <p className="text-xs text-text-secondary">Valores aproximados; los confirmamos juntos por WhatsApp.</p>
               </div>
 
-              <div className="mt-6 border-t border-border-glass pt-5">
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="mt-5 flex w-full items-center justify-center gap-2 rounded-full border border-border-glass py-2.5 text-xs font-medium text-text-secondary transition-colors hover:border-accent/40 hover:text-white"
+              >
+                <Printer size={14} /> Descargar esta cotización en PDF (sin firmar)
+              </button>
+
+              <div className="mt-4 border-t border-border-glass pt-5">
                 <CompraFormulario
                   tiposContrato={tiposContrato}
                   nombreItem={items.map((i) => i.nombre).join(", ")}

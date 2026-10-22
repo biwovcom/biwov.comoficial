@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, ChevronDown } from "lucide-react";
+import { X, ChevronDown, Printer } from "lucide-react";
 import { DURACION_MINIMA_MESES, type ItemPlan, type Plan } from "@/data/planes";
 import { EXTRAS_COTIZABLES } from "@/data/extrasCotizables";
 import { formatCopEnMoneda, sumarPrecios, multiplicarPrecio, type Moneda } from "@/lib/moneda";
@@ -242,7 +242,15 @@ function PlanDetalleTarjeta({
           />
         </div>
 
-        <div className="mt-6 border-t border-border-glass pt-5">
+        <button
+          type="button"
+          onClick={() => window.print()}
+          className="mt-6 flex w-full items-center justify-center gap-2 rounded-full border border-border-glass py-2.5 text-xs font-medium text-text-secondary transition-colors hover:border-accent/40 hover:text-white"
+        >
+          <Printer size={14} /> Descargar esta cotización en PDF (sin firmar)
+        </button>
+
+        <div className="mt-4 border-t border-border-glass pt-5">
           {!mostrarCompra ? (
             <button
               type="button"

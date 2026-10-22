@@ -6,6 +6,7 @@ import type { ExtraCotizable } from "@/data/extrasCotizables";
 import { formatCopEnMoneda, type Moneda } from "@/lib/moneda";
 import { CompraFormulario } from "./CompraFormulario";
 import { PropuestaImprimible } from "@/components/propuestas/PropuestaImprimible";
+import { extraAItemPropuesta } from "@/lib/propuestas/itemPropuesta";
 
 export function CompraItemModal({
   item,
@@ -134,6 +135,14 @@ function ItemTarjeta({
           </ul>
         )}
         <p className="mt-4 text-lg font-semibold text-white">{precioFormateado}</p>
+
+        <button
+          type="button"
+          onClick={() => window.print()}
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-full border border-border-glass py-2.5 text-xs font-medium text-text-secondary transition-colors hover:border-accent/40 hover:text-white"
+        >
+          <Printer size={14} /> Descargar esta cotización en PDF (sin firmar)
+        </button>
       </div>
 
       <div className="mt-6 border-t border-border-glass pt-5">
@@ -149,29 +158,12 @@ function ItemTarjeta({
       <div className="hidden print:block">
         <PropuestaImprimible
           titulo={`${item.categoria} — ${item.nombre}`}
-          items={[
-            {
-              nombre: item.nombre,
-              descripcion: item.descripcion,
-              incluye: item.incluye,
-              noIncluye: item.noIncluye,
-              precio: precioFormateado,
-              periodicidad: item.periodicidad,
-            },
-          ]}
+          items={[extraAItemPropuesta(item, moneda, trm)]}
           totales={[{ label: "Total", valor: precioFormateado }]}
           formasPago={formasPago}
           validez="Esta propuesta tiene una validez de 15 días."
         />
       </div>
-
-      <button
-        type="button"
-        onClick={() => window.print()}
-        className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-border-glass py-2.5 text-xs font-medium text-text-secondary transition-colors hover:border-accent/40 hover:text-white print:hidden"
-      >
-        <Printer size={14} /> Descargar esta propuesta en PDF
-      </button>
     </motion.div>
   );
 }
