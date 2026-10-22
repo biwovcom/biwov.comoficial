@@ -1,8 +1,23 @@
 "use client";
 
-import { EXTRAS_COTIZABLES } from "@/data/extrasCotizables";
+import { Camera, Video, Globe2, Megaphone, CheckCircle2, Circle, type LucideIcon } from "lucide-react";
+import { EXTRAS_COTIZABLES, type CategoriaExtra } from "@/data/extrasCotizables";
 import { formatCopEnMoneda, type Moneda } from "@/lib/moneda";
 import { cn } from "@/lib/utils";
+
+const ICONOS: Record<CategoriaExtra, LucideIcon> = {
+  "Producción de contenido": Camera,
+  "Grabación y edición de video": Video,
+  "Páginas web": Globe2,
+  "Campaña en Meta": Megaphone,
+};
+
+const CATEGORIAS: CategoriaExtra[] = [
+  "Producción de contenido",
+  "Grabación y edición de video",
+  "Páginas web",
+  "Campaña en Meta",
+];
 
 export function SelectorExtras({
   moneda,
@@ -18,37 +33,54 @@ export function SelectorExtras({
   titulo?: string;
 }) {
   return (
-    <div className="rounded-2xl border border-border-glass bg-white/[0.02] p-4">
-      <p className="text-xs font-semibold uppercase tracking-wide text-text-secondary">{titulo}</p>
-      <ul className="mt-3 space-y-2">
-        {EXTRAS_COTIZABLES.map((extra) => {
-          const marcado = seleccionados.includes(extra.id);
+    <div>
+      {titulo && <p className="text-xs font-semibold uppercase tracking-wide text-text-secondary">{titulo}</p>}
+      <div className="mt-3 grid gap-4 sm:grid-cols-2">
+        {CATEGORIAS.map((categoria) => {
+          const Icono = ICONOS[categoria];
+          const items = EXTRAS_COTIZABLES.filter((e) => e.categoria === categoria);
           return (
-            <li key={extra.id}>
-              <label
-                className={cn(
-                  "flex cursor-pointer items-center justify-between gap-3 rounded-xl border px-3 py-2 transition-colors print:cursor-auto",
-                  marcado ? "border-accent/50 bg-accent/5" : "border-border-glass hover:border-accent/30",
-                )}
-              >
-                <span className="flex items-center gap-2.5 text-sm text-white/90">
-                  <input
-                    type="checkbox"
-                    checked={marcado}
-                    onChange={() => onToggle(extra.id)}
-                    className="h-4 w-4 shrink-0 accent-accent"
-                  />
-                  {extra.nombre}
-                </span>
-                <span className="shrink-0 text-xs font-medium text-accent">
-                  {formatCopEnMoneda(extra.precioCop, moneda, trm)}
-                  {extra.periodicidad === "mensual" ? " /mes" : ""}
-                </span>
-              </label>
-            </li>
+            <div
+              key={categoria}
+              className="overflow-hidden rounded-2xl border border-border-glass shadow-[0_8px_30px_-16px_rgba(13,59,102,0.45)]"
+            >
+              <div className="flex items-center gap-2 bg-gradient-brand px-4 py-2.5">
+                <Icono className="h-4 w-4 shrink-0 text-white" />
+                <p className="text-xs font-semibold uppercase tracking-wide text-white">{categoria}</p>
+              </div>
+              <div className="divide-y divide-border-glass bg-white/[0.02]">
+                {items.map((item) => {
+                  const marcado = seleccionados.includes(item.id);
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => onToggle(item.id)}
+                      className={cn(
+                        "flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left transition-colors",
+                        marcado ? "bg-accent/10" : "hover:bg-white/[0.04]",
+                      )}
+                    >
+                      <span className="flex items-center gap-2.5 text-sm text-white/90">
+                        {marcado ? (
+                          <CheckCircle2 className="h-4 w-4 shrink-0 text-accent" />
+                        ) : (
+                          <Circle className="h-4 w-4 shrink-0 text-text-secondary" />
+                        )}
+                        {item.nombre}
+                      </span>
+                      <span className="shrink-0 text-xs font-semibold text-accent">
+                        {formatCopEnMoneda(item.precioCop, moneda, trm)}
+                        {item.periodicidad === "mensual" ? " /mes" : ""}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           );
         })}
-      </ul>
+      </div>
     </div>
   );
 }

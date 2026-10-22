@@ -1,15 +1,11 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { COMPLEMENTOS } from "@/data/complementos";
 import { ProduccionContenidoDetalle } from "./ProduccionContenidoDetalle";
 import { ComplementoPdfModal } from "./ComplementoPdfModal";
-import { CotizacionCombinadaModal } from "./CotizacionCombinadaModal";
 import { Button } from "@/components/ui/Button";
-import { SelectorExtras } from "@/components/planes/SelectorExtras";
-import { EXTRAS_COTIZABLES } from "@/data/extrasCotizables";
 import { linkWhatsApp } from "@/lib/panel/whatsapp";
 import { WHATSAPP_BIWOV } from "@/lib/contacto";
 import { formatCopEnMoneda, type Moneda } from "@/lib/moneda";
@@ -71,17 +67,7 @@ function BotonAccion({ item }: { item: (typeof COMPLEMENTOS)[number] }) {
 
 export function Complementos({ moneda, trm }: { moneda: Moneda; trm: number }) {
   const [modalAbierto, setModalAbierto] = useState<string | null>(null);
-  const [extras, setExtras] = useState<string[]>([]);
-  const [cotizacionAbierta, setCotizacionAbierta] = useState(false);
   const trackRef = useRef<HTMLDivElement>(null);
-
-  const toggleExtra = (id: string) => {
-    setExtras((prev) => (prev.includes(id) ? prev.filter((e) => e !== id) : [...prev, id]));
-  };
-  const totalExtras = EXTRAS_COTIZABLES.filter((e) => extras.includes(e.id)).reduce(
-    (acc, e) => acc + e.precioCop,
-    0,
-  );
 
   const itemModal = COMPLEMENTOS.find((c) => c.titulo === modalAbierto) ?? null;
 
@@ -145,52 +131,6 @@ export function Complementos({ moneda, trm }: { moneda: Moneda; trm: number }) {
           </div>
         ))}
       </div>
-
-      <div className="mt-10">
-        <h4 className="text-sm font-semibold text-text-on-light">
-          ¿Quieres combinar varios de estos en una sola cotización?
-        </h4>
-        <p className="mt-1 text-xs text-text-on-light-secondary">
-          Marca los que te interesan y te armamos un solo mensaje con todo, sin tener que escribirnos por cada uno.
-        </p>
-        <div className="mt-4 rounded-3xl border border-border-glass bg-[#0c1119] p-5">
-          <SelectorExtras
-            moneda={moneda}
-            trm={trm}
-            seleccionados={extras}
-            onToggle={toggleExtra}
-            titulo="Elige lo que quieres sumar"
-          />
-        </div>
-      </div>
-
-      <AnimatePresence>
-        {extras.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            className="fixed inset-x-4 bottom-24 z-40 mx-auto flex max-w-sm items-center justify-between gap-3 rounded-2xl border border-border-glass bg-[#0c1119] p-4 shadow-[0_12px_40px_-8px_rgba(0,0,0,0.5)] sm:inset-x-auto sm:right-6"
-          >
-            <p className="text-xs text-white">
-              {extras.length} seleccionado{extras.length === 1 ? "" : "s"}
-              <br />
-              <span className="font-semibold text-accent">{formatCopEnMoneda(totalExtras, moneda, trm)} aprox.</span>
-            </p>
-            <Button className="!px-4 !py-2 !text-xs whitespace-nowrap" onClick={() => setCotizacionAbierta(true)}>
-              Ver cotización
-            </Button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <CotizacionCombinadaModal
-        abierto={cotizacionAbierta}
-        extras={extras}
-        moneda={moneda}
-        trm={trm}
-        onClose={() => setCotizacionAbierta(false)}
-      />
 
       <ComplementoPdfModal
         titulo={itemModal?.titulo ?? ""}

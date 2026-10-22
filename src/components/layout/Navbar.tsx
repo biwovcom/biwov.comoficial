@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 
 const LINKS = [
   { href: "/#planes", label: "Planes" },
+  { href: "/#calculadora", label: "Calculadora" },
   { href: "/#como-funciona", label: "Cómo funciona" },
   { href: "/#casos", label: "Casos de éxito" },
   { href: "/#testimonios", label: "Testimonios" },
@@ -43,41 +44,34 @@ export function Navbar() {
           : "border-b border-transparent bg-transparent",
       )}
     >
-      <Container className="flex h-18 items-center justify-between py-4">
+      <Container className="flex h-18 items-center justify-between py-4 !max-w-7xl">
         <Link href="/" className="font-logo text-xl font-bold text-white">
           biwov
         </Link>
-        <nav className="hidden items-center gap-5 md:flex lg:gap-8">
+        <nav className="hidden items-center gap-5 xl:flex">
           {LINKS.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className="text-sm text-text-secondary transition-colors hover:text-white"
+              className="text-sm whitespace-nowrap text-text-secondary transition-colors hover:text-white"
             >
               {link.label}
             </a>
           ))}
         </nav>
-        <div className="hidden items-center gap-2 md:flex lg:gap-3">
-          <Button
-            size="md"
-            variant="secondary"
-            className="!px-3 !py-2 !text-xs lg:!px-5 lg:!py-2.5 lg:!text-sm"
-            onClick={() => open()}
-          >
+        <div className="hidden items-center gap-3 xl:flex">
+          <Button size="md" variant="secondary" onClick={() => open()}>
             Diagnóstico gratis
           </Button>
           <a href={LINKS_PANEL.calendario} target="_blank" rel="noopener noreferrer">
-            <Button size="md" className="!px-3 !py-2 !text-xs lg:!px-5 lg:!py-2.5 lg:!text-sm">
-              Agenda una asesoría
-            </Button>
+            <Button size="md">Agenda una asesoría</Button>
           </a>
         </div>
         <button
           type="button"
           onClick={() => setMenuAbierto((v) => !v)}
           aria-label={menuAbierto ? "Cerrar menú" : "Abrir menú"}
-          className="text-white md:hidden"
+          className="text-white xl:hidden"
         >
           {menuAbierto ? <X size={24} /> : <Menu size={24} />}
         </button>
@@ -90,7 +84,7 @@ export function Navbar() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="overflow-hidden border-t border-border-glass bg-bg-base md:hidden"
+            className="overflow-hidden border-t border-border-glass bg-bg-base xl:hidden"
           >
             <Container className="flex flex-col gap-1 py-4">
               {LINKS.map((link) => (

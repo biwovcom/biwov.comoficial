@@ -10,6 +10,7 @@ import { PLANES, type Plan } from "@/data/planes";
 import { formatCopEnMoneda, type Moneda } from "@/lib/moneda";
 import { useTRM } from "@/hooks/useTRM";
 import { PlanDetalleModal } from "@/components/planes/PlanDetalleModal";
+import { MonedaToggle } from "@/components/ui/MonedaToggle";
 import { Complementos } from "./Complementos";
 import { cn } from "@/lib/utils";
 
@@ -30,22 +31,8 @@ export function Ecosystems() {
           description="Empiezas donde estás y avanzas cuando los números lo indican. Sin contratos eternos ni promesas infladas."
         />
 
-        <div className="mt-8 flex justify-center">
-          <div className="inline-flex rounded-full border border-border-light bg-white p-1">
-            {(["COP", "USD"] as Moneda[]).map((m) => (
-              <button
-                key={m}
-                type="button"
-                onClick={() => setMoneda(m)}
-                className={cn(
-                  "rounded-full px-4 py-1.5 text-xs font-semibold transition-colors",
-                  moneda === m ? "bg-gradient-brand text-white" : "text-text-on-light-secondary hover:text-text-on-light",
-                )}
-              >
-                {m === "COP" ? "Pesos colombianos" : "Dólares (USD)"}
-              </button>
-            ))}
-          </div>
+        <div className="mt-8">
+          <MonedaToggle moneda={moneda} onChange={setMoneda} />
         </div>
 
         <div className="mt-10 grid gap-6 lg:grid-cols-3">
