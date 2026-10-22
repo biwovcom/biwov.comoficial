@@ -119,7 +119,7 @@ body {
 @media print {
   @page {
     size: A4;
-    margin: 16mm;
+    margin: 12mm;
   }
   body {
     background: #ffffff !important;

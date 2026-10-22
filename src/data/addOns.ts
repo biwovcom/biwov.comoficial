@@ -51,9 +51,9 @@ export const PRODUCCION_VIDEO = {
   incluye: [
     "Grabación con equipo profesional (cámara, audio e iluminación)",
     "Edición y corrección de color",
-    "Entrega en formato vertical y horizontal, listos para publicar",
+    "Entrega en formato vertical, lista para publicar",
   ],
-  noIncluye: ["Dirección creativa ni construcción de guiones (eso está incluido en Producción de contenido)"],
+  noIncluye: [] as string[],
   minimoVideos: 3,
   reglaJornada: "Una jornada de grabación de 4 horas rinde hasta 3 videos terminados.",
   notaPrecio: "Mientras más videos grabes de una vez, menor es el costo por video a partir del cuarto.",

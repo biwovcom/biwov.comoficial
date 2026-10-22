@@ -46,7 +46,7 @@ export function PropuestaImprimible({
       </div>
       <div className="mt-3 h-1 w-full rounded-full bg-gradient-to-r from-[#1d4772] to-[#3d98cc]" />
 
-      <p className="mt-6 text-xs font-semibold uppercase tracking-wide text-[#3d98cc]">
+      <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-[#3d98cc]">
         Propuesta comercial
       </p>
       <h1 className="mt-1 text-2xl font-bold text-[#0f172a]">{titulo}</h1>
@@ -58,10 +58,10 @@ export function PropuestaImprimible({
         </p>
       )}
 
-      <p className="mt-6 text-xs font-semibold uppercase tracking-wide text-[#6b7280]">Qué incluye</p>
-      <div className="mt-3 space-y-3">
+      <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-[#6b7280]">Qué incluye</p>
+      <div className="mt-2 space-y-2">
         {items.map((item, i) => (
-          <div key={`${item.nombre}-${i}`} className="rounded-2xl border border-[#e5e7eb] p-4">
+          <div key={`${item.nombre}-${i}`} className="break-inside-avoid rounded-2xl border border-[#e5e7eb] p-3">
             <div className="flex items-start gap-3">
               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1d4772] text-xs font-bold text-white">
                 {i + 1}
@@ -100,7 +100,7 @@ export function PropuestaImprimible({
       </div>
 
       {totales.length > 0 && (
-        <div className="mt-6 rounded-2xl bg-[#f3f4f6] p-5">
+        <div className="break-inside-avoid mt-4 rounded-2xl bg-[#f3f4f6] p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-[#6b7280]">Inversión</p>
           <div className="mt-2 space-y-1">
             {totales.map((t) => (
@@ -113,7 +113,7 @@ export function PropuestaImprimible({
         </div>
       )}
 
-      <div className="mt-5 grid gap-5 sm:grid-cols-2">
+      <div className="break-inside-avoid mt-4 grid gap-4 sm:grid-cols-2">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-[#6b7280]">Forma de pago</p>
           <ul className="mt-2 space-y-1">
@@ -139,7 +139,7 @@ export function PropuestaImprimible({
         )}
       </div>
 
-      <div className="mt-8 border-t border-[#e5e7eb] pt-3">
+      <div className="break-inside-avoid mt-4 border-t border-[#e5e7eb] pt-2">
         <p className="text-[11px] text-[#9ca3af]">
           biwov_ · {titulo} · Kathe Digital · {fecha}
         </p>
