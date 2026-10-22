@@ -2,19 +2,14 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import Link from "next/link";
-import { X, Printer, ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Input, Label } from "@/components/ui/Input";
+import { X, ChevronDown } from "lucide-react";
 import { DURACION_MINIMA_MESES, type ItemPlan, type Plan } from "@/data/planes";
 import { EXTRAS_COTIZABLES } from "@/data/extrasCotizables";
 import { formatCopEnMoneda, sumarPrecios, multiplicarPrecio, type Moneda } from "@/lib/moneda";
-import { linkWhatsApp } from "@/lib/panel/whatsapp";
-import { WHATSAPP_BIWOV } from "@/lib/contacto";
 import { cn } from "@/lib/utils";
 import { SelectorExtras } from "./SelectorExtras";
-
-const CONTACTO_INICIAL = { nombre: "", whatsapp: "", email: "", empresa: "" };
+import { CompraFormulario } from "@/components/compras/CompraFormulario";
+import { PropuestaImprimible, type ItemPropuesta } from "@/components/propuestas/PropuestaImprimible";
 
 function FilaIncluye({ item }: { item: ItemPlan }) {
   const [abierto, setAbierto] = useState(false);
@@ -23,27 +18,19 @@ function FilaIncluye({ item }: { item: ItemPlan }) {
   return (
     <li className="text-sm text-white/90">
       <div
-        className={cn("flex items-start gap-2", tieneSubitems && "cursor-pointer print:cursor-auto")}
+        className={cn("flex items-start gap-2", tieneSubitems && "cursor-pointer")}
         onClick={() => tieneSubitems && setAbierto((v) => !v)}
       >
         <span className="mt-0.5 text-accent">✔</span>
         <span className="flex-1">{item.label}</span>
         {tieneSubitems && (
           <ChevronDown
-            className={cn(
-              "mt-0.5 h-3.5 w-3.5 shrink-0 text-accent transition-transform print:hidden",
-              abierto && "rotate-180",
-            )}
+            className={cn("mt-0.5 h-3.5 w-3.5 shrink-0 text-accent transition-transform", abierto && "rotate-180")}
           />
         )}
       </div>
       {tieneSubitems && (
-        <ul
-          className={cn(
-            "mt-2 ml-6 space-y-1.5 border-l border-border-glass pl-3 print:!block",
-            abierto ? "block" : "hidden",
-          )}
-        >
+        <ul className={cn("mt-2 ml-6 space-y-1.5 border-l border-border-glass pl-3", abierto ? "block" : "hidden")}>
           {item.subitems!.map((sub) => (
             <li key={sub} className="text-xs text-text-secondary">
               {sub}
@@ -73,7 +60,7 @@ export function PlanDetalleModal({
       {plan && (
         <motion.div
           id="plan-modal-overlay"
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+          className="print-overlay fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -109,13 +96,7 @@ function PlanDetalleTarjeta({
   onClose: () => void;
 }) {
   const [mostrarCompra, setMostrarCompra] = useState(abrirEnCompraInicial);
-  const [contacto, setContacto] = useState(CONTACTO_INICIAL);
   const [extras, setExtras] = useState<string[]>([]);
-  const [aceptaContrato, setAceptaContrato] = useState(false);
-  const [aceptaDatos, setAceptaDatos] = useState(false);
-  const [enviando, setEnviando] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [enviado, setEnviado] = useState(false);
 
   const toggleExtra = (id: string) => {
     setExtras((prev) => (prev.includes(id) ? prev.filter((e) => e !== id) : [...prev, id]));
@@ -124,10 +105,8 @@ function PlanDetalleTarjeta({
 
   const cerrar = () => {
     onClose();
-    setContacto(CONTACTO_INICIAL);
     setExtras([]);
-    setError(null);
-    setEnviado(false);
+    setMostrarCompra(abrirEnCompraInicial);
   };
 
   const totalSeisMeses = sumarPrecios(
@@ -135,22 +114,21 @@ function PlanDetalleTarjeta({
     multiplicarPrecio(plan.precioDesde, DURACION_MINIMA_MESES),
   );
   const cuotaMontaje = multiplicarPrecio(plan.montajeInicial, 0.5);
+  const totalExtrasCop = extrasSeleccionados.reduce((acc, e) => acc + e.precioCop, 0);
 
-  const comprar = async () => {
-    if (!contacto.nombre.trim() || (!contacto.email.trim() && !contacto.whatsapp.trim())) {
-      setError("Escribe tu nombre y un correo o WhatsApp.");
-      return;
-    }
-    if (!aceptaContrato || !aceptaDatos) {
-      setError("Debes aceptar el contrato y el tratamiento de tus datos para continuar.");
-      return;
-    }
-    setEnviando(true);
-    setError(null);
-    // Se abre la pestaña ya (en blanco) dentro del mismo clic del usuario:
-    // si se espera a que termine el fetch antes de abrir, el navegador lo
-    // trata como pop-up y lo bloquea.
-    const ventanaWhatsApp = window.open("", "_blank");
+  const confirmar = async ({
+    contacto,
+    aceptaContrato,
+    aceptaDatos,
+    nombreFirmante,
+    firmaImagenBase64,
+  }: {
+    contacto: { nombre: string; whatsapp: string; email: string; empresa: string };
+    aceptaContrato: boolean;
+    aceptaDatos: boolean;
+    nombreFirmante: string;
+    firmaImagenBase64: string;
+  }) => {
     const monto = moneda === "USD" ? Math.round(totalSeisMeses.cop / trm) : totalSeisMeses.cop;
     const res = await fetch("/api/plan-checkout", {
       method: "POST",
@@ -162,6 +140,8 @@ function PlanDetalleTarjeta({
         monto,
         aceptaContrato,
         aceptaDatos,
+        nombreFirmante,
+        firmaImagenBase64,
         snapshot: {
           nombre: plan.nombre,
           totalSeisMeses,
@@ -170,24 +150,34 @@ function PlanDetalleTarjeta({
         },
       }),
     });
-    setEnviando(false);
     if (!res.ok) {
-      ventanaWhatsApp?.close();
-      setError("No se pudo enviar. Intenta de nuevo.");
-      return;
+      const data = await res.json().catch(() => null);
+      return { ok: false, error: data?.error };
     }
-    const lineasExtras = extrasSeleccionados.map(
-      (e) => `+ ${e.nombre}: ${formatCopEnMoneda(e.precioCop, moneda, trm)}${e.periodicidad === "mensual" ? " /mes" : ""}`,
-    );
-    const mensaje = `¡Hola! 👋 Quiero comprar el Plan ${plan.nombre} (${formatCopEnMoneda(totalSeisMeses.cop, moneda, trm)} por ${DURACION_MINIMA_MESES} meses).${lineasExtras.length ? `\n\nTambién quiero sumar:\n${lineasExtras.join("\n")}\n\nTotal aproximado, lo confirmamos por aquí.` : ""} Mi nombre es ${contacto.nombre}.`;
-    const urlWhatsApp = linkWhatsApp(contacto.whatsapp || WHATSAPP_BIWOV, mensaje);
-    if (ventanaWhatsApp) {
-      ventanaWhatsApp.location.href = urlWhatsApp;
-    } else {
-      window.open(urlWhatsApp, "_blank");
-    }
-    setEnviado(true);
+    return { ok: true };
   };
+
+  const lineasExtras = extrasSeleccionados.map(
+    (e) => `+ ${e.nombre}: ${formatCopEnMoneda(e.precioCop, moneda, trm)}${e.periodicidad === "mensual" ? " /mes" : ""}`,
+  );
+  const mensajeWhatsApp = `¡Hola! 👋 Quiero comprar el Plan ${plan.nombre} (${formatCopEnMoneda(totalSeisMeses.cop, moneda, trm)} por ${DURACION_MINIMA_MESES} meses).${lineasExtras.length ? `\n\nTambién quiero sumar:\n${lineasExtras.join("\n")}\n\nTotal aproximado, lo confirmamos por aquí.` : ""} Ya firmé y confirmé desde el sitio.`;
+
+  const itemsPropuesta: ItemPropuesta[] = [
+    {
+      nombre: `Plan ${plan.nombre}`,
+      descripcion: plan.paraQuien,
+      incluye: plan.incluye.flatMap((i) => [i.label, ...(i.subitems ?? [])]),
+      precio: `${formatCopEnMoneda(plan.precioDesde.cop, moneda, trm)} al mes`,
+    },
+    ...extrasSeleccionados.map((e) => ({
+      nombre: e.nombre,
+      descripcion: e.descripcion,
+      incluye: e.incluye,
+      noIncluye: e.noIncluye,
+      precio: formatCopEnMoneda(e.precioCop, moneda, trm),
+      periodicidad: e.periodicidad,
+    })),
+  ];
 
   return (
     <motion.div
@@ -196,224 +186,102 @@ function PlanDetalleTarjeta({
       exit={{ opacity: 0, y: 20, scale: 0.98 }}
       className="scrollbar-none max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-border-glass bg-[#0c1119] p-6 md:p-8"
     >
-      <div className="hidden print:mb-6 print:block">
-        <span className="font-logo text-2xl font-bold">biwov_</span>
-        <p className="mt-0.5 text-xs text-[#4b5563]">Agencia de Marketing Digital</p>
-        <div className="mt-3 h-1 w-full rounded-full bg-gradient-to-r from-[#1d4772] to-[#3d98cc]" />
-      </div>
+      <div className="print:hidden">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <span className="text-xs font-semibold uppercase tracking-wide text-accent">
+              Plan {plan.nombre}
+            </span>
+            <h2 className="mt-1 text-2xl font-semibold text-white">{plan.claim}</h2>
+          </div>
+          <button type="button" onClick={cerrar} aria-label="Cerrar" className="text-text-secondary hover:text-white">
+            <X size={22} />
+          </button>
+        </div>
 
-      <div className="flex items-start justify-between gap-4">
-              <div>
-                <span className="text-xs font-semibold uppercase tracking-wide text-accent">
-                  Plan {plan.nombre}
-                </span>
-                <h2 className="mt-1 text-2xl font-semibold text-white">{plan.claim}</h2>
-              </div>
-              <button
-                type="button"
-                onClick={cerrar}
-                aria-label="Cerrar"
-                className="print:hidden text-text-secondary hover:text-white"
-              >
-                <X size={22} />
-              </button>
-            </div>
+        <p className="mt-4 text-sm leading-relaxed text-text-secondary">{plan.paraQuien}</p>
 
-            <p className="mt-4 text-sm leading-relaxed text-text-secondary">{plan.paraQuien}</p>
+        <p className="mt-6 text-xs font-semibold uppercase tracking-wide text-text-secondary">Qué incluye</p>
+        <ul className="mt-3 space-y-2">
+          {plan.incluye.map((item) => (
+            <FilaIncluye key={item.label} item={item} />
+          ))}
+        </ul>
 
-            <p className="mt-6 text-xs font-semibold uppercase tracking-wide text-text-secondary">
-              Qué incluye
+        <div className="mt-6 rounded-2xl border border-border-glass bg-white/[0.02] p-5">
+          <p className="text-base font-semibold text-white">
+            {formatCopEnMoneda(plan.precioDesde.cop, moneda, trm)} al mes
+          </p>
+          <p className="mt-1 text-xs text-text-secondary">
+            + montaje inicial de {formatCopEnMoneda(plan.montajeInicial.cop, moneda, trm)}
+          </p>
+          <p className="mt-1 text-xs text-text-secondary">
+            La inversión en pauta publicitaria (lo que le pagas directamente a Meta) va aparte; la
+            definimos juntos según tu negocio.
+          </p>
+
+          <div className="mt-4 border-t border-border-glass pt-4">
+            <p className="text-xs text-text-secondary">
+              Nuestros planes tienen un compromiso mínimo de {DURACION_MINIMA_MESES} meses: es el
+              tiempo real que toma ver resultados.
             </p>
-            <ul className="mt-3 space-y-2">
-              {plan.incluye.map((item) => (
-                <FilaIncluye key={item.label} item={item} />
-              ))}
-            </ul>
+            <p className="mt-2 text-xs text-text-secondary">
+              ¿Prefieres diferir el montaje inicial? Puedes pagarlo en 2 cuotas iguales de{" "}
+              {formatCopEnMoneda(cuotaMontaje.cop, moneda, trm)}, sin recargo: una al iniciar y otra al segundo mes.
+            </p>
+          </div>
+        </div>
 
-            <div className="mt-6 rounded-2xl border border-border-glass bg-white/[0.02] p-5">
-              <p className="text-base font-semibold text-white">
-                {formatCopEnMoneda(plan.precioDesde.cop, moneda, trm)} al mes
-              </p>
-              <p className="mt-1 text-xs text-text-secondary">
-                + montaje inicial de {formatCopEnMoneda(plan.montajeInicial.cop, moneda, trm)}
-              </p>
-              <p className="mt-1 text-xs text-text-secondary">
-                La inversión en pauta publicitaria (lo que le pagas directamente a Meta) va aparte; la
-                definimos juntos según tu negocio.
-              </p>
+        <div className="mt-6">
+          <SelectorExtras
+            moneda={moneda}
+            trm={trm}
+            seleccionados={extras}
+            onToggle={toggleExtra}
+            titulo="¿Quieres sumar algo más a tu plan? (opcional)"
+          />
+        </div>
 
-              <div className="mt-4 border-t border-border-glass pt-4">
-                <p className="text-xs text-text-secondary">
-                  Nuestros planes tienen un compromiso mínimo de {DURACION_MINIMA_MESES} meses: es el
-                  tiempo real que toma ver resultados.
-                </p>
-                <p className="mt-2 text-xs text-text-secondary">
-                  ¿Prefieres diferir el montaje inicial? Puedes pagarlo en 2 cuotas iguales de{" "}
-                  {formatCopEnMoneda(cuotaMontaje.cop, moneda, trm)}, sin recargo: una al iniciar y otra al segundo mes.
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <SelectorExtras
-                moneda={moneda}
-                trm={trm}
-                seleccionados={extras}
-                onToggle={toggleExtra}
-                titulo="¿Quieres sumar algo más a tu plan? (opcional)"
-              />
-            </div>
-
-            <div className="mt-6 border-t border-border-glass pt-5 print:hidden">
-              {enviado ? (
-                <div className="rounded-2xl border border-accent/30 bg-accent/5 p-5 text-center">
-                  <p className="text-2xl">✅</p>
-                  <p className="mt-2 text-sm text-white">
-                    ¡Gracias, {contacto.nombre.split(" ")[0]}! Te abrimos WhatsApp para coordinar el
-                    pago. Si no se abrió, dale clic aquí abajo.
-                  </p>
-                  <a
-                    href={linkWhatsApp(
-                      contacto.whatsapp || WHATSAPP_BIWOV,
-                      `¡Hola! 👋 Quiero comprar el Plan ${plan.nombre}. Mi nombre es ${contacto.nombre}.`,
-                    )}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-4 block"
-                  >
-                    <Button size="lg" className="w-full">
-                      Abrir WhatsApp
-                    </Button>
-                  </a>
-                </div>
-              ) : plan.linkPago ? (
-                <a href={plan.linkPago} target="_blank" rel="noopener noreferrer" className="block">
-                  <Button size="lg" className="w-full">
-                    Comprar ahora
-                  </Button>
-                </a>
-              ) : !mostrarCompra ? (
-                <Button size="lg" className="w-full" onClick={() => setMostrarCompra(true)}>
-                  Comprar ahora
-                </Button>
-              ) : (
-                <div className="space-y-3">
-                  <p className="text-sm text-text-secondary">
-                    Déjanos tus datos y te escribimos por WhatsApp para coordinar el pago y arrancar.
-                  </p>
-                  <div>
-                    <Label htmlFor="compra-nombre">Nombre completo</Label>
-                    <Input
-                      id="compra-nombre"
-                      value={contacto.nombre}
-                      onChange={(e) => setContacto({ ...contacto, nombre: e.target.value })}
-                      autoComplete="name"
-                    />
-                  </div>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <div>
-                      <Label htmlFor="compra-whatsapp">WhatsApp</Label>
-                      <Input
-                        id="compra-whatsapp"
-                        value={contacto.whatsapp}
-                        onChange={(e) => setContacto({ ...contacto, whatsapp: e.target.value })}
-                        autoComplete="tel"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="compra-email">Correo</Label>
-                      <Input
-                        id="compra-email"
-                        type="email"
-                        value={contacto.email}
-                        onChange={(e) => setContacto({ ...contacto, email: e.target.value })}
-                        autoComplete="email"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <Label htmlFor="compra-empresa">Empresa (opcional)</Label>
-                    <Input
-                      id="compra-empresa"
-                      value={contacto.empresa}
-                      onChange={(e) => setContacto({ ...contacto, empresa: e.target.value })}
-                      autoComplete="organization"
-                    />
-                  </div>
-
-                  <label className="flex items-start gap-2.5 text-xs text-text-secondary">
-                    <input
-                      type="checkbox"
-                      checked={aceptaContrato}
-                      onChange={(e) => setAceptaContrato(e.target.checked)}
-                      className="mt-0.5 h-4 w-4 shrink-0 accent-accent"
-                    />
-                    <span>
-                      Acepto el{" "}
-                      <Link href="/contrato" target="_blank" className="text-accent underline hover:text-white">
-                        contrato y los términos y condiciones
-                      </Link>{" "}
-                      de este plan.
-                    </span>
-                  </label>
-                  <label className="flex items-start gap-2.5 text-xs text-text-secondary">
-                    <input
-                      type="checkbox"
-                      checked={aceptaDatos}
-                      onChange={(e) => setAceptaDatos(e.target.checked)}
-                      className="mt-0.5 h-4 w-4 shrink-0 accent-accent"
-                    />
-                    <span>
-                      Autorizo el tratamiento de mis datos personales según la{" "}
-                      <Link
-                        href="/politica-datos"
-                        target="_blank"
-                        className="text-accent underline hover:text-white"
-                      >
-                        política de datos
-                      </Link>
-                      .
-                    </span>
-                  </label>
-
-                  {error && <p className="text-sm text-red-400">{error}</p>}
-                  <Button
-                    size="lg"
-                    className="w-full"
-                    onClick={comprar}
-                    disabled={enviando || !aceptaContrato || !aceptaDatos}
-                  >
-                    {enviando ? "Enviando..." : "Confirmar compra"}
-                  </Button>
-                </div>
-              )}
-            </div>
-
-            <div className="mt-6 space-y-2 border-t border-border-glass pt-5 text-xs text-text-secondary">
-              <p>
-                Este plan incluye tu plan de trabajo y queda sujeto a nuestros{" "}
-                <Link href="/contrato" target="_blank" className="text-accent underline hover:text-white">
-                  términos y condiciones
-                </Link>{" "}
-                y{" "}
-                <Link href="/politica-datos" target="_blank" className="text-accent underline hover:text-white">
-                  política de datos
-                </Link>
-                . Te lo enviamos para firma digital cuando confirmes el plan.
-              </p>
-              <p>
-                Las herramientas y plataformas (WhatsApp Business, Meta Ads, CRM, etc.) las paga
-                directamente el cliente.
-              </p>
-            </div>
-
+        <div className="mt-6 border-t border-border-glass pt-5">
+          {!mostrarCompra ? (
             <button
               type="button"
-              onClick={() => window.print()}
-              className="mt-5 flex w-full items-center justify-center gap-2 rounded-full border border-border-glass py-2.5 text-xs font-medium text-text-secondary transition-colors hover:border-accent/40 hover:text-white print:hidden"
+              onClick={() => setMostrarCompra(true)}
+              className="w-full rounded-full bg-gradient-brand px-7 py-3.5 text-base font-medium text-white shadow-[0_0_30px_-5px_rgba(50,153,204,0.6)] transition-all hover:shadow-[0_0_45px_-5px_rgba(50,153,204,0.85)]"
             >
-              <Printer size={14} /> Descargar esta propuesta en PDF
+              Comprar ahora
             </button>
+          ) : (
+            <CompraFormulario
+              tiposContrato={Array.from(new Set(["plan", ...extrasSeleccionados.map((e) => e.tipoContrato)]))}
+              nombreItem={`Plan ${plan.nombre}`}
+              montoFormateado={formatCopEnMoneda(totalSeisMeses.cop + totalExtrasCop, moneda, trm)}
+              mensajeWhatsApp={mensajeWhatsApp}
+              onConfirmar={confirmar}
+            />
+          )}
+        </div>
+      </div>
+
+      <div className="hidden print:block">
+        <PropuestaImprimible
+          titulo={`Plan ${plan.nombre}`}
+          subtitulo={plan.claim}
+          items={itemsPropuesta}
+          totales={[
+            { label: `Plan ${plan.nombre} (${DURACION_MINIMA_MESES} meses)`, valor: formatCopEnMoneda(totalSeisMeses.cop, moneda, trm) },
+            ...(extrasSeleccionados.length
+              ? [{ label: "Extras seleccionados", valor: formatCopEnMoneda(totalExtrasCop, moneda, trm) }]
+              : []),
+          ]}
+          formasPago={[
+            "Montaje inicial en 1 o 2 cuotas iguales (sin recargo)",
+            "Mensualidad del plan, mes a mes",
+            "Transferencia o PSE, se coordina por WhatsApp",
+          ]}
+          validez={`Compromiso mínimo de ${DURACION_MINIMA_MESES} meses.`}
+        />
+      </div>
     </motion.div>
   );
 }

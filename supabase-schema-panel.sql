@@ -791,3 +791,42 @@ where not exists (
   select 1 from mensajes_plantilla
   where titulo = 'Flujo de cierre tras enviar la propuesta (habla con los socios)'
 );
+
+-- =========================================================
+-- COMPRAS DE ÍTEMS SUELTOS / COMBOS Y FIRMA DIGITAL
+-- plan_compras pasa de ser "solo planes" a cualquier compra del sitio
+-- (plan completo, un tier/paquete suelto, o un combo de varios).
+-- contratos_firmados guarda la firma electrónica simple (Ley 527/1999):
+-- nombre, imagen de la firma, IP, user-agent y versión exacta del
+-- contrato aceptado, ligada a la fila de plan_compras correspondiente.
+-- =========================================================
+alter table plan_compras alter column plan_id drop not null;
+alter table plan_compras add column if not exists tipo text not null default 'plan' check (tipo in ('plan','item','combo'));
+alter table plan_compras add column if not exists item_id text;
+alter table plan_compras add column if not exists item_nombre text;
+
+create table if not exists contratos_firmados (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+
+  referencia_tipo text not null check (referencia_tipo in ('plan_compra','item_compra')),
+  referencia_id uuid,
+
+  tipo_contrato text not null,
+  version_contrato text not null,
+  nombre_firmante text not null,
+  firma_imagen text not null,
+
+  email text,
+  whatsapp text,
+  ip text,
+  user_agent text
+);
+
+create index if not exists idx_contratos_firmados_referencia on contratos_firmados(referencia_id);
+
+alter table contratos_firmados enable row level security;
+
+drop policy if exists "equipo autenticado - todo" on contratos_firmados;
+create policy "equipo autenticado - todo" on contratos_firmados
+  for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');

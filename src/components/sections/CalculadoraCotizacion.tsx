@@ -26,7 +26,7 @@ export function CalculadoraCotizacion() {
   const totalMensual = seleccionados.filter((e) => e.periodicidad === "mensual").reduce((acc, e) => acc + e.precioCop, 0);
 
   return (
-    <section id="calculadora" className="bg-bg-light py-16 md:py-24">
+    <section id="calculadora" className="print-host bg-bg-light py-16 md:py-24">
       <Container>
         <SectionHeading
           variant="light"

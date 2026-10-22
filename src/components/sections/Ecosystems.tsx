@@ -21,7 +21,7 @@ export function Ecosystems() {
   const { trm } = useTRM();
 
   return (
-    <section id="planes" className="bg-bg-light py-16 md:py-24">
+    <section id="planes" className="print-host bg-bg-light py-16 md:py-24">
       <Container>
         <div className="planes-contenido-principal">
         <SectionHeading
@@ -126,7 +126,7 @@ export function Ecosystems() {
 
         <Complementos moneda={moneda} trm={trm} />
 
-        <p className="mx-auto mt-10 max-w-2xl text-center text-xs text-text-on-light-secondary">
+        <p className="mx-auto mt-10 max-w-2xl text-center text-xs text-text-on-light-secondary print:hidden">
           Valores netos. Si el cliente es agente retenedor, la retención en la fuente se asume
           sobre el valor pactado.
         </p>

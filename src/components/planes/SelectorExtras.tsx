@@ -35,7 +35,7 @@ export function SelectorExtras({
   return (
     <div>
       {titulo && <p className="text-xs font-semibold uppercase tracking-wide text-text-secondary">{titulo}</p>}
-      <div className="mt-3 grid gap-4 sm:grid-cols-2">
+      <div className="mt-3 grid gap-4">
         {CATEGORIAS.map((categoria) => {
           const Icono = ICONOS[categoria];
           const items = EXTRAS_COTIZABLES.filter((e) => e.categoria === categoria);

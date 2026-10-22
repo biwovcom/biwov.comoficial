@@ -1,8 +1,23 @@
 import { PRODUCCION_CONTENIDO, NIVELES_PRODUCCION, PRODUCCION_VIDEO } from "@/data/addOns";
+import { EXTRAS_COTIZABLES, type ExtraCotizable } from "@/data/extrasCotizables";
 import { formatCopEnMoneda, type Moneda } from "@/lib/moneda";
 import { cn } from "@/lib/utils";
 
-export function ProduccionContenidoDetalle({ moneda, trm }: { moneda: Moneda; trm: number }) {
+function buscarExtra(id: string): ExtraCotizable {
+  const extra = EXTRAS_COTIZABLES.find((e) => e.id === id);
+  if (!extra) throw new Error(`Extra cotizable no encontrado: ${id}`);
+  return extra;
+}
+
+export function ProduccionContenidoDetalle({
+  moneda,
+  trm,
+  onAdquirir,
+}: {
+  moneda: Moneda;
+  trm: number;
+  onAdquirir: (item: ExtraCotizable) => void;
+}) {
   return (
     <div className="space-y-6">
       <p className="text-sm text-text-secondary">{PRODUCCION_CONTENIDO.descripcion}</p>
@@ -43,7 +58,7 @@ export function ProduccionContenidoDetalle({ moneda, trm }: { moneda: Moneda; tr
           <div
             key={nivel.id}
             className={cn(
-              "rounded-2xl border p-4",
+              "flex flex-col rounded-2xl border p-4",
               nivel.id === "professional"
                 ? "border-accent/50 bg-accent/5"
                 : "border-border-glass bg-white/[0.02]",
@@ -95,6 +110,14 @@ export function ProduccionContenidoDetalle({ moneda, trm }: { moneda: Moneda; tr
                 B-Roll (videos de apoyo, no la toma principal): <span className="text-white/90">{nivel.clipsBRoll}</span>
               </p>
             </div>
+
+            <button
+              type="button"
+              onClick={() => onAdquirir(buscarExtra(`produccion-${nivel.id}`))}
+              className="mt-4 rounded-full bg-gradient-brand px-3 py-2 text-xs font-medium text-white transition-all hover:shadow-[0_0_20px_-5px_rgba(50,153,204,0.7)]"
+            >
+              Adquirir {nivel.nombre}
+            </button>
           </div>
         ))}
       </div>
@@ -126,7 +149,7 @@ export function ProduccionContenidoDetalle({ moneda, trm }: { moneda: Moneda; tr
 
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           {PRODUCCION_VIDEO.paquetes.map((paquete) => (
-            <div key={paquete.id} className="rounded-2xl border border-border-glass bg-white/[0.02] p-4">
+            <div key={paquete.id} className="flex flex-col rounded-2xl border border-border-glass bg-white/[0.02] p-4">
               <p className="text-sm font-semibold text-white">
                 {paquete.cantidadVideos} video{paquete.cantidadVideos === 1 ? "" : "s"}
                 {paquete.esMensual && " / mes"}
@@ -134,6 +157,13 @@ export function ProduccionContenidoDetalle({ moneda, trm }: { moneda: Moneda; tr
               <p className="mt-0.5 text-base font-bold text-accent">
                 {formatCopEnMoneda(paquete.precio, moneda, trm)}
               </p>
+              <button
+                type="button"
+                onClick={() => onAdquirir(buscarExtra(`video-${paquete.id}`))}
+                className="mt-3 rounded-full bg-gradient-brand px-3 py-2 text-xs font-medium text-white transition-all hover:shadow-[0_0_20px_-5px_rgba(50,153,204,0.7)]"
+              >
+                Adquirir
+              </button>
             </div>
           ))}
         </div>

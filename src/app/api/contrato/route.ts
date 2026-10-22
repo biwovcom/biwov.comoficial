@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     email: body.email ?? null,
     empresa: body.empresa ?? null,
     whatsapp: body.whatsapp ?? null,
-    version_contrato: VERSION_CONTRATO,
+    version_contrato: VERSION_CONTRATO.plan,
     accepted_at: acceptedAt,
   };
 
@@ -23,5 +23,5 @@ export async function POST(request: Request) {
     await supabase.from("contract_acceptances").insert(registro);
   }
 
-  return NextResponse.json({ ok: true, acceptedAt, version: VERSION_CONTRATO });
+  return NextResponse.json({ ok: true, acceptedAt, version: VERSION_CONTRATO.plan });
 }

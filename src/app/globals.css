@@ -110,131 +110,51 @@ body {
   animation: pulse-glow 2.2s ease-in-out infinite;
 }
 
-/* Descarga en PDF de la propuesta de un plan (modal de Planes): al
-   imprimir, se recorta el árbol hasta el modal (body > main > sección >
-   modal) en vez de solo ocultar con visibility, para que no quede el resto
-   de la página en blanco/negro debajo. */
+/* Descarga en PDF de cualquier propuesta/cotización (planes, complementos,
+   ítems sueltos, cotización combinada): se recorta el árbol hasta el modal
+   (body > main > sección anfitriona > modal) para que no quede el resto de
+   la página en blanco/negro debajo. El contenido imprimible en sí
+   (PropuestaImprimible / ReciboFirmado) ya trae sus propios colores claros
+   — aquí solo se oculta todo lo demás y se limpia el contenedor del modal. */
 @media print {
+  @page {
+    size: A4;
+    margin: 16mm;
+  }
   body {
     background: #ffffff !important;
   }
-  body:has(#plan-modal-overlay) > *:not(#plan-modal-overlay):not(:has(#plan-modal-overlay)) {
+  body:has(.print-overlay) > *:not(.print-overlay):not(:has(.print-overlay)) {
     display: none !important;
   }
-  main:has(#plan-modal-overlay) > *:not(#plan-modal-overlay):not(:has(#plan-modal-overlay)) {
+  main:has(.print-overlay) > *:not(.print-overlay):not(:has(.print-overlay)) {
     display: none !important;
   }
-  #planes:has(#plan-modal-overlay) > *:not(#plan-modal-overlay):not(:has(#plan-modal-overlay)) {
+  .print-host:has(.print-overlay) > *:not(.print-overlay):not(:has(.print-overlay)) {
     display: none !important;
   }
-  #planes {
+  .print-host:has(.print-overlay) {
     padding: 0 !important;
     background: #ffffff !important;
   }
-  #plan-modal-overlay {
+  /* Los complementos y la calculadora viven dentro de la sección de Planes
+     (#planes): al imprimir uno de sus modales, también se oculta el resto
+     del contenido de Planes (encabezado, selector de moneda, tarjetas). */
+  body:has(.print-overlay) .planes-contenido-principal {
+    display: none !important;
+  }
+  .print-overlay {
     position: static !important;
     background: #ffffff !important;
     backdrop-filter: none !important;
     padding: 0 !important;
   }
-  #plan-modal-overlay > div {
+  .print-overlay > div {
     max-height: none !important;
     overflow: visible !important;
     background: #ffffff !important;
     border: none !important;
     box-shadow: none !important;
-    color: #111827 !important;
-    font-family: var(--font-montserrat), ui-sans-serif, sans-serif !important;
-  }
-  #plan-modal-overlay h2,
-  #plan-modal-overlay h3,
-  #plan-modal-overlay p,
-  #plan-modal-overlay span,
-  #plan-modal-overlay li {
-    color: #111827 !important;
-  }
-  /* Marca biwov_: azul claro del logo para resaltar, azul oscuro para
-     títulos, y la tipografía del logo solo para la palabra "biwov". */
-  #plan-modal-overlay h2 {
-    color: #1d4772 !important;
-  }
-  #plan-modal-overlay [class*="text-accent"] {
-    color: #3d98cc !important;
-  }
-  #plan-modal-overlay .font-logo {
-    font-family: var(--font-museo), cursive !important;
-    color: #1d4772 !important;
-  }
-  #plan-modal-overlay [class*="text-secondary"] {
-    color: #4b5563 !important;
-  }
-  #plan-modal-overlay [class*="border-"] {
-    border-color: #d1d5db !important;
-  }
-}
-
-/* Lo mismo, para la descarga en PDF de los complementos (Producción de
-   contenido, Páginas adicionales, etc.) desde la sección "¿Necesitas algo
-   más?". */
-@media print {
-  body:has(#complemento-modal-overlay) > *:not(#complemento-modal-overlay):not(:has(#complemento-modal-overlay)) {
-    display: none !important;
-  }
-  main:has(#complemento-modal-overlay) > *:not(#complemento-modal-overlay):not(:has(#complemento-modal-overlay)) {
-    display: none !important;
-  }
-  #complementos-section:has(#complemento-modal-overlay) > *:not(#complemento-modal-overlay):not(:has(#complemento-modal-overlay)) {
-    display: none !important;
-  }
-  #complementos-section {
-    padding: 0 !important;
-    background: #ffffff !important;
-  }
-  /* Los complementos ahora viven dentro de la sección de Planes (#planes):
-     hay que ocultar también el resto del contenido de Planes (encabezado,
-     selector de moneda, tarjetas de planes) cuando se imprime un complemento. */
-  body:has(#complemento-modal-overlay) .planes-contenido-principal {
-    display: none !important;
-  }
-  #complemento-modal-overlay {
-    position: static !important;
-    background: #ffffff !important;
-    backdrop-filter: none !important;
-    padding: 0 !important;
-  }
-  #complemento-modal-overlay > div {
-    max-height: none !important;
-    overflow: visible !important;
-    background: #ffffff !important;
-    border: none !important;
-    box-shadow: none !important;
-    color: #111827 !important;
-    font-family: var(--font-montserrat), ui-sans-serif, sans-serif !important;
-  }
-  #complemento-modal-overlay h2,
-  #complemento-modal-overlay h3,
-  #complemento-modal-overlay p,
-  #complemento-modal-overlay span,
-  #complemento-modal-overlay li,
-  #complemento-modal-overlay dt,
-  #complemento-modal-overlay dd {
-    color: #111827 !important;
-  }
-  #complemento-modal-overlay h2 {
-    color: #1d4772 !important;
-  }
-  #complemento-modal-overlay [class*="text-accent"] {
-    color: #3d98cc !important;
-  }
-  #complemento-modal-overlay .font-logo {
-    font-family: var(--font-museo), cursive !important;
-    color: #1d4772 !important;
-  }
-  #complemento-modal-overlay [class*="text-secondary"] {
-    color: #4b5563 !important;
-  }
-  #complemento-modal-overlay [class*="border-"] {
-    border-color: #d1d5db !important;
   }
 }
 

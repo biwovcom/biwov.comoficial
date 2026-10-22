@@ -6,7 +6,9 @@ import { PLANES } from "@/data/planes";
 interface PlanCompra {
   id: string;
   created_at: string;
-  plan_id: string;
+  tipo: "plan" | "item" | "combo";
+  plan_id: string | null;
+  item_nombre: string | null;
   nombre: string;
   email: string | null;
   whatsapp: string | null;
@@ -21,11 +23,24 @@ function nombrePlan(planId: string): string {
   return PLANES.find((p) => p.id === planId)?.nombre ?? planId;
 }
 
+function descripcionCompra(c: PlanCompra): string {
+  if (c.tipo === "plan") return c.plan_id ? nombrePlan(c.plan_id) : "—";
+  return c.item_nombre ?? "—";
+}
+
+const ETIQUETA_TIPO: Record<PlanCompra["tipo"], string> = {
+  plan: "Plan",
+  item: "Ítem suelto",
+  combo: "Combo",
+};
+
 export default async function ComprasPage() {
   const supabase = await createSupabaseServerClient();
   const { data: compras } = await supabase
     .from("plan_compras")
-    .select("id, created_at, plan_id, nombre, email, whatsapp, empresa, moneda, monto, acepta_contrato, acepta_datos")
+    .select(
+      "id, created_at, tipo, plan_id, item_nombre, nombre, email, whatsapp, empresa, moneda, monto, acepta_contrato, acepta_datos",
+    )
     .order("created_at", { ascending: false })
     .returns<PlanCompra[]>();
 
@@ -45,7 +60,8 @@ export default async function ComprasPage() {
             <Th>Nombre</Th>
             <Th>Empresa</Th>
             <Th>Contacto</Th>
-            <Th>Plan</Th>
+            <Th>Tipo</Th>
+            <Th>Plan / ítem</Th>
             <Th>Monto</Th>
             <Th>Contrato</Th>
             <Th>Datos</Th>
@@ -53,7 +69,7 @@ export default async function ComprasPage() {
           <TableBody>
             {(!compras || compras.length === 0) && (
               <Tr>
-                <Td colSpan={8} className="py-8 text-center text-text-secondary">
+                <Td colSpan={9} className="py-8 text-center text-text-secondary">
                   Todavía no hay compras registradas.
                 </Td>
               </Tr>
@@ -64,7 +80,8 @@ export default async function ComprasPage() {
                 <Td className="text-white">{c.nombre}</Td>
                 <Td>{c.empresa ?? "—"}</Td>
                 <Td>{c.whatsapp ?? c.email ?? "—"}</Td>
-                <Td>{nombrePlan(c.plan_id)}</Td>
+                <Td>{ETIQUETA_TIPO[c.tipo]}</Td>
+                <Td>{descripcionCompra(c)}</Td>
                 <Td>
                   {c.moneda === "USD" ? "US$" : "$"}
                   {Math.round(c.monto).toLocaleString(c.moneda === "USD" ? "en-US" : "es-CO")}{" "}

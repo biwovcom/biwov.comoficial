@@ -3,34 +3,89 @@
 import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { COMPLEMENTOS } from "@/data/complementos";
+import { EXTRAS_COTIZABLES, type ExtraCotizable } from "@/data/extrasCotizables";
 import { ProduccionContenidoDetalle } from "./ProduccionContenidoDetalle";
 import { ComplementoPdfModal } from "./ComplementoPdfModal";
 import { Button } from "@/components/ui/Button";
-import { linkWhatsApp } from "@/lib/panel/whatsapp";
-import { WHATSAPP_BIWOV } from "@/lib/contacto";
+import { CompraItemModal } from "@/components/compras/CompraItemModal";
+import { PropuestaImprimible, type ItemPropuesta } from "@/components/propuestas/PropuestaImprimible";
 import { formatCopEnMoneda, type Moneda } from "@/lib/moneda";
+
+function itemsPropuestaParaComplemento(
+  item: (typeof COMPLEMENTOS)[number],
+  moneda: Moneda,
+  trm: number,
+): ItemPropuesta[] {
+  if (item.tipo === "produccion") {
+    return EXTRAS_COTIZABLES.filter(
+      (e) => e.categoria === "Producción de contenido" || e.categoria === "Grabación y edición de video",
+    ).map((e) => ({
+      nombre: e.nombre,
+      descripcion: e.descripcion,
+      incluye: e.incluye,
+      noIncluye: e.noIncluye,
+      precio: formatCopEnMoneda(e.precioCop, moneda, trm),
+      periodicidad: e.periodicidad,
+    }));
+  }
+  const prefijo =
+    item.titulo === "Páginas web y sitios web adicionales"
+      ? "web"
+      : item.titulo === "Campaña publicitaria en Meta"
+        ? "meta"
+        : null;
+  return (item.items ?? []).map((it) => {
+    const extra = prefijo ? EXTRAS_COTIZABLES.find((e) => e.id === `${prefijo}-${it.label}`) : undefined;
+    return {
+      nombre: it.label,
+      descripcion: extra?.descripcion,
+      incluye: extra?.incluye,
+      noIncluye: extra?.noIncluye,
+      precio: extra
+        ? formatCopEnMoneda(extra.precioCop, moneda, trm) + (extra.periodicidad === "mensual" ? " /mes" : "")
+        : (it.precio ?? "Incluido"),
+    };
+  });
+}
 
 function DetalleComplemento({
   item,
   moneda,
   trm,
+  onAdquirir,
 }: {
   item: (typeof COMPLEMENTOS)[number];
   moneda: Moneda;
   trm: number;
+  onAdquirir: (extra: ExtraCotizable) => void;
 }) {
   if (item.tipo === "produccion") {
-    return <ProduccionContenidoDetalle moneda={moneda} trm={trm} />;
+    return <ProduccionContenidoDetalle moneda={moneda} trm={trm} onAdquirir={onAdquirir} />;
   }
+
+  const prefijo = item.titulo === "Páginas web y sitios web adicionales" ? "web" : "meta";
+
   return (
     <>
       <ul className="space-y-3">
         {item.items!.map((it) => {
           const precio = it.precioCop !== undefined ? formatCopEnMoneda(it.precioCop, moneda, trm) : it.precio;
+          const extra = EXTRAS_COTIZABLES.find((e) => e.id === `${prefijo}-${it.label}`);
           return (
-            <li key={it.label} className="text-sm">
-              <p className="text-white/90">{it.label}</p>
-              {precio && <p className="mt-0.5 text-xs font-medium text-accent">{precio}</p>}
+            <li key={it.label} className="flex items-start justify-between gap-3 text-sm">
+              <div>
+                <p className="text-white/90">{it.label}</p>
+                {precio && <p className="mt-0.5 text-xs font-medium text-accent">{precio}</p>}
+              </div>
+              {extra && (
+                <button
+                  type="button"
+                  onClick={() => onAdquirir(extra)}
+                  className="shrink-0 rounded-full bg-gradient-brand px-3 py-1.5 text-xs font-medium whitespace-nowrap text-white transition-all hover:shadow-[0_0_20px_-5px_rgba(50,153,204,0.7)]"
+                >
+                  Adquirir
+                </button>
+              )}
             </li>
           );
         })}
@@ -40,26 +95,12 @@ function DetalleComplemento({
   );
 }
 
-function BotonAccion({ item }: { item: (typeof COMPLEMENTOS)[number] }) {
-  if (item.linkAgendar) {
-    return (
-      <a href={item.linkAgendar} target="_blank" rel="noopener noreferrer" className="flex-1">
-        <Button variant="primary" className="w-full !px-3 !py-2 !text-xs whitespace-nowrap">
-          {item.textoBotonAgendar ?? "Agendar"}
-        </Button>
-      </a>
-    );
-  }
-  const mensaje = `¡Hola! 👋 Quiero adquirir el complemento "${item.titulo}". Quisiera coordinar el pago.`;
+function BotonAgendar({ item }: { item: (typeof COMPLEMENTOS)[number] }) {
+  if (!item.linkAgendar) return null;
   return (
-    <a
-      href={linkWhatsApp(WHATSAPP_BIWOV, mensaje)}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex-1"
-    >
+    <a href={item.linkAgendar} target="_blank" rel="noopener noreferrer" className="flex-1">
       <Button variant="primary" className="w-full !px-3 !py-2 !text-xs whitespace-nowrap">
-        Adquirir
+        {item.textoBotonAgendar ?? "Agendar"}
       </Button>
     </a>
   );
@@ -67,6 +108,7 @@ function BotonAccion({ item }: { item: (typeof COMPLEMENTOS)[number] }) {
 
 export function Complementos({ moneda, trm }: { moneda: Moneda; trm: number }) {
   const [modalAbierto, setModalAbierto] = useState<string | null>(null);
+  const [itemCompra, setItemCompra] = useState<ExtraCotizable | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
 
   const itemModal = COMPLEMENTOS.find((c) => c.titulo === modalAbierto) ?? null;
@@ -76,7 +118,7 @@ export function Complementos({ moneda, trm }: { moneda: Moneda; trm: number }) {
   };
 
   return (
-    <div id="complementos-section" className="mt-16 border-t border-border-light pt-16">
+    <div id="complementos-section" className="print-host mt-16 border-t border-border-light pt-16">
       <div className="flex items-end justify-between gap-4">
         <div>
           <span className="inline-block rounded-full border border-border-light bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-accent">
@@ -126,7 +168,7 @@ export function Complementos({ moneda, trm }: { moneda: Moneda; trm: number }) {
               >
                 Más información
               </Button>
-              <BotonAccion item={item} />
+              <BotonAgendar item={item} />
             </div>
           </div>
         ))}
@@ -136,16 +178,30 @@ export function Complementos({ moneda, trm }: { moneda: Moneda; trm: number }) {
         titulo={itemModal?.titulo ?? ""}
         abierto={Boolean(itemModal)}
         onClose={() => setModalAbierto(null)}
+        propuesta={
+          itemModal && (
+            <PropuestaImprimible
+              titulo={itemModal.titulo}
+              subtitulo={itemModal.detalle}
+              items={itemsPropuestaParaComplemento(itemModal, moneda, trm)}
+              totales={[]}
+              formasPago={["50% anticipado, 50% contra entrega (servicios únicos)", "Pago mensual por adelantado (servicios recurrentes)"]}
+              validez="Escríbenos cuál de estas opciones te interesa para confirmarla."
+            />
+          )
+        }
       >
         {itemModal && (
           <>
-            <DetalleComplemento item={itemModal} moneda={moneda} trm={trm} />
-            <div className="mt-6 flex gap-2 print:hidden">
-              <BotonAccion item={itemModal} />
+            <DetalleComplemento item={itemModal} moneda={moneda} trm={trm} onAdquirir={setItemCompra} />
+            <div className="mt-6 flex gap-2">
+              <BotonAgendar item={itemModal} />
             </div>
           </>
         )}
       </ComplementoPdfModal>
+
+      <CompraItemModal item={itemCompra} moneda={moneda} trm={trm} onClose={() => setItemCompra(null)} />
     </div>
   );
 }
