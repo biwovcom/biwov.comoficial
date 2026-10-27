@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 
 const LINKS = [
   { href: "/#planes", label: "Planes" },
-  { href: "/#calculadora", label: "Calculadora" },
+  { href: "/#tienda", label: "Tienda" },
   { href: "/#como-funciona", label: "Cómo funciona" },
   { href: "/#casos", label: "Casos de éxito" },
   { href: "/#testimonios", label: "Testimonios" },

@@ -10,28 +10,43 @@ import { extraAItemPropuesta } from "@/lib/propuestas/itemPropuesta";
 
 export function CotizacionCombinadaModal({
   abierto,
-  extras,
+  carrito,
   moneda,
   trm,
   onClose,
 }: {
   abierto: boolean;
-  extras: string[];
+  carrito: Record<string, number>;
   moneda: Moneda;
   trm: number;
   onClose: () => void;
 }) {
-  const items = EXTRAS_COTIZABLES.filter((e) => extras.includes(e.id));
-  const totalUnico = items.filter((i) => i.periodicidad === "único").reduce((acc, i) => acc + i.precioCop, 0);
-  const totalMensual = items.filter((i) => i.periodicidad === "mensual").reduce((acc, i) => acc + i.precioCop, 0);
-  const tiposContrato = Array.from(new Set(items.map((i) => i.tipoContrato)));
+  const items = Object.entries(carrito)
+    .map(([id, cantidad]) => ({ item: EXTRAS_COTIZABLES.find((e) => e.id === id), cantidad }))
+    .filter((x): x is { item: (typeof EXTRAS_COTIZABLES)[number]; cantidad: number } => Boolean(x.item) && x.cantidad > 0);
+
+  const totalUnico = items
+    .filter((x) => x.item.periodicidad === "único")
+    .reduce((acc, x) => acc + x.item.precioCop * x.cantidad, 0);
+  const totalMensual = items
+    .filter((x) => x.item.periodicidad === "mensual")
+    .reduce((acc, x) => acc + x.item.precioCop * x.cantidad, 0);
+  const tiposContrato = Array.from(new Set(items.map((x) => x.item.tipoContrato)));
 
   const lineasWhatsApp = items.map(
-    (i) => `• ${i.nombre}: ${formatCopEnMoneda(i.precioCop, moneda, trm)}${i.periodicidad === "mensual" ? " /mes" : ""}`,
+    (x) =>
+      `• ${x.item.nombre} × ${x.cantidad}: ${formatCopEnMoneda(x.item.precioCop * x.cantidad, moneda, trm)}${x.item.periodicidad === "mensual" ? " /mes" : ""}`,
   );
-  const mensajeWhatsApp = `¡Hola! 👋 Quiero esta cotización combinada:\n\n${lineasWhatsApp.join("\n")}\n\nYa firmé y confirmé desde el sitio. Quisiera coordinar los detalles.`;
+  const mensajeWhatsApp = `¡Hola! 👋 Quiero esta cotización de mi carrito en la tienda:\n\n${lineasWhatsApp.join("\n")}\n\nYa firmé y confirmé desde el sitio. Quisiera coordinar los detalles.`;
 
-  const itemsPropuesta = items.map((i) => extraAItemPropuesta(i, moneda, trm));
+  const itemsPropuesta = items.map((x) => {
+    const base = extraAItemPropuesta(x.item, moneda, trm);
+    return {
+      ...base,
+      nombre: x.cantidad > 1 ? `${x.item.nombre} × ${x.cantidad}` : x.item.nombre,
+      precio: formatCopEnMoneda(x.item.precioCop * x.cantidad, moneda, trm),
+    };
+  });
 
   const montoFormateado = [
     totalUnico > 0 ? `${formatCopEnMoneda(totalUnico, moneda, trm)} único` : null,
@@ -59,7 +74,7 @@ export function CotizacionCombinadaModal({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         tipo: "combo",
-        itemNombre: items.map((i) => i.nombre).join(", "),
+        itemNombre: items.map((x) => `${x.item.nombre} x${x.cantidad}`).join(", "),
         ...contacto,
         moneda,
         monto: montoNumerico,
@@ -68,7 +83,7 @@ export function CotizacionCombinadaModal({
         tiposContrato,
         nombreFirmante,
         firmaImagenBase64,
-        snapshot: { items, moneda },
+        snapshot: { items: items.map((x) => ({ ...x.item, cantidad: x.cantidad })), moneda },
       }),
     });
     if (!res.ok) {
@@ -99,19 +114,22 @@ export function CotizacionCombinadaModal({
           >
             <div className="print:hidden">
               <div className="flex items-start justify-between gap-4">
-                <h2 className="text-xl font-semibold text-white">Tu cotización combinada</h2>
+                <h2 className="text-xl font-semibold text-white">Tu carrito</h2>
                 <button type="button" onClick={onClose} aria-label="Cerrar" className="text-text-secondary hover:text-white">
                   <X size={22} />
                 </button>
               </div>
 
               <ul className="mt-5 space-y-2.5">
-                {items.map((item) => (
-                  <li key={item.id} className="flex justify-between gap-3 text-sm">
-                    <span className="text-white/90">{item.nombre}</span>
+                {items.map((x) => (
+                  <li key={x.item.id} className="flex justify-between gap-3 text-sm">
+                    <span className="text-white/90">
+                      {x.item.nombre}
+                      {x.cantidad > 1 && <span className="text-text-secondary"> × {x.cantidad}</span>}
+                    </span>
                     <span className="shrink-0 font-medium text-accent">
-                      {formatCopEnMoneda(item.precioCop, moneda, trm)}
-                      {item.periodicidad === "mensual" ? " /mes" : ""}
+                      {formatCopEnMoneda(x.item.precioCop * x.cantidad, moneda, trm)}
+                      {x.item.periodicidad === "mensual" ? " /mes" : ""}
                     </span>
                   </li>
                 ))}
@@ -142,7 +160,7 @@ export function CotizacionCombinadaModal({
               <div className="mt-4 border-t border-border-glass pt-5">
                 <CompraFormulario
                   tiposContrato={tiposContrato}
-                  nombreItem={items.map((i) => i.nombre).join(", ")}
+                  nombreItem={items.map((x) => `${x.item.nombre} x${x.cantidad}`).join(", ")}
                   montoFormateado={montoFormateado}
                   mensajeWhatsApp={mensajeWhatsApp}
                   onConfirmar={confirmar}
@@ -152,7 +170,7 @@ export function CotizacionCombinadaModal({
 
             <div className="hidden print:block">
               <PropuestaImprimible
-                titulo="Cotización combinada"
+                titulo="Cotización de tu carrito en la tienda biwov"
                 items={itemsPropuesta}
                 totales={[
                   ...(totalUnico > 0 ? [{ label: "Total pago único", valor: formatCopEnMoneda(totalUnico, moneda, trm) }] : []),
