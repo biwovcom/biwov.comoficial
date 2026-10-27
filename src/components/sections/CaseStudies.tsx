@@ -110,19 +110,27 @@ export function CaseStudies() {
                   </p>
 
                   {caso.videos && caso.videos.length > 0 && (
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {caso.videos.map((v) => (
-                        <a
-                          key={v.url}
-                          href={v.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1.5 rounded-full border border-border-glass px-3 py-1.5 text-xs text-text-secondary transition-colors hover:border-accent/40 hover:text-white"
-                        >
-                          <Play className="h-3 w-3" />
-                          {v.label}
-                        </a>
-                      ))}
+                    <div className="mt-5">
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-text-secondary">
+                        Videos hechos para la marca
+                      </p>
+                      <div className="mt-2 grid grid-cols-4 gap-2">
+                        {caso.videos.map((v) => (
+                          <a
+                            key={v.url}
+                            href={v.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group/reel relative flex aspect-[9/16] flex-col items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-[#f58529] via-[#dd2a7b] to-[#8134af] shadow-[0_8px_20px_-10px_rgba(0,0,0,0.7)] transition-transform hover:scale-[1.03]"
+                          >
+                            <span className="absolute inset-0 bg-black/10 transition-colors group-hover/reel:bg-black/0" />
+                            <span className="relative flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm">
+                              <Play className="h-4 w-4 fill-[#dd2a7b] text-[#dd2a7b]" />
+                            </span>
+                            <span className="relative mt-1.5 text-[10px] font-semibold text-white">{v.label}</span>
+                          </a>
+                        ))}
+                      </div>
                     </div>
                   )}
 
