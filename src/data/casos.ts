@@ -1,3 +1,14 @@
+export interface ImagenCaso {
+  src: string;
+  alt: string;
+  tipo: "desktop" | "mobile";
+}
+
+export interface VideoCaso {
+  label: string;
+  url: string;
+}
+
 export interface CasoExito {
   id: string;
   cliente: string;
@@ -5,9 +16,34 @@ export interface CasoExito {
   reto: string;
   solucion: string;
   destacado: string;
+  imagenes?: ImagenCaso[];
+  videos?: VideoCaso[];
+  enProgreso?: string;
 }
 
 export const CASOS_EXITO: CasoExito[] = [
+  {
+    id: "fashion-lash-nagaraku",
+    cliente: "Fashion Lash — Punto Autorizado Nagaraku",
+    url: "https://nagaraku.com.co/",
+    reto:
+      "Fashion Lash es distribuidor autorizado de Nagaraku (insumos para pestañas y cejas) en Manizales y necesitaba una tienda virtual propia para vender al mayor y al detal en todo Colombia.",
+    solucion:
+      "Diseño y desarrollo de la tienda virtual nagaraku.com.co, más campañas y reels de producto para redes sociales. Actualmente en desarrollo: un chatbot de atención por WhatsApp.",
+    destacado: "Tienda virtual propia + contenido en redes trabajando juntos.",
+    imagenes: [
+      { src: "/casos/fashion-lash-desktop.webp", alt: "Inicio de la tienda virtual nagaraku.com.co", tipo: "desktop" },
+      { src: "/casos/fashion-lash-tienda.webp", alt: "Catálogo de productos de nagaraku.com.co", tipo: "desktop" },
+      { src: "/casos/fashion-lash-mobile.webp", alt: "Tienda virtual nagaraku.com.co en celular", tipo: "mobile" },
+    ],
+    videos: [
+      { label: "Reel 1", url: "https://www.instagram.com/reel/DTs121LkfgF/" },
+      { label: "Reel 2", url: "https://www.instagram.com/reel/DNzBf7P2H09/" },
+      { label: "Reel 3", url: "https://www.instagram.com/reel/DMN79oIxPMZ/" },
+      { label: "Reel 4", url: "https://www.instagram.com/reel/DMF_3DQslUH/" },
+    ],
+    enProgreso: "Chatbot de atención por WhatsApp",
+  },
   {
     id: "fv-arquitectura",
     cliente: "FV Arquitectura",
