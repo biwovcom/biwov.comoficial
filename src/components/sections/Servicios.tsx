@@ -27,7 +27,7 @@ export function Servicios() {
             </p>
           </div>
           <Link
-            href="/#planes"
+            href="/tienda"
             className="shrink-0 text-sm font-semibold text-bg-base underline-offset-4 hover:underline"
           >
             Ver todos los servicios →

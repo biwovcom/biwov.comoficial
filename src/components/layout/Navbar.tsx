@@ -13,8 +13,8 @@ import { cn } from "@/lib/utils";
 
 const LINKS = [
   { href: "/#servicios", label: "Servicios" },
-  { href: "/#planes", label: "Planes" },
-  { href: "/#tienda", label: "Tienda" },
+  { href: "/tienda#planes", label: "Planes" },
+  { href: "/tienda", label: "Tienda" },
   { href: "/#casos", label: "Casos de éxito" },
   { href: "/#testimonios", label: "Testimonios" },
   { href: "/kathe", label: "Fundadora" },
@@ -50,7 +50,7 @@ export function Navbar() {
           <LogoMark className="h-6 w-6 text-white" />
           biwov_
         </Link>
-        <nav className="hidden items-center gap-5 xl:flex">
+        <nav className="hidden items-center gap-4 xl:gap-5 lg:flex">
           {LINKS.map((link) => (
             <a
               key={link.href}
@@ -61,7 +61,7 @@ export function Navbar() {
             </a>
           ))}
         </nav>
-        <div className="hidden items-center gap-3 xl:flex">
+        <div className="hidden items-center gap-2 xl:gap-3 lg:flex">
           <Button size="md" variant="secondary" onClick={() => open()}>
             Diagnóstico gratis
           </Button>
@@ -73,7 +73,7 @@ export function Navbar() {
           type="button"
           onClick={() => setMenuAbierto((v) => !v)}
           aria-label={menuAbierto ? "Cerrar menú" : "Abrir menú"}
-          className="text-white xl:hidden"
+          className="text-white lg:hidden"
         >
           {menuAbierto ? <X size={24} /> : <Menu size={24} />}
         </button>
@@ -86,7 +86,7 @@ export function Navbar() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="overflow-hidden border-t border-border-glass bg-bg-base xl:hidden"
+            className="overflow-hidden border-t border-border-glass bg-bg-base lg:hidden"
           >
             <Container className="flex flex-col gap-1 py-4">
               {LINKS.map((link) => (

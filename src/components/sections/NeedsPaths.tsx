@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
@@ -14,10 +15,11 @@ const PLANES_TABS: PlanId[] = ["esencial", "crecimiento", "escala"];
 
 export function NeedsPaths() {
   const { open } = useQuoter();
+  const router = useRouter();
   const [activo, setActivo] = useState<PlanId>("esencial");
 
   const irAlPlan = () => {
-    document.getElementById("planes")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    router.push("/tienda#planes");
   };
 
   const situaciones = SITUACIONES_NEGOCIO.filter((s) => s.plan === activo);
