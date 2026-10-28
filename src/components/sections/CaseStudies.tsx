@@ -4,8 +4,9 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { ExternalLink, Play, Hammer } from "lucide-react";
 import { Container } from "@/components/ui/Container";
-import { SectionHeading } from "@/components/ui/SectionHeading";
 import { GlassCard } from "@/components/ui/GlassCard";
+import { Button } from "@/components/ui/Button";
+import { useQuoter } from "@/components/quoter/QuoterProvider";
 import { CASOS_EXITO, type ImagenCaso } from "@/data/casos";
 import { cn } from "@/lib/utils";
 
@@ -38,16 +39,40 @@ function MockupFrame({ imagen, className }: { imagen: ImagenCaso; className?: st
 }
 
 export function CaseStudies() {
+  const { open } = useQuoter();
+
   return (
     <section id="casos" className="py-16 md:py-24">
-      <Container>
-        <SectionHeading
-          eyebrow="Casos de éxito"
-          title="Negocios con todo conectado"
-          description="Desde sitios en construcción hasta desarrollo a medida y ventas con automatización: así se ve en la vida real un negocio con todo conectado."
+      <div className="relative isolate mb-14 overflow-hidden py-16 md:py-20">
+        <Image
+          src="https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=1920&q=70"
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover"
         />
+        <div className="absolute inset-0 bg-[#0a2642]/80" />
+        <Container className="relative z-10">
+          <span className="mb-3 block text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+            Resultados reales
+          </span>
+          <h2 className="max-w-lg text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            Negocios con todo conectado
+          </h2>
+          <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/75 md:text-base">
+            Desde sitios en construcción hasta desarrollo a medida y ventas con automatización:
+            así se ve en la vida real un negocio con todo conectado.
+          </p>
+          <div className="mt-7">
+            <Button variant="white" onClick={() => open()}>
+              Agenda una llamada
+            </Button>
+          </div>
+        </Container>
+      </div>
 
-        <div className="mt-14 grid gap-6 md:grid-cols-2">
+      <Container>
+        <div className="grid gap-6 md:grid-cols-2">
           {CASOS_EXITO.map((caso, i) => {
             const desktopImgs = caso.imagenes?.filter((img) => img.tipo === "desktop") ?? [];
             const mobileImg = caso.imagenes?.find((img) => img.tipo === "mobile");

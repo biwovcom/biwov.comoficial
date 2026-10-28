@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { GlassCard } from "@/components/ui/GlassCard";
 import { Table, TableHead, TableBody, Th, Tr, Td } from "@/components/ui/Table";
 import { RESPONSABILIDADES, METODO_4_PASOS } from "@/data/comoTrabajamos";
 
@@ -40,7 +39,7 @@ export function ComoTrabajamos() {
           </Table>
         </motion.div>
 
-        <div className="mx-auto mt-16 grid max-w-3xl gap-5 sm:grid-cols-2">
+        <div className="mt-16 grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-4">
           {METODO_4_PASOS.map((paso, i) => (
             <motion.div
               key={paso.numero}
@@ -48,16 +47,13 @@ export function ComoTrabajamos() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.06 }}
+              className="relative"
             >
-              <GlassCard className="flex h-full items-start gap-4 p-5">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-brand text-sm font-semibold text-white">
-                  {paso.numero}
-                </span>
-                <div>
-                  <h3 className="text-sm font-semibold text-white">{paso.titulo}</h3>
-                  <p className="mt-1 text-xs text-text-secondary">{paso.detalle}</p>
-                </div>
-              </GlassCard>
+              <span className="text-gradient text-3xl font-black">
+                {String(paso.numero).padStart(2, "0")}
+              </span>
+              <h3 className="mt-3 text-sm font-semibold text-white">{paso.titulo}</h3>
+              <p className="mt-1.5 text-xs leading-relaxed text-text-secondary">{paso.detalle}</p>
             </motion.div>
           ))}
         </div>
