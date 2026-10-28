@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "ghost";
+  variant?: "primary" | "secondary" | "ghost" | "outline";
   size?: "md" | "lg";
   children: ReactNode;
 }
@@ -13,6 +13,8 @@ const VARIANTS: Record<string, string> = {
   secondary:
     "border border-border-glass bg-white/[0.03] text-white backdrop-blur-md hover:bg-white/[0.07] hover:border-accent/40",
   ghost: "text-text-secondary hover:text-white",
+  outline:
+    "border border-[rgba(13,20,32,0.14)] bg-[rgba(13,20,32,0.02)] text-text-on-light backdrop-blur-md hover:bg-[rgba(13,20,32,0.05)] hover:border-accent/50",
 };
 
 const SIZES: Record<string, string> = {

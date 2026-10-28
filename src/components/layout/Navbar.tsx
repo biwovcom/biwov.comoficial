@@ -40,12 +40,12 @@ export function Navbar() {
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-all duration-300",
         scrolled || menuAbierto
-          ? "border-b border-border-glass bg-bg-base/80 backdrop-blur-xl"
+          ? "border-b border-border-light bg-bg-light-elevated/85 backdrop-blur-xl"
           : "border-b border-transparent bg-transparent",
       )}
     >
       <Container className="flex h-18 items-center justify-between py-4 !max-w-7xl">
-        <Link href="/" className="font-logo text-xl font-bold text-white">
+        <Link href="/" className="font-logo text-xl font-bold text-text-on-light">
           biwov_
         </Link>
         <nav className="hidden items-center gap-5 xl:flex">
@@ -53,14 +53,14 @@ export function Navbar() {
             <a
               key={link.href}
               href={link.href}
-              className="text-sm whitespace-nowrap text-text-secondary transition-colors hover:text-white"
+              className="text-sm whitespace-nowrap text-text-on-light-secondary transition-colors hover:text-text-on-light"
             >
               {link.label}
             </a>
           ))}
         </nav>
         <div className="hidden items-center gap-3 xl:flex">
-          <Button size="md" variant="secondary" onClick={() => open()}>
+          <Button size="md" variant="outline" onClick={() => open()}>
             Diagnóstico gratis
           </Button>
           <a href={LINKS_PANEL.calendario} target="_blank" rel="noopener noreferrer">
@@ -71,7 +71,7 @@ export function Navbar() {
           type="button"
           onClick={() => setMenuAbierto((v) => !v)}
           aria-label={menuAbierto ? "Cerrar menú" : "Abrir menú"}
-          className="text-white xl:hidden"
+          className="text-text-on-light xl:hidden"
         >
           {menuAbierto ? <X size={24} /> : <Menu size={24} />}
         </button>
@@ -84,7 +84,7 @@ export function Navbar() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="overflow-hidden border-t border-border-glass bg-bg-base xl:hidden"
+            className="overflow-hidden border-t border-border-light bg-bg-light-elevated xl:hidden"
           >
             <Container className="flex flex-col gap-1 py-4">
               {LINKS.map((link) => (
@@ -92,12 +92,12 @@ export function Navbar() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMenuAbierto(false)}
-                  className="rounded-xl px-3 py-3 text-base text-text-secondary transition-colors hover:bg-white/[0.05] hover:text-white"
+                  className="rounded-xl px-3 py-3 text-base text-text-on-light-secondary transition-colors hover:bg-[rgba(13,20,32,0.04)] hover:text-text-on-light"
                 >
                   {link.label}
                 </a>
               ))}
-              <Button size="md" variant="secondary" className="mt-2 w-full" onClick={cerrarYDiagnostico}>
+              <Button size="md" variant="outline" className="mt-2 w-full" onClick={cerrarYDiagnostico}>
                 Diagnóstico gratis
               </Button>
               <a
