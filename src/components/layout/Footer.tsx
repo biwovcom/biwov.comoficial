@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LockKeyhole } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { linkWhatsApp } from "@/lib/panel/whatsapp";
+import { LogoMark } from "./LogoMark";
 import {
   WHATSAPP_BIWOV,
   MENSAJE_WHATSAPP_BIWOV,
@@ -24,6 +25,7 @@ export function Footer() {
     <footer className="border-t border-border-glass pt-12 pb-24 sm:pb-12">
       <Container className="flex flex-col items-center justify-between gap-6 text-center text-sm text-text-secondary md:flex-row md:text-left">
         <div className="flex items-center gap-2">
+          <LogoMark className="h-5 w-5 shrink-0 text-white" />
           <span className="font-logo text-lg font-bold text-white">biwov_</span>
           <span>Diseña ecosistemas digitales inteligentes</span>
         </div>

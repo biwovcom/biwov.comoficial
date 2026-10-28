@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Minus, Plus, ShoppingCart } from "lucide-react";
 import type { ExtraCotizable } from "@/data/extrasCotizables";
 import { ARTE_CATEGORIA } from "@/data/categoriasExtras";
@@ -18,13 +19,17 @@ export function ProductoCard({
   cantidad: number;
   onCambiarCantidad: (id: string, cantidad: number) => void;
 }) {
-  const { icono: Icono, gradiente } = ARTE_CATEGORIA[item.categoria];
+  const { icono: Icono, imagen } = ARTE_CATEGORIA[item.categoria];
   const precio = formatCopEnMoneda(item.precioCop, moneda, trm) + (item.periodicidad === "mensual" ? " /mes" : "");
 
   return (
     <div className="flex flex-col overflow-hidden rounded-2xl border border-border-glass bg-[#0a2642] shadow-[0_8px_30px_-16px_rgba(46,91,126,0.45)]">
-      <div className={`flex h-28 items-center justify-center bg-gradient-to-br ${gradiente}`}>
-        <Icono className="h-10 w-10 text-white/90" />
+      <div className="relative h-28 overflow-hidden">
+        <Image src={imagen} alt="" fill sizes="300px" className="object-cover" />
+        <div className="absolute inset-0 bg-[#0a2642]/45" />
+        <span className="absolute bottom-2 left-2 flex h-8 w-8 items-center justify-center rounded-lg border border-white/25 bg-[#0a2642]/70 backdrop-blur-sm">
+          <Icono className="h-4 w-4 text-white" />
+        </span>
       </div>
       <div className="flex flex-1 flex-col p-4">
         <p className="text-[10px] font-semibold uppercase tracking-wide text-accent">{item.categoria}</p>

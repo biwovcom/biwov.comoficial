@@ -63,7 +63,7 @@ export function Problem() {
           transition={{ duration: 0.5 }}
           className="mx-auto max-w-xl"
         >
-          <GlassCard className="glow flex items-center gap-3 border-accent/40 bg-accent/10 px-6 py-5 text-center">
+          <GlassCard className="flex items-center gap-3 border-accent/40 bg-accent/10 px-6 py-5 text-center">
             <Sparkles className="h-5 w-5 shrink-0 text-accent" />
             <p className="text-sm font-medium text-white md:text-base">
               biwov conecta todo para que tu negocio funcione solo.

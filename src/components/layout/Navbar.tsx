@@ -8,6 +8,7 @@ import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { useQuoter } from "@/components/quoter/QuoterProvider";
 import { LINKS_PANEL } from "@/lib/panel/panelConfig";
+import { LogoMark } from "./LogoMark";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
@@ -18,14 +19,6 @@ const LINKS = [
   { href: "/#testimonios", label: "Testimonios" },
   { href: "/kathe", label: "Fundadora" },
 ];
-
-function LogoMark({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 32 32" fill="none" className={className} aria-hidden>
-      <circle cx="16" cy="16" r="13" stroke="currentColor" strokeWidth="2.2" strokeDasharray="68 14" strokeLinecap="round" />
-    </svg>
-  );
-}
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -54,7 +47,7 @@ export function Navbar() {
     >
       <Container className="flex h-18 items-center justify-between py-4 !max-w-7xl">
         <Link href="/" className="flex items-center gap-2 font-logo text-xl font-bold text-white">
-          <LogoMark className="h-6 w-6 text-accent" />
+          <LogoMark className="h-6 w-6 text-white" />
           biwov_
         </Link>
         <nav className="hidden items-center gap-5 xl:flex">

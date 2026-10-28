@@ -34,7 +34,8 @@
   --color-text-on-light: var(--text-on-light);
   --color-text-on-light-secondary: var(--text-on-light-secondary);
   --color-border-light: var(--border-light);
-  --font-sans: var(--font-poppins);
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-nunito);
   --font-logo: var(--font-museo);
 }
 
@@ -46,9 +47,18 @@ html {
 body {
   background: var(--bg-base);
   color: var(--text-primary);
-  font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading), ui-sans-serif, system-ui, sans-serif;
 }
 
 ::selection {
@@ -61,14 +71,14 @@ body {
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, #0a2642, #00c2e8 70%);
+  background: linear-gradient(135deg, #00c2e8, #ffffff 75%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
 .bg-gradient-brand {
-  background: linear-gradient(135deg, #0a2642, #00c2e8);
+  background: linear-gradient(135deg, #0a2642, #15385a);
 }
 
 .scrollbar-none::-webkit-scrollbar {
