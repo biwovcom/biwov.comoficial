@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
-import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Button } from "@/components/ui/Button";
 import { MonedaToggle } from "@/components/ui/MonedaToggle";
 import { ProductoCard } from "@/components/tienda/ProductoCard";
@@ -54,14 +53,19 @@ export function TiendaBiwov() {
   return (
     <section id="tienda" className="print-host bg-bg-light py-16 md:py-24">
       <Container>
-        <SectionHeading
-          variant="light"
-          eyebrow="Tienda"
-          title="Elige los servicios que necesitas"
-          description="Agrégalos a tu carrito en la cantidad que quieras y te armamos un solo mensaje con todo — sin compromiso."
-        />
-
-        <div className="mt-8">
+        <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
+          <div className="text-center sm:text-left">
+            <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+              Servicios sueltos
+            </span>
+            <h3 className="text-2xl font-bold text-text-on-light">
+              O arma tu propio combo
+            </h3>
+            <p className="mt-2 max-w-md text-sm text-text-on-light-secondary">
+              Agrégalos a tu carrito en la cantidad que quieras y te armamos un solo mensaje con
+              todo — sin compromiso.
+            </p>
+          </div>
           <MonedaToggle moneda={moneda} onChange={setMoneda} />
         </div>
 
