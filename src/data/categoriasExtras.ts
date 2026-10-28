@@ -7,7 +7,7 @@ export interface ArteCategoria {
 }
 
 export const ARTE_CATEGORIA: Record<CategoriaExtra, ArteCategoria> = {
-  "Producción de contenido": { icono: Camera, gradiente: "from-[#1e3d52] to-[#1fc4de]" },
+  "Producción de contenido": { icono: Camera, gradiente: "from-[#2e5b7e] to-[#00c2e8]" },
   "Grabación y edición de video": { icono: Video, gradiente: "from-[#3d2a72] to-[#8134af]" },
   "Páginas web": { icono: Globe2, gradiente: "from-[#0d6e4f] to-[#1fae7d]" },
   "Campaña en Meta": { icono: Megaphone, gradiente: "from-[#7a1d4a] to-[#c23b74]" },

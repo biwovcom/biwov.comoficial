@@ -20,7 +20,7 @@ export function Hero() {
             "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
         }}
       />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_20%_0%,rgba(31,196,222,0.16),transparent_60%),radial-gradient(ellipse_60%_50%_at_90%_100%,rgba(30,61,82,0.35),transparent_65%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_20%_0%,rgba(0,194,232,0.16),transparent_60%),radial-gradient(ellipse_60%_50%_at_90%_100%,rgba(46,91,126,0.35),transparent_65%)]" />
       <div className="pointer-events-none absolute left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 rounded-full bg-accent/15 blur-[140px]" />
 
       <div className="absolute right-6 top-24 z-10 print:hidden">

@@ -16,8 +16,8 @@ export function ParticleField() {
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const SPACING = 44;
-    const RADIO = 170;
+    const SPACING = 48;
+    const RADIO = 130;
 
     let width = 0;
     let height = 0;
@@ -61,10 +61,10 @@ export function ParticleField() {
         const dy = p.y - mouse.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
         const cerca = Math.max(0, 1 - dist / RADIO);
-        const r = 1 + cerca * 2.4;
+        const r = 1 + cerca * 1.3;
         ctx.beginPath();
         ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(31, 196, 222, ${0.12 + cerca * 0.7})`;
+        ctx.fillStyle = `rgba(0, 194, 232, ${0.07 + cerca * 0.33})`;
         ctx.fill();
       }
       if (!reducedMotion) raf = requestAnimationFrame(draw);

@@ -82,7 +82,7 @@ function DetalleComplemento({
                   <button
                     type="button"
                     onClick={() => onAdquirir(extra)}
-                    className="rounded-full bg-gradient-brand px-3 py-1.5 text-xs font-medium whitespace-nowrap text-white transition-all hover:shadow-[0_0_20px_-5px_rgba(31,196,222,0.7)]"
+                    className="rounded-full bg-gradient-brand px-3 py-1.5 text-xs font-medium whitespace-nowrap text-white transition-all hover:shadow-[0_6px_18px_-6px_rgba(10,38,66,0.5)]"
                   >
                     Adquirir
                   </button>
@@ -168,7 +168,7 @@ export function Complementos({ moneda, trm }: { moneda: Moneda; trm: number }) {
         {COMPLEMENTOS.map((item) => (
           <div
             key={item.titulo}
-            className="flex w-[300px] shrink-0 snap-start flex-col rounded-3xl border border-border-glass bg-[#0b1f38] p-6 shadow-[0_12px_40px_-16px_rgba(30,61,82,0.35)]"
+            className="flex w-[300px] shrink-0 snap-start flex-col rounded-3xl border border-border-glass bg-[#0a2642] p-6 shadow-[0_12px_40px_-16px_rgba(46,91,126,0.35)]"
           >
             <h4 className="text-base font-semibold text-white">{item.titulo}</h4>
             <p className="mt-1.5 flex-1 text-sm text-text-secondary">{item.detalle}</p>

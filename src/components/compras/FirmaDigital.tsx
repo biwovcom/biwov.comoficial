@@ -50,7 +50,7 @@ export function FirmaDigital({
     if (!ctx) return;
     dibujandoRef.current = true;
     const { x, y } = posicion(e);
-    ctx.strokeStyle = "#1e3d52";
+    ctx.strokeStyle = "#2e5b7e";
     ctx.lineWidth = 2.5;
     ctx.lineCap = "round";
     ctx.beginPath();

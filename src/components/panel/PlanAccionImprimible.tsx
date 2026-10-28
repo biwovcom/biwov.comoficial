@@ -16,7 +16,7 @@ function SeccionTemperatura({ items }: { items: PlanCreativoEntrada[] }) {
 
   return (
     <div className="mb-6 break-inside-avoid">
-      <h2 className="text-sm font-bold uppercase tracking-wide text-[#1e3d52]">Temperatura del embudo</h2>
+      <h2 className="text-sm font-bold uppercase tracking-wide text-[#2e5b7e]">Temperatura del embudo</h2>
       <p className="mt-1 text-xs text-[#5b6677]">
         Mezcla ideal: 60-70% TOFU, 20-30% MOFU, ~10% BOFU.
       </p>
@@ -60,7 +60,7 @@ function SeccionCampana({ campana }: { campana: PlanCampana }) {
   return (
     <div className="mb-6 break-inside-avoid">
       <div className="flex items-center gap-2">
-        <h2 className="text-sm font-bold uppercase tracking-wide text-[#1e3d52]">Brief de la campaña</h2>
+        <h2 className="text-sm font-bold uppercase tracking-wide text-[#2e5b7e]">Brief de la campaña</h2>
         {campana.aprobado && (
           <span className="rounded-full bg-[#dcfce7] px-2 py-0.5 text-[10px] font-semibold text-[#15803d]">
             ✓ Aprobado{campana.aprobado_en ? ` el ${new Date(campana.aprobado_en).toLocaleDateString("es-CO")}` : ""}
@@ -84,12 +84,12 @@ function Seccion({ titulo, items }: { titulo: string; items: PlanCreativoEntrada
   if (items.length === 0) return null;
   return (
     <div className="mb-6 break-inside-avoid">
-      <h2 className="text-sm font-bold uppercase tracking-wide text-[#1e3d52]">{titulo}</h2>
+      <h2 className="text-sm font-bold uppercase tracking-wide text-[#2e5b7e]">{titulo}</h2>
       <div className="mt-2 space-y-4">
         {items.map((item) => (
           <div key={item.id} className="break-inside-avoid border-t border-[#e5e7eb] pt-3">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-wide text-[#1e3d52]">{item.tipo}</span>
+              <span className="text-xs font-semibold uppercase tracking-wide text-[#2e5b7e]">{item.tipo}</span>
               {item.etapa_embudo && (
                 <span className="rounded-full bg-[#eef2ff] px-2 py-0.5 text-[10px] font-semibold text-[#3730a3]">
                   {ETAPAS_EMBUDO[item.etapa_embudo].label}
@@ -108,7 +108,7 @@ function Seccion({ titulo, items }: { titulo: string; items: PlanCreativoEntrada
             </div>
             {item.titulo && <p className="mt-1 text-sm font-semibold text-[#111827]">{item.titulo}</p>}
             {item.link && (
-              <p className="mt-0.5 text-xs text-[#1e3d52] underline">{item.link}</p>
+              <p className="mt-0.5 text-xs text-[#2e5b7e] underline">{item.link}</p>
             )}
             {item.contenido && (
               <p className="mt-1 whitespace-pre-line text-sm text-[#111827]">{item.contenido}</p>
@@ -124,11 +124,11 @@ function SeccionRedes({ items }: { items: RedHistorialEntrada[] }) {
   if (items.length === 0) return null;
   return (
     <div className="mb-6 break-inside-avoid">
-      <h2 className="text-sm font-bold uppercase tracking-wide text-[#1e3d52]">Redes y crecimiento</h2>
+      <h2 className="text-sm font-bold uppercase tracking-wide text-[#2e5b7e]">Redes y crecimiento</h2>
       <div className="mt-2 space-y-4">
         {items.map((e) => (
           <div key={e.id} className="break-inside-avoid border-t border-[#e5e7eb] pt-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-[#1e3d52]">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[#2e5b7e]">
               {e.red_social} · {new Date(`${e.fecha}T00:00:00`).toLocaleDateString("es-CO")} · periodo de{" "}
               {e.periodo_dias} días
             </p>
@@ -205,9 +205,9 @@ export function PlanAccionImprimible({
     <div className="bg-white p-8 text-[#111827]">
       <span className="font-logo text-2xl font-bold">biwov_</span>
       <p className="mt-0.5 text-xs text-[#4b5563]">Agencia de Marketing Digital</p>
-      <div className="mt-3 h-1 w-full rounded-full bg-gradient-to-r from-[#1e3d52] to-[#1fc4de]" />
+      <div className="mt-3 h-1 w-full rounded-full bg-gradient-to-r from-[#2e5b7e] to-[#00c2e8]" />
 
-      <p className="mt-6 text-xs font-semibold uppercase tracking-wide text-[#1e3d52]">
+      <p className="mt-6 text-xs font-semibold uppercase tracking-wide text-[#2e5b7e]">
         {TITULO_MODO[modo]} · biwov_
       </p>
       <h1 className="mt-1 text-2xl font-bold text-[#0d1420]">{empresa || prospectoNombre}</h1>

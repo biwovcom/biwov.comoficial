@@ -28,9 +28,9 @@ export function ReciboFirmado({
         </div>
         <p className="text-xs text-[#6b7280]">{fechaFirma}</p>
       </div>
-      <div className="mt-3 h-1 w-full rounded-full bg-gradient-to-r from-[#1e3d52] to-[#1fc4de]" />
+      <div className="mt-3 h-1 w-full rounded-full bg-gradient-to-r from-[#2e5b7e] to-[#00c2e8]" />
 
-      <p className="mt-6 text-xs font-semibold uppercase tracking-wide text-[#1fc4de]">
+      <p className="mt-6 text-xs font-semibold uppercase tracking-wide text-[#00c2e8]">
         Comprobante de compra y firma digital
       </p>
       <h1 className="mt-1 text-2xl font-bold text-[#0f172a]">{itemNombre}</h1>
@@ -49,7 +49,7 @@ export function ReciboFirmado({
           )}
           <p className="text-sm">
             <span className="text-[#6b7280]">Monto: </span>
-            <span className="font-semibold text-[#1e3d52]">{monto}</span>
+            <span className="font-semibold text-[#2e5b7e]">{monto}</span>
           </p>
           <p className="text-sm">
             <span className="text-[#6b7280]">Contrato: </span>

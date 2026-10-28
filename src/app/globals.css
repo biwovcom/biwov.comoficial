@@ -1,23 +1,24 @@
 @import "tailwindcss";
 
 :root {
-  /* Branding biwov — Azul profundo, Azul acero, Azul claro, Cian acento, Marfil. */
-  --bg-base: #0b1f38;
-  --bg-elevated: #1e3d52;
-  --accent: #1fc4de;
-  --accent-light: #4fb3d9;
-  --accent-soft: #1fc4de26;
+  /* Branding biwov — lectura precisa del moodboard + azul profundo ajustado
+     a pedido de Kathe (#0A2642 en vez del #0B1F38 original del moodboard). */
+  --bg-base: #0a2642;
+  --bg-elevated: #2e5b7e;
+  --accent: #00c2e8;
+  --accent-light: #8fb3c9;
+  --accent-soft: #00c2e826;
   --text-primary: #ffffff;
   --text-secondary: #a9b4c2;
-  --border-glass: rgba(31, 196, 222, 0.15);
+  --border-glass: rgba(0, 194, 232, 0.14);
 
   /* Franjas claras alternadas en marfil (en vez de azul pálido), para que
      el sitio no se sienta todo oscuro (pedido explícito de Kathe). */
-  --bg-light: #f2ece0;
-  --bg-light-elevated: #fbf8f2;
+  --bg-light: #f6f4ed;
+  --bg-light-elevated: #fcfbf7;
   --text-on-light: #0d1420;
   --text-on-light-secondary: #5b6677;
-  --border-light: rgba(30, 61, 82, 0.12);
+  --border-light: rgba(46, 91, 126, 0.12);
 }
 
 @theme inline {
@@ -52,7 +53,7 @@ body {
 
 ::selection {
   background: var(--accent);
-  color: #0b1f38;
+  color: #0a2642;
 }
 
 .glow {
@@ -60,14 +61,14 @@ body {
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, #0b1f38, #1fc4de 70%);
+  background: linear-gradient(135deg, #0a2642, #00c2e8 70%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
 .bg-gradient-brand {
-  background: linear-gradient(135deg, #0b1f38, #1fc4de);
+  background: linear-gradient(135deg, #0a2642, #00c2e8);
 }
 
 .scrollbar-none::-webkit-scrollbar {

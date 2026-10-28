@@ -42,7 +42,7 @@ export function SelectorExtras({
           return (
             <div
               key={categoria}
-              className="overflow-hidden rounded-2xl border border-border-glass shadow-[0_8px_30px_-16px_rgba(30,61,82,0.45)]"
+              className="overflow-hidden rounded-2xl border border-border-glass shadow-[0_8px_30px_-16px_rgba(46,91,126,0.45)]"
             >
               <div className="flex items-center gap-2 bg-gradient-brand px-4 py-2.5">
                 <Icono className="h-4 w-4 shrink-0 text-white" />

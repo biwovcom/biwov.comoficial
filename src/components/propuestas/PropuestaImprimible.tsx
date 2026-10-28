@@ -44,9 +44,9 @@ export function PropuestaImprimible({
         </div>
         <p className="text-xs text-[#6b7280]">{fecha}</p>
       </div>
-      <div className="mt-3 h-1 w-full rounded-full bg-gradient-to-r from-[#1e3d52] to-[#1fc4de]" />
+      <div className="mt-3 h-1 w-full rounded-full bg-gradient-to-r from-[#2e5b7e] to-[#00c2e8]" />
 
-      <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-[#1fc4de]">
+      <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-[#00c2e8]">
         Propuesta comercial
       </p>
       <h1 className="mt-1 text-2xl font-bold text-[#0f172a]">{titulo}</h1>
@@ -63,13 +63,13 @@ export function PropuestaImprimible({
         {items.map((item, i) => (
           <div key={`${item.nombre}-${i}`} className="break-inside-avoid rounded-2xl border border-[#e5e7eb] p-3">
             <div className="flex items-start gap-3">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1e3d52] text-xs font-bold text-white">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#2e5b7e] text-xs font-bold text-white">
                 {i + 1}
               </span>
               <div className="flex-1">
                 <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                   <h3 className="text-base font-semibold text-[#0f172a]">{item.nombre}</h3>
-                  <p className="text-sm font-bold text-[#1e3d52]">
+                  <p className="text-sm font-bold text-[#2e5b7e]">
                     {item.precio}
                     {item.periodicidad === "mensual" ? " /mes" : ""}
                   </p>
@@ -79,7 +79,7 @@ export function PropuestaImprimible({
                   <ul className="mt-2 space-y-1">
                     {item.incluye.map((inc) => (
                       <li key={inc} className="text-xs text-[#374151]">
-                        <span className="text-[#1fc4de]">✓</span> {inc}
+                        <span className="text-[#00c2e8]">✓</span> {inc}
                       </li>
                     ))}
                   </ul>

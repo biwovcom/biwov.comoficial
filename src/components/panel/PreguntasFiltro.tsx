@@ -32,7 +32,7 @@ function OptionCard({
       className={cn(
         "rounded-xl border px-4 py-3 text-left text-sm transition-all duration-200",
         selected
-          ? "border-accent bg-accent/10 text-white shadow-[0_0_24px_-8px_rgba(31,196,222,0.7)]"
+          ? "border-accent bg-accent/10 text-white"
           : "border-border-glass bg-white/[0.02] text-white/90 hover:border-accent/40 hover:bg-white/[0.05]",
       )}
     >

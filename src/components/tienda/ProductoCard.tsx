@@ -22,7 +22,7 @@ export function ProductoCard({
   const precio = formatCopEnMoneda(item.precioCop, moneda, trm) + (item.periodicidad === "mensual" ? " /mes" : "");
 
   return (
-    <div className="flex flex-col overflow-hidden rounded-2xl border border-border-glass bg-[#0b1f38] shadow-[0_8px_30px_-16px_rgba(30,61,82,0.45)]">
+    <div className="flex flex-col overflow-hidden rounded-2xl border border-border-glass bg-[#0a2642] shadow-[0_8px_30px_-16px_rgba(46,91,126,0.45)]">
       <div className={`flex h-28 items-center justify-center bg-gradient-to-br ${gradiente}`}>
         <Icono className="h-10 w-10 text-white/90" />
       </div>
@@ -45,7 +45,7 @@ export function ProductoCard({
             <button
               type="button"
               onClick={() => onCambiarCantidad(item.id, 1)}
-              className="flex w-full items-center justify-center gap-1.5 rounded-full bg-gradient-brand px-3 py-2 text-xs font-medium text-white transition-all hover:shadow-[0_0_20px_-5px_rgba(31,196,222,0.7)]"
+              className="flex w-full items-center justify-center gap-1.5 rounded-full bg-gradient-brand px-3 py-2 text-xs font-medium text-white transition-all hover:shadow-[0_6px_18px_-6px_rgba(10,38,66,0.5)]"
             >
               <ShoppingCart className="h-3.5 w-3.5" />
               Agregar

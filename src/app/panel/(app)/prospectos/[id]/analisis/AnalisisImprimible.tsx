@@ -16,7 +16,7 @@ const CUELLO_LABEL: Record<AnalisisIA["cuelloDeBotella"]["tipo"], string> = {
 function Seccion({ titulo, children }: { titulo: string; children: React.ReactNode }) {
   return (
     <div className="mb-5 break-inside-avoid">
-      <h2 className="text-sm font-bold uppercase tracking-wide text-[#1e3d52]">{titulo}</h2>
+      <h2 className="text-sm font-bold uppercase tracking-wide text-[#2e5b7e]">{titulo}</h2>
       <div className="mt-1.5 text-sm text-[#111827]">{children}</div>
     </div>
   );
@@ -47,7 +47,7 @@ export function AnalisisImprimible({
 
   return (
     <div className="bg-white p-8 text-[#111827]">
-      <p className="text-xs font-semibold uppercase tracking-wide text-[#1e3d52]">
+      <p className="text-xs font-semibold uppercase tracking-wide text-[#2e5b7e]">
         Diagnóstico · biwov_
       </p>
       <h1 className="mt-1 text-2xl font-bold text-[#0d1420]">{empresa || prospectoNombre}</h1>
