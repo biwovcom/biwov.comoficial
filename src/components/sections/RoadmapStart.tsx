@@ -28,7 +28,7 @@ export function RoadmapStart() {
                   className={cn(
                     "flex shrink-0 items-center gap-2 whitespace-nowrap rounded-xl border px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide transition-all sm:shrink sm:whitespace-normal",
                     activo === i
-                      ? "border-accent bg-accent/10 text-accent shadow-[0_0_24px_-8px_rgba(50,153,204,0.6)]"
+                      ? "border-accent bg-accent/10 text-accent shadow-[0_0_24px_-8px_rgba(31,196,222,0.6)]"
                       : "border-border-glass text-text-secondary hover:border-accent/40 hover:text-white",
                   )}
                 >

@@ -41,18 +41,18 @@ export function FlowAnimation({ className }: { className?: string }) {
               className="relative flex h-14 w-14 items-center justify-center rounded-2xl border border-border-glass bg-white/[0.03] backdrop-blur-md md:h-16 md:w-16"
               animate={{
                 borderColor: [
-                  "rgba(50,153,204,0.15)",
-                  "rgba(50,153,204,0.15)",
-                  "#3299CC",
-                  "rgba(50,153,204,0.15)",
-                  "rgba(50,153,204,0.15)",
+                  "rgba(31,196,222,0.15)",
+                  "rgba(31,196,222,0.15)",
+                  "#1FC4DE",
+                  "rgba(31,196,222,0.15)",
+                  "rgba(31,196,222,0.15)",
                 ],
                 boxShadow: [
-                  "0 0 0px rgba(50,153,204,0)",
-                  "0 0 0px rgba(50,153,204,0)",
-                  "0 0 30px rgba(50,153,204,0.8)",
-                  "0 0 0px rgba(50,153,204,0)",
-                  "0 0 0px rgba(50,153,204,0)",
+                  "0 0 0px rgba(31,196,222,0)",
+                  "0 0 0px rgba(31,196,222,0)",
+                  "0 0 30px rgba(31,196,222,0.8)",
+                  "0 0 0px rgba(31,196,222,0)",
+                  "0 0 0px rgba(31,196,222,0)",
                 ],
               }}
               transition={{

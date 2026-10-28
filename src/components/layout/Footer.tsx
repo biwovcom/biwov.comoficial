@@ -24,8 +24,8 @@ export function Footer() {
     <footer className="border-t border-border-glass pt-12 pb-24 sm:pb-12">
       <Container className="flex flex-col items-center justify-between gap-6 text-center text-sm text-text-secondary md:flex-row md:text-left">
         <div className="flex items-center gap-2">
-          <span className="font-logo text-lg font-bold text-white">biwov</span>
-          <span>Todo tu negocio conectado</span>
+          <span className="font-logo text-lg font-bold text-white">biwov_</span>
+          <span>Diseña ecosistemas digitales inteligentes</span>
         </div>
         <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
           <Link href="/contrato" className="hover:text-white">

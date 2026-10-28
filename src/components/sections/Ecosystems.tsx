@@ -46,8 +46,8 @@ export function Ecosystems() {
             >
               <div
                 className={cn(
-                  "flex h-full flex-col overflow-hidden rounded-3xl border border-border-glass bg-[#0c1119] shadow-[0_12px_40px_-16px_rgba(13,59,102,0.35)]",
-                  plan.id === "crecimiento" && "border-accent/50 shadow-[0_0_40px_-12px_rgba(50,153,204,0.5)]",
+                  "flex h-full flex-col overflow-hidden rounded-3xl border border-border-glass bg-[#0b1f38] shadow-[0_12px_40px_-16px_rgba(30,61,82,0.35)]",
+                  plan.id === "crecimiento" && "border-accent/50 shadow-[0_0_40px_-12px_rgba(31,196,222,0.5)]",
                 )}
               >
                 <div className={cn("bg-gradient-brand px-7 py-6", plan.id === "crecimiento" && "relative")}>

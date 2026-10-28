@@ -12,7 +12,7 @@ export function GlassCard({
       className={cn(
         "rounded-3xl backdrop-blur-xl",
         variant === "light"
-          ? "border border-border-light bg-bg-light-elevated shadow-[0_8px_30px_-16px_rgba(13,59,102,0.25)]"
+          ? "border border-border-light bg-bg-light-elevated shadow-[0_8px_30px_-16px_rgba(30,61,82,0.25)]"
           : "border border-border-glass bg-white/[0.03] shadow-[0_8px_40px_-16px_rgba(0,0,0,0.6)]",
         className,
       )}

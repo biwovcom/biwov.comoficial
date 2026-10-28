@@ -64,7 +64,7 @@ export function ParticleField() {
         const r = 1 + cerca * 2.4;
         ctx.beginPath();
         ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(50, 153, 204, ${0.12 + cerca * 0.7})`;
+        ctx.fillStyle = `rgba(31, 196, 222, ${0.12 + cerca * 0.7})`;
         ctx.fill();
       }
       if (!reducedMotion) raf = requestAnimationFrame(draw);

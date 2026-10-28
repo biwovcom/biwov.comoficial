@@ -46,7 +46,7 @@ export function Navbar() {
     >
       <Container className="flex h-18 items-center justify-between py-4 !max-w-7xl">
         <Link href="/" className="font-logo text-xl font-bold text-white">
-          biwov
+          biwov_
         </Link>
         <nav className="hidden items-center gap-5 xl:flex">
           {LINKS.map((link) => (
