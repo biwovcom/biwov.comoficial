@@ -9,11 +9,25 @@ import { FAQ } from "@/data/faq";
 import { cn } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
 
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQ.map((item) => ({
+    "@type": "Question",
+    name: item.pregunta,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: item.respuesta,
+    },
+  })),
+};
+
 export function Faq() {
   const [abierta, setAbierta] = useState<number | null>(null);
 
   return (
     <section className="py-16 md:py-24">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <Container>
         <SectionHeading eyebrow="Preguntas frecuentes" title="Lo que más nos preguntan" />
 

@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { FlowAnimation } from "./FlowAnimation";
+import { FlowBackground } from "./FlowBackground";
+import { ParticleField } from "./ParticleField";
 import { useQuoter } from "@/components/quoter/QuoterProvider";
 
 export function Hero() {
@@ -11,9 +13,10 @@ export function Hero() {
 
   return (
     <section className="relative flex min-h-dvh items-center overflow-hidden pt-28 pb-16 md:min-h-fit md:py-24 lg:min-h-dvh lg:pt-28 lg:pb-16">
-      <div className="pointer-events-none absolute left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 rounded-full bg-accent/20 blur-[140px]" />
+      <FlowBackground />
+      <ParticleField />
 
-      <Container className="relative">
+      <Container className="relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}

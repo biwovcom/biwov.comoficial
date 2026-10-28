@@ -95,6 +95,50 @@ body {
   }
 }
 
+@keyframes flow-drift-1 {
+  0%,
+  100% {
+    transform: translate(-8%, -10%) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translate(10%, 6%) rotate(18deg) scale(1.15);
+  }
+}
+@keyframes flow-drift-2 {
+  0%,
+  100% {
+    transform: translate(6%, 10%) rotate(0deg) scale(1.1);
+  }
+  50% {
+    transform: translate(-10%, -6%) rotate(-14deg) scale(0.95);
+  }
+}
+@keyframes flow-drift-3 {
+  0%,
+  100% {
+    transform: translate(-4%, 6%) scale(1);
+  }
+  50% {
+    transform: translate(5%, -8%) scale(1.08);
+  }
+}
+.animate-flow-1 {
+  animation: flow-drift-1 20s ease-in-out infinite;
+}
+.animate-flow-2 {
+  animation: flow-drift-2 24s ease-in-out infinite;
+}
+.animate-flow-3 {
+  animation: flow-drift-3 17s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-flow-1,
+  .animate-flow-2,
+  .animate-flow-3 {
+    animation: none;
+  }
+}
+
 @keyframes pulse-glow {
   0%,
   100% {

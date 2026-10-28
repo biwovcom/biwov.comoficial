@@ -3,6 +3,33 @@ import { Poppins, MuseoModerno, Montserrat } from "next/font/google";
 import "./globals.css";
 import { QuoterProvider } from "@/components/quoter/QuoterProvider";
 import { SiteChrome } from "@/components/layout/SiteChrome";
+import { INSTAGRAM_BIWOV, WHATSAPP_BIWOV } from "@/lib/contacto";
+
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "biwov",
+  alternateName: "biwov_",
+  url: "https://biwov.com",
+  logo: "https://biwov.com/favicon.ico",
+  description:
+    "Agencia de marketing digital y automatización para negocios en Colombia y Latinoamérica: páginas web, CRM, producción de contenido, campañas en Meta y automatización de WhatsApp conectados en un solo sistema.",
+  slogan: "Desde que te ven hasta que pagan.",
+  areaServed: ["Colombia", "Latinoamérica"],
+  knowsLanguage: "es",
+  sameAs: [INSTAGRAM_BIWOV],
+  contactPoint: {
+    "@type": "ContactPoint",
+    contactType: "customer service",
+    telephone: WHATSAPP_BIWOV,
+    areaServed: "CO",
+    availableLanguage: "Spanish",
+  },
+  founder: {
+    "@type": "Person",
+    name: "Katherine Usma Aristizábal",
+  },
+};
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -25,19 +52,32 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://biwov.com"),
-  title: "biwov — Todo tu negocio conectado",
+  title: "biwov — Agencia de marketing digital y automatización en Colombia",
   description:
-    "biwov conecta tus redes, tu WhatsApp, tus ventas y la inteligencia artificial en un solo sistema, para que tu negocio venda más sin que tengas que hacerlo todo tú.",
+    "Agencia de marketing digital que conecta tus redes, tu WhatsApp, tu CRM y la inteligencia artificial en un solo sistema: páginas web, producción de contenido, campañas en Meta y automatización de WhatsApp para que tu negocio venda más sin que tengas que hacerlo todo tú.",
   keywords: [
+    "agencia de marketing digital",
+    "agencia de marketing digital Colombia",
+    "automatización de WhatsApp",
+    "CRM para negocios",
+    "páginas web para negocios",
+    "publicidad en Meta",
+    "campañas de Facebook e Instagram Ads",
+    "producción de contenido para redes sociales",
+    "automatización con inteligencia artificial",
     "negocio conectado",
-    "automatización",
-    "CRM",
-    "marketing digital",
-    "ventas por WhatsApp",
     "biwov",
   ],
+  alternates: {
+    canonical: "https://biwov.com",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
   openGraph: {
-    title: "biwov — Todo tu negocio conectado",
+    title: "biwov — Agencia de marketing digital y automatización en Colombia",
     description:
       "No vendemos servicios sueltos. Conectamos tus herramientas para que trabajen juntas: atraer clientes, venderles y automatizar lo repetitivo.",
     url: "https://biwov.com",
@@ -47,7 +87,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "biwov — Todo tu negocio conectado",
+    title: "biwov — Agencia de marketing digital y automatización en Colombia",
     description:
       "Conectamos tus redes, tu WhatsApp y tus ventas para que tu negocio crezca sin que tengas que hacerlo todo tú.",
   },
@@ -60,6 +100,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${poppins.variable} ${museoModerno.variable} ${montserrat.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-bg-base">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
         <QuoterProvider>
           <SiteChrome>{children}</SiteChrome>
         </QuoterProvider>
