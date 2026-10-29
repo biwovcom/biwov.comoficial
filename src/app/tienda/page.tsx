@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { Ecosystems } from "@/components/sections/Ecosystems";
-import { TiendaBiwov } from "@/components/sections/TiendaBiwov";
+import { TiendaExperiencia } from "@/components/sections/TiendaExperiencia";
 
 export const metadata: Metadata = {
   title: "Tienda biwov_ — Planes y servicios digitales",
@@ -12,10 +11,5 @@ export const metadata: Metadata = {
 };
 
 export default function TiendaPage() {
-  return (
-    <>
-      <Ecosystems />
-      <TiendaBiwov />
-    </>
-  );
+  return <TiendaExperiencia />;
 }

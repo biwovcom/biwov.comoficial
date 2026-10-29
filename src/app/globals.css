@@ -195,12 +195,6 @@ h6 {
     padding: 0 !important;
     background: #ffffff !important;
   }
-  /* Los complementos viven dentro de la sección de Planes (#planes): al
-     imprimir uno de sus modales, también se oculta el resto del contenido
-     de Planes (encabezado, selector de moneda, tarjetas). */
-  body:has(.print-overlay) .planes-contenido-principal {
-    display: none !important;
-  }
   .print-overlay {
     position: static !important;
     background: #ffffff !important;
