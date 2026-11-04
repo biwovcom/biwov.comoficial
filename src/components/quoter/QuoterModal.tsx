@@ -102,6 +102,10 @@ export function QuoterModal() {
       planId: analisisIA.planRecomendado.plan,
       extrasRecomendados: analisisIA.extrasRecomendados,
       cliente: { nombre: contacto.nombre, empresa: contacto.empresa || undefined },
+      diagnostico: {
+        situacion: analisisIA.resumenCorto,
+        porQue: analisisIA.planRecomendado.justificacion,
+      },
     });
     if (!propuesta) {
       setErrorIA("No se encontró el plan recomendado.");

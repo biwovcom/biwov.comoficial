@@ -21,11 +21,14 @@ export function propuestaDesdeRecomendacion({
   extrasRecomendados,
   cliente,
   titulo,
+  diagnostico,
 }: {
   planId: Plan["id"];
   extrasRecomendados: ExtraRecomendado[];
   cliente?: { nombre?: string; empresa?: string };
   titulo?: string;
+  /** Qué se encontró y por qué se eligió este plan. "Para qué" se completa solo con el resumen del plan. */
+  diagnostico?: { situacion: string; porQue: string };
 }): PropuestaImprimibleProps | null {
   const plan = PLANES.find((p) => p.id === planId);
   if (!plan) return null;
@@ -70,6 +73,9 @@ export function propuestaDesdeRecomendacion({
     titulo: titulo ?? `Propuesta para ${cliente?.empresa || cliente?.nombre || plan.nombre}`,
     subtitulo: plan.claim,
     cliente,
+    diagnostico: diagnostico
+      ? { situacion: diagnostico.situacion, porQue: diagnostico.porQue, paraQue: plan.resumen }
+      : undefined,
     items,
     totales: [
       { label: "Mensualidad total", valor: formatCopEnMoneda(totalMensual, "COP", 1) },

@@ -66,6 +66,17 @@ const styles = StyleSheet.create({
   itemDescripcion: { fontSize: 9.5, color: COLOR.grisMedio, marginTop: 3 },
   incluyeItem: { fontSize: 8.5, color: COLOR.grisTexto, marginTop: 2 },
   noIncluyeItem: { fontSize: 8.5, color: COLOR.grisTenue, marginTop: 2 },
+  diagnosticoBox: {
+    backgroundColor: COLOR.fondoClaro,
+    borderLeftWidth: 3,
+    borderLeftColor: COLOR.cian,
+    borderRadius: 8,
+    padding: 12,
+    marginTop: 14,
+  },
+  diagnosticoTexto: { fontSize: 9.5, color: COLOR.grisTexto, lineHeight: 1.4 },
+  diagnosticoFila: { marginTop: 8 },
+  diagnosticoEtiqueta: { fontSize: 8.5, fontWeight: 700, color: COLOR.acero },
   totalesBox: {
     backgroundColor: COLOR.fondoClaro,
     borderRadius: 10,
@@ -91,6 +102,7 @@ export function PropuestaPdfDocument({
   titulo,
   subtitulo,
   cliente,
+  diagnostico,
   items,
   totales,
   formasPago,
@@ -119,6 +131,21 @@ export function PropuestaPdfDocument({
             Para: <Text style={styles.clienteNombre}>{cliente.nombre}</Text>
             {cliente.empresa ? ` · ${cliente.empresa}` : ""}
           </Text>
+        )}
+
+        {diagnostico && (
+          <View style={styles.diagnosticoBox} wrap={false}>
+            <Text style={styles.seccionLabel}>Diagnóstico</Text>
+            <Text style={styles.diagnosticoTexto}>{diagnostico.situacion}</Text>
+            <View style={styles.diagnosticoFila}>
+              <Text style={styles.diagnosticoEtiqueta}>Por qué este plan:</Text>
+              <Text style={styles.diagnosticoTexto}>{diagnostico.porQue}</Text>
+            </View>
+            <View style={styles.diagnosticoFila}>
+              <Text style={styles.diagnosticoEtiqueta}>Para qué:</Text>
+              <Text style={styles.diagnosticoTexto}>{diagnostico.paraQue}</Text>
+            </View>
+          </View>
         )}
 
         <Text style={styles.seccionLabel}>Qué incluye</Text>

@@ -167,6 +167,10 @@ export function AnalisisForm({
       extrasRecomendados: contenido.extrasRecomendados,
       cliente: { nombre: prospectoNombre, empresa: empresa ?? undefined },
       titulo: `Propuesta para ${empresa || prospectoNombre}`,
+      diagnostico: {
+        situacion: `${contenido.etapaNegocioExplicacion} ${contenido.diagnostico.porQueNoHaCrecido}`.trim(),
+        porQue: contenido.planRecomendado.justificacion,
+      },
     });
     if (!propuesta) {
       setError("No se encontró el plan recomendado.");
