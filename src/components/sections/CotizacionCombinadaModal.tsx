@@ -1,12 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Printer } from "lucide-react";
 import { EXTRAS_COTIZABLES } from "@/data/extrasCotizables";
 import { formatCopEnMoneda, type Moneda } from "@/lib/moneda";
 import { CompraFormulario } from "@/components/compras/CompraFormulario";
-import { PropuestaImprimible } from "@/components/propuestas/PropuestaImprimible";
 import { extraAItemPropuesta } from "@/lib/propuestas/itemPropuesta";
+import { descargarPropuestaPdf } from "@/lib/pdf/descargarPropuesta";
 
 export function CotizacionCombinadaModal({
   abierto,
@@ -21,6 +22,9 @@ export function CotizacionCombinadaModal({
   trm: number;
   onClose: () => void;
 }) {
+  const [descargandoPdf, setDescargandoPdf] = useState(false);
+  const [errorPdf, setErrorPdf] = useState<string | null>(null);
+
   const items = Object.entries(carrito)
     .map(([id, cantidad]) => ({ item: EXTRAS_COTIZABLES.find((e) => e.id === id), cantidad }))
     .filter((x): x is { item: (typeof EXTRAS_COTIZABLES)[number]; cantidad: number } => Boolean(x.item) && x.cantidad > 0);
@@ -151,11 +155,28 @@ export function CotizacionCombinadaModal({
 
               <button
                 type="button"
-                onClick={() => window.print()}
-                className="mt-5 flex w-full items-center justify-center gap-2 rounded-full border border-border-glass py-2.5 text-xs font-medium text-text-secondary transition-colors hover:border-accent/40 hover:text-white"
+                disabled={descargandoPdf}
+                onClick={async () => {
+                  setDescargandoPdf(true);
+                  setErrorPdf(null);
+                  const r = await descargarPropuestaPdf({
+                    titulo: "Cotización de tu carrito en la tienda biwov",
+                    items: itemsPropuesta,
+                    totales: [
+                      ...(totalUnico > 0 ? [{ label: "Total pago único", valor: formatCopEnMoneda(totalUnico, moneda, trm) }] : []),
+                      ...(totalMensual > 0 ? [{ label: "Total mensual", valor: formatCopEnMoneda(totalMensual, moneda, trm) }] : []),
+                    ],
+                    formasPago: ["50% anticipado, 50% contra entrega (servicios únicos)", "Pago mensual por adelantado (servicios recurrentes)"],
+                    validez: "Esta propuesta tiene una validez de 15 días.",
+                  });
+                  if (!r.ok) setErrorPdf(r.error);
+                  setDescargandoPdf(false);
+                }}
+                className="mt-5 flex w-full items-center justify-center gap-2 rounded-full border border-border-glass py-2.5 text-xs font-medium text-text-secondary transition-colors hover:border-accent/40 hover:text-white disabled:opacity-50"
               >
-                <Printer size={14} /> Descargar esta cotización en PDF (sin firmar)
+                <Printer size={14} /> {descargandoPdf ? "Generando PDF..." : "Descargar esta cotización en PDF (sin firmar)"}
               </button>
+              {errorPdf && <p className="mt-2 text-xs text-red-400">{errorPdf}</p>}
 
               <div className="mt-4 border-t border-border-glass pt-5">
                 <CompraFormulario
@@ -166,19 +187,6 @@ export function CotizacionCombinadaModal({
                   onConfirmar={confirmar}
                 />
               </div>
-            </div>
-
-            <div className="hidden print:block">
-              <PropuestaImprimible
-                titulo="Cotización de tu carrito en la tienda biwov"
-                items={itemsPropuesta}
-                totales={[
-                  ...(totalUnico > 0 ? [{ label: "Total pago único", valor: formatCopEnMoneda(totalUnico, moneda, trm) }] : []),
-                  ...(totalMensual > 0 ? [{ label: "Total mensual", valor: formatCopEnMoneda(totalMensual, moneda, trm) }] : []),
-                ]}
-                formasPago={["50% anticipado, 50% contra entrega (servicios únicos)", "Pago mensual por adelantado (servicios recurrentes)"]}
-                validez="Esta propuesta tiene una validez de 15 días."
-              />
             </div>
           </motion.div>
         </motion.div>

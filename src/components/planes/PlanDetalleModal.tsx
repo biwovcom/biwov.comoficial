@@ -9,7 +9,8 @@ import { formatCopEnMoneda, sumarPrecios, multiplicarPrecio, type Moneda } from 
 import { cn } from "@/lib/utils";
 import { SelectorExtras } from "./SelectorExtras";
 import { CompraFormulario } from "@/components/compras/CompraFormulario";
-import { PropuestaImprimible, type ItemPropuesta } from "@/components/propuestas/PropuestaImprimible";
+import { type ItemPropuesta } from "@/components/propuestas/PropuestaImprimible";
+import { descargarPropuestaPdf } from "@/lib/pdf/descargarPropuesta";
 
 function FilaIncluye({ item }: { item: ItemPlan }) {
   const [abierto, setAbierto] = useState(false);
@@ -97,6 +98,8 @@ function PlanDetalleTarjeta({
 }) {
   const [mostrarCompra, setMostrarCompra] = useState(abrirEnCompraInicial);
   const [extras, setExtras] = useState<string[]>([]);
+  const [descargandoPdf, setDescargandoPdf] = useState(false);
+  const [errorPdf, setErrorPdf] = useState<string | null>(null);
 
   const toggleExtra = (id: string) => {
     setExtras((prev) => (prev.includes(id) ? prev.filter((e) => e !== id) : [...prev, id]));
@@ -244,11 +247,38 @@ function PlanDetalleTarjeta({
 
         <button
           type="button"
-          onClick={() => window.print()}
-          className="mt-6 flex w-full items-center justify-center gap-2 rounded-full border border-border-glass py-2.5 text-xs font-medium text-text-secondary transition-colors hover:border-accent/40 hover:text-white"
+          disabled={descargandoPdf}
+          onClick={async () => {
+            setDescargandoPdf(true);
+            setErrorPdf(null);
+            const r = await descargarPropuestaPdf({
+              titulo: `Plan ${plan.nombre}`,
+              subtitulo: plan.claim,
+              items: itemsPropuesta,
+              totales: [
+                {
+                  label: `Plan ${plan.nombre} (${DURACION_MINIMA_MESES} meses)`,
+                  valor: formatCopEnMoneda(totalSeisMeses.cop, moneda, trm),
+                },
+                ...(extrasSeleccionados.length
+                  ? [{ label: "Extras seleccionados", valor: formatCopEnMoneda(totalExtrasCop, moneda, trm) }]
+                  : []),
+              ],
+              formasPago: [
+                "Montaje inicial en 1 o 2 cuotas iguales (sin recargo)",
+                "Mensualidad del plan, mes a mes",
+                "Transferencia o PSE, se coordina por WhatsApp",
+              ],
+              validez: `Compromiso mínimo de ${DURACION_MINIMA_MESES} meses.`,
+            });
+            if (!r.ok) setErrorPdf(r.error);
+            setDescargandoPdf(false);
+          }}
+          className="mt-6 flex w-full items-center justify-center gap-2 rounded-full border border-border-glass py-2.5 text-xs font-medium text-text-secondary transition-colors hover:border-accent/40 hover:text-white disabled:opacity-50"
         >
-          <Printer size={14} /> Descargar esta cotización en PDF (sin firmar)
+          <Printer size={14} /> {descargandoPdf ? "Generando PDF..." : "Descargar esta cotización en PDF (sin firmar)"}
         </button>
+        {errorPdf && <p className="mt-2 text-xs text-red-400">{errorPdf}</p>}
 
         <div className="mt-4 border-t border-border-glass pt-5">
           {!mostrarCompra ? (
@@ -269,26 +299,6 @@ function PlanDetalleTarjeta({
             />
           )}
         </div>
-      </div>
-
-      <div className="hidden print:block">
-        <PropuestaImprimible
-          titulo={`Plan ${plan.nombre}`}
-          subtitulo={plan.claim}
-          items={itemsPropuesta}
-          totales={[
-            { label: `Plan ${plan.nombre} (${DURACION_MINIMA_MESES} meses)`, valor: formatCopEnMoneda(totalSeisMeses.cop, moneda, trm) },
-            ...(extrasSeleccionados.length
-              ? [{ label: "Extras seleccionados", valor: formatCopEnMoneda(totalExtrasCop, moneda, trm) }]
-              : []),
-          ]}
-          formasPago={[
-            "Montaje inicial en 1 o 2 cuotas iguales (sin recargo)",
-            "Mensualidad del plan, mes a mes",
-            "Transferencia o PSE, se coordina por WhatsApp",
-          ]}
-          validez={`Compromiso mínimo de ${DURACION_MINIMA_MESES} meses.`}
-        />
       </div>
     </motion.div>
   );

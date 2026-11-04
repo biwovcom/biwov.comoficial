@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Printer } from "lucide-react";
 import type { ReactNode } from "react";
@@ -9,14 +10,16 @@ export function ComplementoPdfModal({
   abierto,
   onClose,
   children,
-  propuesta,
+  onDescargarPdf,
 }: {
   titulo: string;
   abierto: boolean;
   onClose: () => void;
   children: ReactNode;
-  propuesta?: ReactNode;
+  onDescargarPdf?: () => Promise<{ ok: true } | { ok: false; error: string }>;
 }) {
+  const [descargandoPdf, setDescargandoPdf] = useState(false);
+  const [errorPdf, setErrorPdf] = useState<string | null>(null);
   return (
     <AnimatePresence>
       {abierto && (
@@ -46,16 +49,26 @@ export function ComplementoPdfModal({
 
               <div className="mt-5">{children}</div>
 
-              <button
-                type="button"
-                onClick={() => window.print()}
-                className="mt-6 flex w-full items-center justify-center gap-2 rounded-full border border-border-glass py-2.5 text-xs font-medium text-text-secondary transition-colors hover:border-accent/40 hover:text-white"
-              >
-                <Printer size={14} /> Descargar en PDF
-              </button>
+              {onDescargarPdf && (
+                <>
+                  <button
+                    type="button"
+                    disabled={descargandoPdf}
+                    onClick={async () => {
+                      setDescargandoPdf(true);
+                      setErrorPdf(null);
+                      const r = await onDescargarPdf();
+                      if (!r.ok) setErrorPdf(r.error);
+                      setDescargandoPdf(false);
+                    }}
+                    className="mt-6 flex w-full items-center justify-center gap-2 rounded-full border border-border-glass py-2.5 text-xs font-medium text-text-secondary transition-colors hover:border-accent/40 hover:text-white disabled:opacity-50"
+                  >
+                    <Printer size={14} /> {descargandoPdf ? "Generando PDF..." : "Descargar en PDF"}
+                  </button>
+                  {errorPdf && <p className="mt-2 text-xs text-red-400">{errorPdf}</p>}
+                </>
+              )}
             </div>
-
-            {propuesta && <div className="hidden print:block">{propuesta}</div>}
           </motion.div>
         </motion.div>
       )}

@@ -1,12 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Printer } from "lucide-react";
 import type { ExtraCotizable } from "@/data/extrasCotizables";
 import { formatCopEnMoneda, type Moneda } from "@/lib/moneda";
 import { CompraFormulario } from "./CompraFormulario";
-import { PropuestaImprimible } from "@/components/propuestas/PropuestaImprimible";
 import { extraAItemPropuesta } from "@/lib/propuestas/itemPropuesta";
+import { descargarPropuestaPdf } from "@/lib/pdf/descargarPropuesta";
 
 export function CompraItemModal({
   item,
@@ -50,6 +51,8 @@ function ItemTarjeta({
   trm: number;
   onClose: () => void;
 }) {
+  const [descargandoPdf, setDescargandoPdf] = useState(false);
+  const [errorPdf, setErrorPdf] = useState<string | null>(null);
   const precioFormateado = formatCopEnMoneda(item.precioCop, moneda, trm) + (item.periodicidad === "mensual" ? " /mes" : "");
   const monto = moneda === "USD" ? Math.round(item.precioCop / trm) : item.precioCop;
   const formasPago =
@@ -138,11 +141,25 @@ function ItemTarjeta({
 
         <button
           type="button"
-          onClick={() => window.print()}
-          className="mt-4 flex w-full items-center justify-center gap-2 rounded-full border border-border-glass py-2.5 text-xs font-medium text-text-secondary transition-colors hover:border-accent/40 hover:text-white"
+          disabled={descargandoPdf}
+          onClick={async () => {
+            setDescargandoPdf(true);
+            setErrorPdf(null);
+            const r = await descargarPropuestaPdf({
+              titulo: `${item.categoria} — ${item.nombre}`,
+              items: [extraAItemPropuesta(item, moneda, trm)],
+              totales: [{ label: "Total", valor: precioFormateado }],
+              formasPago,
+              validez: "Esta propuesta tiene una validez de 15 días.",
+            });
+            if (!r.ok) setErrorPdf(r.error);
+            setDescargandoPdf(false);
+          }}
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-full border border-border-glass py-2.5 text-xs font-medium text-text-secondary transition-colors hover:border-accent/40 hover:text-white disabled:opacity-50"
         >
-          <Printer size={14} /> Descargar esta cotización en PDF (sin firmar)
+          <Printer size={14} /> {descargandoPdf ? "Generando PDF..." : "Descargar esta cotización en PDF (sin firmar)"}
         </button>
+        {errorPdf && <p className="mt-2 text-xs text-red-400">{errorPdf}</p>}
       </div>
 
       <div className="mt-6 border-t border-border-glass pt-5">
@@ -152,16 +169,6 @@ function ItemTarjeta({
           montoFormateado={precioFormateado}
           mensajeWhatsApp={`¡Hola! 👋 Quiero adquirir "${item.categoria} — ${item.nombre}" (${precioFormateado}). Ya firmé y confirmé desde el sitio.`}
           onConfirmar={confirmar}
-        />
-      </div>
-
-      <div className="hidden print:block">
-        <PropuestaImprimible
-          titulo={`${item.categoria} — ${item.nombre}`}
-          items={[extraAItemPropuesta(item, moneda, trm)]}
-          totales={[{ label: "Total", valor: precioFormateado }]}
-          formasPago={formasPago}
-          validez="Esta propuesta tiene una validez de 15 días."
         />
       </div>
     </motion.div>

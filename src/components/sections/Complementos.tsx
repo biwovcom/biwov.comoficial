@@ -8,8 +8,9 @@ import { ProduccionContenidoDetalle } from "./ProduccionContenidoDetalle";
 import { ComplementoPdfModal } from "./ComplementoPdfModal";
 import { Button } from "@/components/ui/Button";
 import { CompraItemModal } from "@/components/compras/CompraItemModal";
-import { PropuestaImprimible, type ItemPropuesta } from "@/components/propuestas/PropuestaImprimible";
+import { type ItemPropuesta } from "@/components/propuestas/PropuestaImprimible";
 import { extraAItemPropuesta } from "@/lib/propuestas/itemPropuesta";
+import { descargarPropuestaPdf } from "@/lib/pdf/descargarPropuesta";
 import { formatCopEnMoneda, type Moneda } from "@/lib/moneda";
 
 function itemsPropuestaParaComplemento(
@@ -111,7 +112,6 @@ function BotonAgendar({ item }: { item: (typeof COMPLEMENTOS)[number] }) {
 export function Complementos({ moneda, trm }: { moneda: Moneda; trm: number }) {
   const [modalAbierto, setModalAbierto] = useState<string | null>(null);
   const [itemCompra, setItemCompra] = useState<ExtraCotizable | null>(null);
-  const [itemDestacado, setItemDestacado] = useState<ExtraCotizable | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
 
   const itemModal = COMPLEMENTOS.find((c) => c.titulo === modalAbierto) ?? null;
@@ -122,13 +122,16 @@ export function Complementos({ moneda, trm }: { moneda: Moneda; trm: number }) {
 
   const abrirModal = (titulo: string | null) => {
     setModalAbierto(titulo);
-    setItemDestacado(null);
   };
 
-  const descargarItemIndividual = (extra: ExtraCotizable) => {
-    setItemDestacado(extra);
-    requestAnimationFrame(() => window.print());
-  };
+  const descargarItemIndividual = (extra: ExtraCotizable) =>
+    descargarPropuestaPdf({
+      titulo: `${extra.categoria} — ${extra.nombre}`,
+      items: [extraAItemPropuesta(extra, moneda, trm)],
+      totales: [{ label: "Total", valor: formatCopEnMoneda(extra.precioCop, moneda, trm) }],
+      formasPago: ["50% anticipado, 50% contra entrega (servicios únicos)", "Pago mensual por adelantado (servicios recurrentes)"],
+      validez: "Esta propuesta tiene una validez de 15 días.",
+    });
 
   return (
     <div id="complementos-section" className="print-host mt-16 border-t border-border-light pt-16">
@@ -191,21 +194,18 @@ export function Complementos({ moneda, trm }: { moneda: Moneda; trm: number }) {
         titulo={itemModal?.titulo ?? ""}
         abierto={Boolean(itemModal)}
         onClose={() => abrirModal(null)}
-        propuesta={
-          itemModal && (
-            <PropuestaImprimible
-              titulo={itemDestacado ? `${itemModal.titulo} — ${itemDestacado.nombre}` : itemModal.titulo}
-              subtitulo={itemDestacado ? undefined : itemModal.detalle}
-              items={itemDestacado ? [extraAItemPropuesta(itemDestacado, moneda, trm)] : itemsPropuestaParaComplemento(itemModal, moneda, trm)}
-              totales={
-                itemDestacado
-                  ? [{ label: "Total", valor: formatCopEnMoneda(itemDestacado.precioCop, moneda, trm) }]
-                  : []
-              }
-              formasPago={["50% anticipado, 50% contra entrega (servicios únicos)", "Pago mensual por adelantado (servicios recurrentes)"]}
-              validez={itemDestacado ? "Esta propuesta tiene una validez de 15 días." : "Escríbenos cuál de estas opciones te interesa para confirmarla."}
-            />
-          )
+        onDescargarPdf={
+          itemModal
+            ? () =>
+                descargarPropuestaPdf({
+                  titulo: itemModal.titulo,
+                  subtitulo: itemModal.detalle,
+                  items: itemsPropuestaParaComplemento(itemModal, moneda, trm),
+                  totales: [],
+                  formasPago: ["50% anticipado, 50% contra entrega (servicios únicos)", "Pago mensual por adelantado (servicios recurrentes)"],
+                  validez: "Escríbenos cuál de estas opciones te interesa para confirmarla.",
+                })
+            : undefined
         }
       >
         {itemModal && (
