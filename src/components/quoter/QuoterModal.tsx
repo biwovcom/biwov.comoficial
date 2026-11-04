@@ -18,6 +18,9 @@ import { linkWhatsApp } from "@/lib/panel/whatsapp";
 import { WHATSAPP_BIWOV } from "@/lib/contacto";
 import { LINKS_PANEL } from "@/lib/panel/panelConfig";
 import { PLANES } from "@/data/planes";
+import type { AnalisisRapido } from "@/lib/panel/ia/analisisRapido";
+import { propuestaDesdeRecomendacion } from "@/lib/propuestas/propuestaDesdeRecomendacion";
+import { descargarPropuestaPdf } from "@/lib/pdf/descargarPropuesta";
 
 interface Contacto {
   nombre: string;
@@ -52,6 +55,10 @@ export function QuoterModal() {
   const [autorizaDatos, setAutorizaDatos] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [analisisIA, setAnalisisIA] = useState<AnalisisRapido | null>(null);
+  const [generandoIA, setGenerandoIA] = useState(false);
+  const [errorIA, setErrorIA] = useState<string | null>(null);
+  const [descargandoPdf, setDescargandoPdf] = useState(false);
 
   const reset = () => {
     setVista("contacto");
@@ -62,6 +69,48 @@ export function QuoterModal() {
     setProspectoId(null);
     setAutorizaDatos(false);
     setError(null);
+    setAnalisisIA(null);
+    setErrorIA(null);
+  };
+
+  const generarConIA = async () => {
+    if (!prospectoId) return;
+    setGenerandoIA(true);
+    setErrorIA(null);
+    try {
+      const res = await fetch("/api/diagnostico/analizar-rapido", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prospectoId }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setErrorIA(data?.error ?? "No se pudo generar el diagnóstico con IA.");
+        return;
+      }
+      setAnalisisIA(data.analisis);
+    } finally {
+      setGenerandoIA(false);
+    }
+  };
+
+  const descargarPropuestaIA = async () => {
+    if (!analisisIA) return;
+    setDescargandoPdf(true);
+    setErrorIA(null);
+    const propuesta = propuestaDesdeRecomendacion({
+      planId: analisisIA.planRecomendado.plan,
+      extrasRecomendados: analisisIA.extrasRecomendados,
+      cliente: { nombre: contacto.nombre, empresa: contacto.empresa || undefined },
+    });
+    if (!propuesta) {
+      setErrorIA("No se encontró el plan recomendado.");
+      setDescargandoPdf(false);
+      return;
+    }
+    const r = await descargarPropuestaPdf(propuesta);
+    if (!r.ok) setErrorIA(r.error);
+    setDescargandoPdf(false);
   };
 
   const handleClose = () => {
@@ -311,10 +360,63 @@ export function QuoterModal() {
                     <p className="mt-2 text-sm text-text-secondary">{plan.paraQuien}</p>
                   </div>
 
+                  {!analisisIA ? (
+                    <>
+                      <p className="mt-5 text-sm text-text-secondary">
+                        Esta sugerencia es automática y rápida. Para un diagnóstico más a fondo con
+                        IA (y una propuesta lista para descargar), dale clic abajo.
+                      </p>
+                      <Button
+                        size="lg"
+                        variant="secondary"
+                        className="mt-4 w-full"
+                        onClick={generarConIA}
+                        disabled={generandoIA}
+                      >
+                        {generandoIA ? "Analizando con IA..." : "Generar diagnóstico completo con IA"}
+                      </Button>
+                      {errorIA && <p className="mt-2 text-sm text-red-400">{errorIA}</p>}
+                    </>
+                  ) : (
+                    <div className="mt-5 rounded-2xl border border-border-glass bg-white/[0.03] p-5 text-left">
+                      <span className="text-xs font-semibold uppercase tracking-wide text-accent">
+                        Diagnóstico con IA
+                      </span>
+                      <p className="mt-2 text-sm text-text-secondary">{analisisIA.resumenCorto}</p>
+
+                      <p className="mt-4 text-sm font-semibold text-white">
+                        Plan recomendado: {PLANES.find((p) => p.id === analisisIA.planRecomendado.plan)?.nombre}
+                      </p>
+                      <p className="mt-1 text-xs text-text-secondary">{analisisIA.planRecomendado.justificacion}</p>
+
+                      {analisisIA.extrasRecomendados.length > 0 && (
+                        <ul className="mt-3 space-y-1.5">
+                          {analisisIA.extrasRecomendados.map((e, i) => (
+                            <li key={i} className="text-xs text-text-secondary">
+                              <span className="font-medium text-white">
+                                {e.nombre} {e.obligatorio ? "" : "(opcional)"}:
+                              </span>{" "}
+                              {e.justificacion}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+
+                      <Button
+                        size="lg"
+                        className="mt-4 w-full"
+                        onClick={descargarPropuestaIA}
+                        disabled={descargandoPdf}
+                      >
+                        {descargandoPdf ? "Generando PDF..." : "Descargar propuesta en PDF"}
+                      </Button>
+                      {errorIA && <p className="mt-2 text-sm text-red-400">{errorIA}</p>}
+                    </div>
+                  )}
+
                   <p className="mt-5 text-sm text-text-secondary">
-                    Este es un primer resultado automático. Agenda tu asesoría ya mismo — Kathe
-                    revisa tus respuestas antes de la reunión para llegar con recomendaciones
-                    concretas para tu negocio.
+                    Agenda tu asesoría ya mismo — Kathe revisa tus respuestas antes de la reunión
+                    para llegar con recomendaciones concretas para tu negocio.
                   </p>
 
                   {LINKS_PANEL.calendario ? (

@@ -7,11 +7,10 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Select } from "@/components/ui/Select";
 import { PAQUETES_INFO, type AnalisisIA } from "@/lib/panel/ia/schema";
-import { PLANES, DURACION_MINIMA_MESES } from "@/data/planes";
+import { PLANES } from "@/data/planes";
 import { EXTRAS_COTIZABLES, type CategoriaExtra } from "@/data/extrasCotizables";
-import { formatCopEnMoneda } from "@/lib/moneda";
 import { descargarPropuestaPdf } from "@/lib/pdf/descargarPropuesta";
-import type { ItemPropuesta } from "@/components/propuestas/PropuestaImprimible";
+import { propuestaDesdeRecomendacion } from "@/lib/propuestas/propuestaDesdeRecomendacion";
 import { AnalisisImprimible } from "./AnalisisImprimible";
 
 const CATEGORIAS_EXTRA: CategoriaExtra[] = [
@@ -162,66 +161,20 @@ export function AnalisisForm({
     if (!contenido) return;
     setDescargandoPropuesta(true);
     setError(null);
-    const plan = PLANES.find((p) => p.id === contenido.planRecomendado.plan);
-    if (!plan) {
+
+    const propuesta = propuestaDesdeRecomendacion({
+      planId: contenido.planRecomendado.plan,
+      extrasRecomendados: contenido.extrasRecomendados,
+      cliente: { nombre: prospectoNombre, empresa: empresa ?? undefined },
+      titulo: `Propuesta para ${empresa || prospectoNombre}`,
+    });
+    if (!propuesta) {
       setError("No se encontró el plan recomendado.");
       setDescargandoPropuesta(false);
       return;
     }
 
-    const extrasObligatorios = contenido.extrasRecomendados.filter((e) => e.obligatorio);
-    const extrasOpcionales = contenido.extrasRecomendados.filter((e) => !e.obligatorio);
-
-    const itemsPropuesta: ItemPropuesta[] = [
-      {
-        nombre: `Plan ${plan.nombre}`,
-        descripcion: plan.paraQuien,
-        incluye: plan.incluye.flatMap((i) => [i.label, ...(i.subitems ?? [])]),
-        precio: formatCopEnMoneda(plan.precioDesde.cop, "COP", 1),
-        periodicidad: "mensual",
-      },
-      ...extrasObligatorios.map((e) => {
-        const real = EXTRAS_COTIZABLES.find((x) => x.nombre === e.nombre && x.categoria === e.categoria);
-        return {
-          nombre: e.nombre,
-          descripcion: e.justificacion,
-          precio: real ? formatCopEnMoneda(real.precioCop, "COP", 1) : "Por confirmar",
-          periodicidad: real?.periodicidad,
-        };
-      }),
-    ];
-
-    const totalMensual =
-      plan.precioDesde.cop +
-      extrasObligatorios.reduce((acc, e) => {
-        const real = EXTRAS_COTIZABLES.find((x) => x.nombre === e.nombre && x.categoria === e.categoria);
-        return acc + (real?.periodicidad === "mensual" ? real.precioCop : 0);
-      }, 0);
-    const totalUnico = extrasObligatorios.reduce((acc, e) => {
-      const real = EXTRAS_COTIZABLES.find((x) => x.nombre === e.nombre && x.categoria === e.categoria);
-      return acc + (real?.periodicidad === "único" ? real.precioCop : 0);
-    }, 0);
-
-    const r = await descargarPropuestaPdf({
-      titulo: `Propuesta para ${empresa || prospectoNombre}`,
-      subtitulo: plan.claim,
-      cliente: { nombre: prospectoNombre, empresa: empresa ?? undefined },
-      items: itemsPropuesta,
-      totales: [
-        { label: "Mensualidad total", valor: formatCopEnMoneda(totalMensual, "COP", 1) },
-        ...(totalUnico > 0 ? [{ label: "Pago único (montaje/producción)", valor: formatCopEnMoneda(totalUnico, "COP", 1) }] : []),
-      ],
-      formasPago: [
-        "Montaje inicial en 1 o 2 cuotas iguales (sin recargo)",
-        "Mensualidad del plan, mes a mes",
-        "Transferencia o PSE, se coordina por WhatsApp",
-      ],
-      validez: `Compromiso mínimo de ${DURACION_MINIMA_MESES} meses.`,
-      notas:
-        extrasOpcionales.length > 0
-          ? extrasOpcionales.map((e) => `También recomendado (opcional): ${e.nombre} — ${e.justificacion}`)
-          : undefined,
-    });
+    const r = await descargarPropuestaPdf(propuesta);
     if (!r.ok) setError(r.error);
     setDescargandoPropuesta(false);
   };
