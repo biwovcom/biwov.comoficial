@@ -31,6 +31,7 @@ export function CopiarParaIABoton({
       redesSociales,
       resumenFiltro,
       respuestasDiagnostico,
+      cantidadPdfsRedes: 0,
     });
     const texto = `${system}\n\n---\n\n${mensaje}`;
     await navigator.clipboard.writeText(texto);

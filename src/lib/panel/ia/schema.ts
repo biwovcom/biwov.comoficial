@@ -86,6 +86,42 @@ export const AnalisisIASchema = z.object({
   iconosEcosistemaActivos: z.array(z.string()).max(8),
 
   ideasContenido: z.array(z.string()).length(5),
+
+  // --- Recomendación sobre el catálogo REAL de la tienda (no el de paqueteRecomendado,
+  // que es una taxonomía distinta usada solo internamente). Esto es lo que Kathe usa
+  // para armar la cotización real que le llega al prospecto. ---
+  planRecomendado: z.object({
+    // Debe coincidir exactamente con un id de PLANES en src/data/planes.ts.
+    plan: z.enum(["esencial", "crecimiento", "escala"]),
+    justificacion: z.string(),
+  }),
+
+  extrasRecomendados: z.array(
+    z.object({
+      // Debe coincidir, lo más exacto posible, con el "nombre" de un ítem real
+      // de EXTRAS_COTIZABLES en src/data/extrasCotizables.ts.
+      nombre: z.string(),
+      categoria: z.enum([
+        "Producción de contenido",
+        "Grabación y edición de video",
+        "Páginas web",
+        "Campaña en Meta",
+      ]),
+      // true = lo necesita sí o sí para resolver su cuello de botella.
+      // false = se lo ofrecemos como opción adicional, no es indispensable.
+      obligatorio: z.boolean(),
+      justificacion: z.string(),
+    }),
+  ),
+
+  // null si no se adjuntó ningún reporte/captura de redes sociales en PDF.
+  resumenRedesSociales: z
+    .object({
+      fortalezas: z.array(z.string()),
+      debilidades: z.array(z.string()),
+      puntuacionGeneral: Puntaje,
+    })
+    .nullable(),
 });
 
 export type AnalisisIA = z.infer<typeof AnalisisIASchema>;

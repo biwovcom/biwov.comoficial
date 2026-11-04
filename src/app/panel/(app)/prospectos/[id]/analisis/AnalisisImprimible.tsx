@@ -1,4 +1,5 @@
 import { PAQUETES_INFO, type AnalisisIA } from "@/lib/panel/ia/schema";
+import { PLANES } from "@/data/planes";
 
 const ETAPA_LABEL: Record<AnalisisIA["etapaNegocio"], string> = {
   empezando: "Empezando",
@@ -112,6 +113,43 @@ export function AnalisisImprimible({
               <p className="text-[#4b5563]">{PAQUETES_INFO[contenido.paqueteRecomendado.paquete].descripcion}</p>
               <p className="mt-1 text-[#4b5563]">{contenido.paqueteRecomendado.justificacion}</p>
             </Seccion>
+
+            {contenido.resumenRedesSociales && (
+              <Seccion titulo="Resumen de redes sociales">
+                <p className="font-medium">
+                  Puntuación general: {contenido.resumenRedesSociales.puntuacionGeneral.puntaje}/10
+                </p>
+                <p className="mt-1 text-[#4b5563]">
+                  {contenido.resumenRedesSociales.puntuacionGeneral.justificacion}
+                </p>
+                <p className="mt-2 font-medium">Fortalezas</p>
+                <Lista items={contenido.resumenRedesSociales.fortalezas} />
+                <p className="mt-2 font-medium">Debilidades</p>
+                <Lista items={contenido.resumenRedesSociales.debilidades} />
+              </Seccion>
+            )}
+
+            <Seccion titulo="Plan real recomendado">
+              <p className="font-medium">
+                {PLANES.find((p) => p.id === contenido.planRecomendado.plan)?.nombre}
+              </p>
+              <p className="mt-1 text-[#4b5563]">{contenido.planRecomendado.justificacion}</p>
+            </Seccion>
+
+            {contenido.extrasRecomendados.length > 0 && (
+              <Seccion titulo="Extras recomendados">
+                <ul className="space-y-1.5">
+                  {contenido.extrasRecomendados.map((extra, i) => (
+                    <li key={i}>
+                      <span className="font-medium">
+                        {extra.nombre} {extra.obligatorio ? "(obligatorio)" : "(opcional)"}:
+                      </span>{" "}
+                      {extra.justificacion}
+                    </li>
+                  ))}
+                </ul>
+              </Seccion>
+            )}
 
             {contenido.noRecomendarPorAhora.length > 0 && (
               <Seccion titulo="Qué no recomendamos por ahora">

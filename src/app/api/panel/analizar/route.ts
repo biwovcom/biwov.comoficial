@@ -26,9 +26,22 @@ export async function POST(request: Request) {
     );
   }
 
-  const { prospectoId }: { prospectoId: string } = await request.json();
+  const {
+    prospectoId,
+    pdfsRedes,
+  }: { prospectoId: string; pdfsRedes?: { nombre: string; base64: string }[] } = await request.json();
   if (!prospectoId) {
     return NextResponse.json({ error: "Falta el prospecto" }, { status: 400 });
+  }
+
+  const documentosRedes = (pdfsRedes ?? []).slice(0, 5);
+  for (const doc of documentosRedes) {
+    if (!doc.base64 || doc.base64.length > 15_000_000) {
+      return NextResponse.json(
+        { error: `El archivo "${doc.nombre}" no es válido o es demasiado pesado (máx. ~10 MB).` },
+        { status: 400 },
+      );
+    }
   }
 
   const { data: prospecto } = await supabase
@@ -73,9 +86,19 @@ export async function POST(request: Request) {
     redesSociales: prospecto.redes_sociales,
     resumenFiltro,
     respuestasDiagnostico: diagnostico.respuestas,
+    cantidadPdfsRedes: documentosRedes.length,
   });
 
   const client = new Anthropic();
+
+  const contenidoMensaje: Anthropic.Messages.MessageParam["content"] = [
+    { type: "text", text: mensaje },
+    ...documentosRedes.map((doc) => ({
+      type: "document" as const,
+      source: { type: "base64" as const, media_type: "application/pdf" as const, data: doc.base64 },
+      title: doc.nombre,
+    })),
+  ];
 
   let parsed;
   try {
@@ -83,7 +106,7 @@ export async function POST(request: Request) {
       model: "claude-opus-5",
       max_tokens: 16000,
       system,
-      messages: [{ role: "user", content: mensaje }],
+      messages: [{ role: "user", content: contenidoMensaje }],
       output_config: { format: zodOutputFormat(AnalisisIASchema) },
     });
     parsed = { analisis: response.parsed_output, modelo: response.model };

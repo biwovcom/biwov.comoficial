@@ -1,13 +1,34 @@
 "use client";
 
 import { useState } from "react";
-import { Download } from "lucide-react";
+import { Download, FileText, X } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Select } from "@/components/ui/Select";
 import { PAQUETES_INFO, type AnalisisIA } from "@/lib/panel/ia/schema";
+import { PLANES } from "@/data/planes";
+import { EXTRAS_COTIZABLES, type CategoriaExtra } from "@/data/extrasCotizables";
 import { AnalisisImprimible } from "./AnalisisImprimible";
+
+const CATEGORIAS_EXTRA: CategoriaExtra[] = [
+  "Producción de contenido",
+  "Grabación y edición de video",
+  "Páginas web",
+  "Campaña en Meta",
+];
+
+function archivoABase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const resultado = reader.result as string;
+      resolve(resultado.split(",")[1] ?? "");
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
 interface FilaAnalisis {
   id: string;
@@ -128,18 +149,32 @@ export function AnalisisForm({
   const [analisisFila, setAnalisisFila] = useState<FilaAnalisis | null>(analisisInicial);
   const [contenido, setContenido] = useState<AnalisisIA | null>(analisisInicial?.contenido_editado ?? null);
   const [textoManual, setTextoManual] = useState(analisisInicial?.texto_manual ?? "");
+  const [pdfsRedes, setPdfsRedes] = useState<File[]>([]);
   const [generando, setGenerando] = useState(false);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const agregarPdfs = (archivos: FileList | null) => {
+    if (!archivos) return;
+    const nuevos = Array.from(archivos).filter((f) => f.type === "application/pdf");
+    setPdfsRedes((prev) => [...prev, ...nuevos].slice(0, 5));
+  };
+
+  const quitarPdf = (nombre: string) => {
+    setPdfsRedes((prev) => prev.filter((f) => f.name !== nombre));
+  };
 
   const generar = async () => {
     setGenerando(true);
     setError(null);
     try {
+      const pdfsBase64 = await Promise.all(
+        pdfsRedes.map(async (f) => ({ nombre: f.name, base64: await archivoABase64(f) })),
+      );
       const res = await fetch("/api/panel/analizar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prospectoId }),
+        body: JSON.stringify({ prospectoId, pdfsRedes: pdfsBase64 }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -152,6 +187,47 @@ export function AnalisisForm({
       setGenerando(false);
     }
   };
+
+  const SubidaPdfsRedes = (
+    <GlassCard className="p-5">
+      <p className="text-sm font-semibold text-white">Reportes de redes sociales (opcional)</p>
+      <p className="mt-1 text-xs text-text-secondary">
+        Sube capturas o exportes en PDF de Instagram, Facebook, TikTok o YouTube — la IA los analiza
+        junto con el diagnóstico para recomendar el plan real y los extras.
+      </p>
+      <label className="mt-3 flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-border-glass px-4 py-3 text-sm text-text-secondary transition-colors hover:border-accent/40 hover:text-white">
+        <FileText size={16} />
+        Adjuntar PDF (hasta 5)
+        <input
+          type="file"
+          accept="application/pdf"
+          multiple
+          className="hidden"
+          onChange={(e) => agregarPdfs(e.target.files)}
+        />
+      </label>
+      {pdfsRedes.length > 0 && (
+        <ul className="mt-3 space-y-1.5">
+          {pdfsRedes.map((f) => (
+            <li
+              key={f.name}
+              className="flex items-center justify-between gap-2 rounded-lg bg-white/[0.03] px-3 py-1.5 text-xs text-white"
+            >
+              <span className="truncate">{f.name}</span>
+              <button
+                type="button"
+                onClick={() => quitarPdf(f.name)}
+                aria-label={`Quitar ${f.name}`}
+                className="shrink-0 text-text-secondary hover:text-white"
+              >
+                <X size={14} />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </GlassCard>
+  );
 
   const guardarManualNuevo = async () => {
     if (!textoManual.trim()) return;
@@ -214,6 +290,8 @@ export function AnalisisForm({
   if (!analisisFila) {
     return (
       <div className="max-w-xl space-y-5">
+        {SubidaPdfsRedes}
+
         <GlassCard className="p-6">
           <p className="mb-4 text-sm text-text-secondary">
             Todavía no se ha generado un análisis para este prospecto.
@@ -312,6 +390,8 @@ export function AnalisisForm({
           </Button>
         </div>
       </div>
+
+      {SubidaPdfsRedes}
 
       <GlassCard className="space-y-4 p-5">
         <p className="text-sm font-semibold text-white">Etapa del negocio</p>
@@ -443,6 +523,159 @@ export function AnalisisForm({
           value={contenido.paqueteRecomendado.justificacion}
           onChange={(v) => update({ paqueteRecomendado: { ...contenido.paqueteRecomendado, justificacion: v } })}
         />
+      </GlassCard>
+
+      {contenido.resumenRedesSociales && (
+        <GlassCard className="space-y-3 border-accent/30 bg-accent/5 p-5">
+          <p className="text-sm font-semibold text-white">Resumen de redes sociales (del PDF adjunto)</p>
+          <CampoPuntaje
+            label="Puntuación general"
+            value={contenido.resumenRedesSociales.puntuacionGeneral}
+            onChange={(v) =>
+              update({
+                resumenRedesSociales: contenido.resumenRedesSociales
+                  ? { ...contenido.resumenRedesSociales, puntuacionGeneral: v }
+                  : null,
+              })
+            }
+          />
+          <CampoLista
+            label="Fortalezas"
+            value={contenido.resumenRedesSociales.fortalezas}
+            onChange={(v) =>
+              update({
+                resumenRedesSociales: contenido.resumenRedesSociales
+                  ? { ...contenido.resumenRedesSociales, fortalezas: v }
+                  : null,
+              })
+            }
+          />
+          <CampoLista
+            label="Debilidades"
+            value={contenido.resumenRedesSociales.debilidades}
+            onChange={(v) =>
+              update({
+                resumenRedesSociales: contenido.resumenRedesSociales
+                  ? { ...contenido.resumenRedesSociales, debilidades: v }
+                  : null,
+              })
+            }
+          />
+        </GlassCard>
+      )}
+
+      <GlassCard className="space-y-4 border-accent/30 bg-accent/5 p-5">
+        <p className="text-sm font-semibold text-white">Plan real recomendado (para la cotización)</p>
+        <Select
+          value={contenido.planRecomendado.plan}
+          onChange={(e) =>
+            update({
+              planRecomendado: {
+                ...contenido.planRecomendado,
+                plan: e.target.value as AnalisisIA["planRecomendado"]["plan"],
+              },
+            })
+          }
+        >
+          {PLANES.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.nombre}
+            </option>
+          ))}
+        </Select>
+        <p className="text-xs text-text-secondary">
+          {PLANES.find((p) => p.id === contenido.planRecomendado.plan)?.claim} — desde{" "}
+          {PLANES.find((p) => p.id === contenido.planRecomendado.plan)?.precioDesde.cop.toLocaleString("es-CO")}{" "}
+          COP/mes
+        </p>
+        <CampoTexto
+          label="Justificación"
+          value={contenido.planRecomendado.justificacion}
+          onChange={(v) => update({ planRecomendado: { ...contenido.planRecomendado, justificacion: v } })}
+        />
+      </GlassCard>
+
+      <GlassCard className="space-y-4 p-5">
+        <div className="flex items-center justify-between">
+          <p className="text-sm font-semibold text-white">Extras recomendados</p>
+          <button
+            type="button"
+            onClick={() =>
+              update({
+                extrasRecomendados: [
+                  ...contenido.extrasRecomendados,
+                  { nombre: "", categoria: "Producción de contenido", obligatorio: false, justificacion: "" },
+                ],
+              })
+            }
+            className="text-xs text-accent hover:underline"
+          >
+            + Agregar extra
+          </button>
+        </div>
+
+        {contenido.extrasRecomendados.length === 0 && (
+          <p className="text-xs text-text-secondary">Ninguno por ahora.</p>
+        )}
+
+        {contenido.extrasRecomendados.map((extra, i) => {
+          const actualizarExtra = (patch: Partial<AnalisisIA["extrasRecomendados"][number]>) => {
+            const copia = [...contenido.extrasRecomendados];
+            copia[i] = { ...copia[i], ...patch };
+            update({ extrasRecomendados: copia });
+          };
+          const opciones = EXTRAS_COTIZABLES.filter((e) => e.categoria === extra.categoria);
+
+          return (
+            <div key={i} className="space-y-2 rounded-xl bg-white/[0.03] p-3">
+              <div className="flex items-center justify-between gap-2">
+                <Select
+                  value={extra.categoria}
+                  onChange={(e) => actualizarExtra({ categoria: e.target.value as CategoriaExtra, nombre: "" })}
+                >
+                  {CATEGORIAS_EXTRA.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </Select>
+                <button
+                  type="button"
+                  onClick={() =>
+                    update({ extrasRecomendados: contenido.extrasRecomendados.filter((_, idx) => idx !== i) })
+                  }
+                  aria-label="Quitar extra"
+                  className="shrink-0 text-text-secondary hover:text-white"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+              <Select value={extra.nombre} onChange={(e) => actualizarExtra({ nombre: e.target.value })}>
+                <option value="">Elige el servicio exacto...</option>
+                {opciones.map((o) => (
+                  <option key={o.id} value={o.nombre}>
+                    {o.nombre} — {o.precioCop.toLocaleString("es-CO")} COP{o.periodicidad === "mensual" ? "/mes" : ""}
+                  </option>
+                ))}
+              </Select>
+              <label className="flex items-center gap-2 text-xs text-text-secondary">
+                <input
+                  type="checkbox"
+                  checked={extra.obligatorio}
+                  onChange={(e) => actualizarExtra({ obligatorio: e.target.checked })}
+                />
+                Es obligatorio (lo necesita sí o sí, no es solo una opción)
+              </label>
+              <textarea
+                rows={2}
+                className={textareaClass}
+                placeholder="Justificación..."
+                value={extra.justificacion}
+                onChange={(e) => actualizarExtra({ justificacion: e.target.value })}
+              />
+            </div>
+          );
+        })}
       </GlassCard>
 
       <GlassCard className="space-y-4 p-5">
