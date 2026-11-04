@@ -1,4 +1,4 @@
-import { NIVELES_PRODUCCION, PRODUCCION_VIDEO } from "@/data/addOns";
+import { NIVELES_PRODUCCION, PRODUCCION_VIDEO, PRODUCCION_UGC } from "@/data/addOns";
 import { COMPLEMENTOS } from "@/data/complementos";
 import type { TipoContrato } from "@/lib/contrato";
 
@@ -48,7 +48,7 @@ export const EXTRAS_COTIZABLES: ExtraCotizable[] = [
   })),
   ...PRODUCCION_VIDEO.paquetes.map((paquete) => ({
     id: `video-${paquete.id}`,
-    nombre: `${paquete.cantidadVideos} videos${paquete.esMensual ? " al mes" : ""}`,
+    nombre: paquete.nombre ?? `${paquete.cantidadVideos} videos${paquete.esMensual ? " al mes" : ""}`,
     categoria: "Grabación y edición de video" as const,
     tipoContrato: TIPO_CONTRATO_POR_CATEGORIA["Grabación y edición de video"],
     precioCop: paquete.precio,
@@ -56,6 +56,17 @@ export const EXTRAS_COTIZABLES: ExtraCotizable[] = [
     descripcion: PRODUCCION_VIDEO.descripcion,
     incluye: PRODUCCION_VIDEO.incluye,
     noIncluye: PRODUCCION_VIDEO.noIncluye,
+  })),
+  ...PRODUCCION_UGC.paquetes.map((paquete) => ({
+    id: `video-${paquete.id}`,
+    nombre: paquete.nombre ?? `${paquete.cantidadVideos} videos UGC`,
+    categoria: "Grabación y edición de video" as const,
+    tipoContrato: TIPO_CONTRATO_POR_CATEGORIA["Grabación y edición de video"],
+    precioCop: paquete.precio,
+    periodicidad: (paquete.esMensual ? "mensual" : "único") as "único" | "mensual",
+    descripcion: PRODUCCION_UGC.descripcion,
+    incluye: PRODUCCION_UGC.incluye,
+    noIncluye: PRODUCCION_UGC.noIncluye,
   })),
   ...(paginasWeb?.items ?? [])
     .filter((item) => item.precioCop !== undefined)

@@ -38,6 +38,8 @@ export interface PaqueteProduccionVideo {
   cantidadVideos: number;
   precio: number; // COP
   esMensual?: boolean;
+  /** Si se da, reemplaza el nombre autogenerado ("3 videos", etc.). */
+  nombre?: string;
 }
 
 /**
@@ -58,10 +60,34 @@ export const PRODUCCION_VIDEO = {
   reglaJornada: "Una jornada de grabación de 4 horas rinde hasta 3 videos terminados.",
   notaPrecio: "Mientras más videos grabes de una vez, menor es el costo por video a partir del cuarto.",
   paquetes: [
-    { id: "3-videos", cantidadVideos: 3, precio: 360000 },
-    { id: "6-videos", cantidadVideos: 6, precio: 696000 },
-    { id: "12-videos-mes", cantidadVideos: 12, precio: 1344000, esMensual: true },
-  ] satisfies PaqueteProduccionVideo[],
+    { id: "3-videos", cantidadVideos: 3, precio: 450000 },
+    { id: "6-videos", cantidadVideos: 6, precio: 870000 },
+    { id: "12-videos-mes", cantidadVideos: 12, precio: 1680000, esMensual: true },
+  ] as PaqueteProduccionVideo[],
+};
+
+/**
+ * UGC (contenido generado por usuario/creador): servicio aparte de
+ * PRODUCCION_VIDEO, con su propia curva de descuento por volumen. Se cobra
+ * por video individual, no por jornada ni por paquete mensual.
+ */
+export const PRODUCCION_UGC = {
+  descripcion:
+    "Grabación y edición de video estilo UGC (contenido generado por creador): cercano, auténtico, pensado para pauta y redes.",
+  incluye: [
+    "Grabación con equipo profesional (cámara, audio e iluminación)",
+    "Edición y corrección de color",
+    "Entrega en formato vertical, lista para publicar",
+  ],
+  noIncluye: [] as string[],
+  notaPrecio: "Entre más videos UGC grabes de una vez, menor es el costo por video.",
+  paquetes: [
+    { id: "ugc-x1", cantidadVideos: 1, precio: 459000, nombre: "Grabación y edición UGC x1 video" },
+    { id: "ugc-x2", cantidadVideos: 2, precio: 900000, nombre: "Grabación y edición UGC x2 videos" },
+    { id: "ugc-x3", cantidadVideos: 3, precio: 1320000, nombre: "Grabación y edición UGC x3 videos" },
+    { id: "ugc-x4", cantidadVideos: 4, precio: 1720000, nombre: "Grabación y edición UGC x4 videos" },
+    { id: "ugc-x5", cantidadVideos: 5, precio: 2100000, nombre: "Grabación y edición UGC x5 videos" },
+  ] as PaqueteProduccionVideo[],
 };
 
 // Valores en USD son una referencia aproximada (tasa ~4.000 COP/USD).
