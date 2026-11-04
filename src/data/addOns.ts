@@ -63,6 +63,12 @@ export const PRODUCCION_VIDEO = {
     { id: "3-videos", cantidadVideos: 3, precio: 450000 },
     { id: "6-videos", cantidadVideos: 6, precio: 870000 },
     { id: "12-videos-mes", cantidadVideos: 12, precio: 1680000, esMensual: true },
+    {
+      id: "4-adicionales-plan",
+      cantidadVideos: 4,
+      precio: 360000,
+      nombre: "4 videos adicionales (si ya tienes un plan)",
+    },
   ] as PaqueteProduccionVideo[],
 };
 

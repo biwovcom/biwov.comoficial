@@ -72,6 +72,7 @@ export const PLANES: Plan[] = [
         ],
       },
       { label: "Asistente con IA que filtra a los curiosos y te pasa los interesados" },
+      { label: "3 videos y 2 imágenes de contenido cada mes, grabados y editados por nosotros" },
     ],
     precioDesde: { cop: 1900000, usd: 475 },
     montajeInicial: { cop: 1800000, usd: 450 },
