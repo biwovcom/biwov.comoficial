@@ -45,14 +45,14 @@ export function CartDrawer({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 z-[60] bg-[#0a2642]/60 backdrop-blur-sm"
+            className="fixed inset-0 z-[60] bg-[#03101b]/70 backdrop-blur-sm"
           />
           <motion.aside
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-y-0 right-0 z-[61] flex w-full max-w-md flex-col bg-bg-light-elevated shadow-2xl"
+            className="card-universo fixed inset-y-0 right-0 z-[61] flex w-full max-w-md flex-col rounded-l-[2rem] shadow-2xl"
           >
             <div className="flex items-center justify-between border-b border-border-light px-6 py-5">
               <h3 className="text-lg font-bold text-text-on-light">Tu carrito</h3>

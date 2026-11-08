@@ -382,7 +382,7 @@ export function QuoterModal() {
                       {errorIA && <p className="mt-2 text-sm text-red-400">{errorIA}</p>}
                     </>
                   ) : (
-                    <div className="mt-5 rounded-2xl border border-border-glass bg-white/[0.03] p-5 text-left">
+                    <div className="card-universo mt-5 rounded-[1.5rem] p-5 text-left">
                       <span className="text-xs font-semibold uppercase tracking-wide text-accent">
                         Diagnóstico con IA
                       </span>

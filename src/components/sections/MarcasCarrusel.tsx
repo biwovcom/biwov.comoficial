@@ -71,7 +71,7 @@ export function MarcasCarrusel() {
   }, [pausado, activa]);
 
   return (
-    <section className="py-16 md:py-24">
+    <section id="casos" className="scroll-mt-24 py-16 md:py-24">
       <Container className="!max-w-7xl">
         <motion.span
           initial={{ opacity: 0, y: 12 }}
