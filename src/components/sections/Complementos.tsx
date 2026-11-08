@@ -137,7 +137,7 @@ export function Complementos({ moneda, trm }: { moneda: Moneda; trm: number }) {
     <div id="complementos-section" className="print-host mt-16 border-t border-border-light pt-16">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <span className="inline-block rounded-full border border-border-light bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-accent">
+          <span className="inline-block rounded-full border border-border-light bg-white/[0.04] px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-accent">
             Complementos
           </span>
           <h3 className="mt-3 text-2xl font-semibold text-text-on-light sm:text-3xl">

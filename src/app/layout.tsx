@@ -105,7 +105,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="es"
       className={`${inter.variable} ${nunito.variable} ${museoModerno.variable} ${montserrat.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col bg-bg-base">
+      <body className="flex min-h-full flex-col bg-bg-deep">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
 import { Search, ShoppingBag } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { ProductoCard } from "@/components/tienda/ProductoCard";
@@ -85,30 +84,22 @@ export function TiendaCatalogo({
 
   return (
     <section id="tienda" className="print-host bg-bg-light">
-      <div className="relative isolate overflow-hidden py-16 md:py-20">
-        <Image
-          src="https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1920&q=70"
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-[#0a2642]/82" />
-        <Container className="relative z-10 text-center">
-          <span className="mb-4 inline-block rounded-full border border-white/20 bg-white/[0.06] px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-accent">
+      <div className="relative isolate overflow-hidden pb-14 pt-36 md:pb-20 md:pt-44">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_70%_at_85%_10%,rgba(0,194,232,0.16),transparent_65%)]" />
+        <Container className="relative z-10">
+          <span className="mb-5 block text-xs font-semibold uppercase tracking-[0.22em] text-accent md:text-sm">
             Tienda biwov_
           </span>
-          <h1 className="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
-            Arma tu ecosistema digital
+          <h1 className="max-w-4xl text-[2.6rem] font-semibold leading-[1] tracking-[-0.045em] text-white sm:text-6xl md:text-7xl">
+            Arma tu ecosistema <span className="text-accent">digital.</span>
           </h1>
-          <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-white/75 md:text-lg">
-            Elige un plan mensual o agrega servicios sueltos — como en una tienda, a tu propio
-            ritmo.
+          <p className="mt-6 max-w-xl text-base leading-relaxed text-white/65 md:text-xl">
+            Elige un plan mensual o agrega servicios sueltos, como en una tienda, a tu propio ritmo.
           </p>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs uppercase tracking-wide text-white/70">
-            <span>✦ Producción propia</span>
-            <span>✦ Cotización inmediata</span>
-            <span>✦ Pago seguro en línea</span>
+          <div className="mt-8 flex flex-wrap gap-x-8 gap-y-2 text-sm text-white/55">
+            <span>Producción propia</span>
+            <span>Cotización inmediata</span>
+            <span>Pago seguro en línea</span>
           </div>
         </Container>
       </div>
@@ -125,7 +116,7 @@ export function TiendaCatalogo({
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
               placeholder="Buscar un servicio…"
-              className="w-full rounded-full border border-border-light bg-white py-2 pl-9 pr-4 text-sm text-text-on-light placeholder:text-text-on-light-secondary focus:border-accent/50 focus:outline-none"
+              className="w-full rounded-full border border-border-light bg-white/[0.04] py-2 pl-9 pr-4 text-sm text-text-on-light placeholder:text-text-on-light-secondary focus:border-accent/50 focus:outline-none"
             />
           </div>
           <div className="ml-auto flex shrink-0 items-center gap-2">
@@ -134,7 +125,7 @@ export function TiendaCatalogo({
               type="button"
               onClick={() => setCarritoAbierto(true)}
               aria-label="Abrir carrito"
-              className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border-light bg-white text-text-on-light hover:border-accent/40"
+              className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border-light bg-white/[0.04] text-text-on-light hover:border-accent/40"
             >
               <ShoppingBag className="h-5 w-5" />
               {totalUnidades > 0 && (
@@ -156,7 +147,7 @@ export function TiendaCatalogo({
                 "shrink-0 rounded-full border px-4 py-1.5 text-xs font-semibold whitespace-nowrap transition-colors",
                 categoriaActiva === cat
                   ? "border-transparent bg-gradient-brand text-white"
-                  : "border-border-light bg-white text-text-on-light-secondary hover:text-text-on-light",
+                  : "border-border-light bg-white/[0.04] text-text-on-light-secondary hover:text-text-on-light",
               )}
             >
               {cat}

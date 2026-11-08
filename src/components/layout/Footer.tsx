@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { LockKeyhole } from "lucide-react";
 import { Container } from "@/components/ui/Container";
+import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
 import { linkWhatsApp } from "@/lib/panel/whatsapp";
 import { LogoMark } from "./LogoMark";
 import {
@@ -10,71 +11,96 @@ import {
   INSTAGRAM_KATHE,
 } from "@/lib/contacto";
 
-function InstagramIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className={className}>
-      <rect x="3" y="3" width="18" height="18" rx="5" />
-      <circle cx="12" cy="12" r="4" />
-      <circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
+const ECOSISTEMA = [
+  { href: "/#servicios", label: "Servicios" },
+  { href: "/tienda#planes", label: "Planes" },
+  { href: "/tienda", label: "Tienda" },
+  { href: "/#casos", label: "Casos" },
+  { href: "/kathe", label: "Fundadora" },
+];
 
 export function Footer() {
+  const whatsapp = linkWhatsApp(WHATSAPP_BIWOV, MENSAJE_WHATSAPP_BIWOV);
+  const enlace = "text-[15px] text-white/55 transition-colors hover:text-white";
+
   return (
-    <footer className="border-t border-border-glass pt-12 pb-24 sm:pb-12">
-      <Container className="flex flex-col items-center justify-between gap-6 text-center text-sm text-text-secondary md:flex-row md:text-left">
-        <div className="flex items-center gap-2">
-          <LogoMark className="h-5 w-5 shrink-0 text-white" />
-          <span className="font-logo text-lg font-bold text-white">biwov_</span>
-          <span>Diseña ecosistemas digitales inteligentes</span>
+    <footer className="border-t border-white/[0.06] bg-[#020b13] pt-20 pb-28 sm:pb-14">
+      <Container className="!max-w-7xl">
+        <div className="grid gap-14 md:grid-cols-[1.4fr_1fr_1fr]">
+          <div>
+            <Link href="/" className="flex items-center gap-2 font-logo text-2xl font-bold text-white">
+              <LogoMark className="h-7 w-7 text-white" />
+              biwov_
+            </Link>
+            <p className="mt-10 max-w-md text-2xl font-medium leading-snug tracking-[-0.02em] text-white md:text-3xl">
+              Ideas para que tu negocio venda más y mejor.
+            </p>
+            <p className="mt-4 max-w-md text-base leading-relaxed text-white/55">
+              Escríbenos y te contamos qué necesita tu negocio hoy: estrategia, contenido, campañas o
+              automatización.
+            </p>
+            <a
+              href={whatsapp}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-7 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#03101b] transition-transform duration-300 hover:scale-[1.03]"
+            >
+              <WhatsAppIcon className="h-5 w-5" />
+              Escríbenos por WhatsApp
+            </a>
+          </div>
+
+          <div>
+            <p className="text-base font-semibold text-white">Ecosistema</p>
+            <ul className="mt-5 space-y-3">
+              {ECOSISTEMA.map((l) => (
+                <li key={l.href}>
+                  <a href={l.href} className={enlace}>
+                    {l.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <p className="text-base font-semibold text-white">Atención</p>
+            <ul className="mt-5 space-y-3">
+              <li>
+                <a href={whatsapp} target="_blank" rel="noopener noreferrer" className={enlace}>
+                  WhatsApp
+                </a>
+              </li>
+              <li>
+                <a href={INSTAGRAM_BIWOV} target="_blank" rel="noopener noreferrer" className={enlace}>
+                  Instagram biwov
+                </a>
+              </li>
+              <li>
+                <a href={INSTAGRAM_KATHE} target="_blank" rel="noopener noreferrer" className={enlace}>
+                  Instagram Kathe
+                </a>
+              </li>
+              <li>
+                <Link href="/contrato" className={enlace}>
+                  Términos y condiciones
+                </Link>
+              </li>
+              <li>
+                <Link href="/politica-datos" className={enlace}>
+                  Política de datos
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
-        <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
-          <Link href="/contrato" className="hover:text-white">
-            Términos y condiciones
-          </Link>
-          <Link href="/politica-datos" className="hover:text-white">
-            Política de datos
-          </Link>
-          <a
-            href={linkWhatsApp(WHATSAPP_BIWOV, MENSAJE_WHATSAPP_BIWOV)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-white"
-          >
-            WhatsApp
-          </a>
-          <a
-            href={INSTAGRAM_BIWOV}
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Instagram de biwov"
-            className="flex items-center gap-1.5 hover:text-white"
-          >
-            <InstagramIcon className="h-4 w-4" />
-            Instagram
-          </a>
-          <a
-            href={INSTAGRAM_KATHE}
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Instagram de Katherine"
-            className="flex items-center gap-1.5 hover:text-white"
-          >
-            <InstagramIcon className="h-4 w-4" />
-            Kathe
-          </a>
-        </div>
-        <p className="flex items-center gap-1.5">
-          © {new Date().getFullYear()} biwov. Todos los derechos reservados.
-          <Link
-            href="/panel/login"
-            aria-label="Acceso privado"
-            className="opacity-20 transition-opacity hover:opacity-60"
-          >
+
+        <div className="mt-16 flex items-center gap-2 border-t border-white/[0.06] pt-7 text-sm text-white/40">
+          <span>© {new Date().getFullYear()} biwov. Todos los derechos reservados.</span>
+          <Link href="/panel/login" aria-label="Acceso privado" className="opacity-30 transition-opacity hover:opacity-70">
             <LockKeyhole className="h-3 w-3" />
           </Link>
-        </p>
+        </div>
       </Container>
     </footer>
   );

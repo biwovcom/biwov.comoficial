@@ -4,51 +4,54 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
-import { Button } from "@/components/ui/Button";
 import { CIFRAS_KATHE } from "@/data/kathe";
 
 export function FounderTeaser() {
   return (
     <section className="py-16 md:py-24">
-      <Container>
+      <Container className="!max-w-7xl">
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="grid items-center gap-10 md:grid-cols-[auto_1fr]"
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          className="card-universo group grid overflow-hidden rounded-[2rem] p-3 md:grid-cols-[1fr_1.1fr] md:p-4"
         >
-          <div className="relative mx-auto aspect-square w-40 shrink-0 overflow-hidden rounded-full border border-accent/30 md:w-48">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-[1.5rem] md:aspect-auto md:min-h-[460px]">
             <Image
               src="/kathe.png"
               alt="Katherine Usma Aristizábal, fundadora de biwov_"
               fill
-              sizes="200px"
-              className="object-cover object-[15%_35%]"
+              sizes="(max-width: 768px) 100vw, 600px"
+              className="object-cover object-[15%_35%] transition-transform duration-700 group-hover:scale-[1.04]"
             />
           </div>
 
-          <div className="text-center md:text-left">
-            <span className="text-xs font-semibold uppercase tracking-wide text-accent">
+          <div className="flex flex-col justify-center px-4 py-10 md:px-14">
+            <span className="text-xs font-semibold uppercase tracking-[0.22em] text-accent md:text-sm">
               Quién está detrás de biwov
             </span>
-            <h3 className="mt-2 text-xl font-semibold text-white md:text-2xl">
-              Katherine Usma Aristizábal · Fundadora de biwov_
-            </h3>
-            <p className="mt-2 max-w-xl text-sm text-text-secondary md:text-base">
-              Ordenamos tu negocio digital para que escale con claridad.
+            <h2 className="mt-4 text-4xl font-medium leading-[1.05] text-white md:text-5xl">
+              Katherine Usma Aristizábal
+            </h2>
+            <p className="mt-4 max-w-md text-base leading-relaxed text-white/60 md:text-lg">
+              Fundadora de biwov_. Ordenamos tu negocio digital para que escale con claridad.
             </p>
 
-            <div className="mt-5 flex flex-wrap justify-center gap-6 md:justify-start">
+            <dl className="mt-8 grid grid-cols-3 gap-4">
               {CIFRAS_KATHE.map((cifra) => (
                 <div key={cifra.valor}>
-                  <p className="text-xl font-semibold text-accent">{cifra.valor}</p>
+                  <dt className="text-2xl font-semibold tracking-tight text-white md:text-3xl">{cifra.valor}</dt>
+                  <dd className="mt-1 text-xs leading-snug text-white/50 md:text-sm">{cifra.etiqueta}</dd>
                 </div>
               ))}
-            </div>
+            </dl>
 
-            <Link href="/kathe" className="mt-6 inline-block">
-              <Button variant="secondary">Conoce mi historia</Button>
+            <Link
+              href="/kathe"
+              className="mt-9 self-start border-b border-white/70 pb-1 text-base text-white transition-colors hover:border-accent hover:text-accent md:text-lg"
+            >
+              Conoce mi historia
             </Link>
           </div>
         </motion.div>

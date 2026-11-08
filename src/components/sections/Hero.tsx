@@ -15,7 +15,7 @@ const CIFRAS = [
 
 export function Hero() {
   return (
-    <section className="relative isolate flex flex-col overflow-hidden bg-[#03101b] pb-14 pt-[340px] sm:pt-[420px] md:min-h-[100svh] md:justify-center md:pb-20 md:pt-32">
+    <section className="relative isolate flex flex-col overflow-hidden bg-[#03101b] pb-14 pt-[340px] sm:pt-[420px] md:min-h-[min(100svh,980px)] md:justify-center md:pb-20 md:pt-32">
       {/* Foto de Kathe a sangre: en escritorio ocupa el lado derecho; en móvil queda arriba, detrás del texto. */}
       <div className="absolute inset-x-0 top-0 h-[400px] sm:h-[480px] md:inset-0 md:h-auto">
       <Image
@@ -28,7 +28,7 @@ export function Hero() {
       />
       <div className="absolute inset-0 bg-gradient-to-t from-[#03101b] via-[#03101b]/20 to-transparent md:bg-gradient-to-r md:from-[#03101b] md:via-[#03101b]/60 md:to-transparent" />
       </div>
-      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-bg-base to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-bg-deep to-transparent" />
 
       <Container className="relative z-10 !max-w-7xl">
         <motion.div

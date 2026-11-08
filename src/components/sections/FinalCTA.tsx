@@ -1,44 +1,40 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
-import { Button } from "@/components/ui/Button";
-import { useQuoter } from "@/components/quoter/QuoterProvider";
+import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
+import { linkWhatsApp } from "@/lib/panel/whatsapp";
+import { WHATSAPP_BIWOV, MENSAJE_WHATSAPP_BIWOV } from "@/lib/contacto";
 
 export function FinalCTA() {
-  const { open } = useQuoter();
-
   return (
-    <section className="py-16 md:py-24">
-      <Container>
+    <section className="py-20 md:py-32">
+      <Container className="!max-w-7xl">
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="relative isolate overflow-hidden rounded-[2.5rem] px-8 py-16 text-center md:px-16 md:py-24"
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          className="card-universo grid items-center gap-10 rounded-[2.25rem] px-7 py-14 md:grid-cols-2 md:gap-16 md:px-16 md:py-24"
         >
-          <Image
-            src="https://images.unsplash.com/photo-1496307653780-42ee777d4833?auto=format&fit=crop&w=1600&q=70"
-            alt=""
-            fill
-            sizes="(max-width: 1024px) 100vw, 1200px"
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-[#0a2642]/85" />
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,194,232,0.18),transparent_60%)]" />
-          <h2 className="relative text-2xl font-semibold text-white sm:text-4xl md:text-5xl">
-            ¿No sabes por dónde empezar?
+          <h2 className="text-4xl font-medium leading-[1.04] text-white sm:text-5xl md:text-[3.6rem]">
+            Todo lo que tu negocio necesita para{" "}
+            <span className="text-accent">vender más y mejor.</span>
           </h2>
-          <p className="relative mx-auto mt-4 max-w-md text-sm text-white/80 md:text-base">
-            Empecemos por entender tu negocio. Responde unas preguntas rápidas y te decimos qué
-            necesita tu negocio hoy.
-          </p>
-          <div className="relative mt-8">
-            <Button size="lg" variant="white" onClick={() => open()}>
-              Haz tu diagnóstico gratis
-            </Button>
+          <div>
+            <p className="text-lg leading-relaxed text-white/60 md:text-xl">
+              Estrategia para decidir. Contenido para atraer. Tecnología para vender.
+              Acompañamiento para crecer.
+            </p>
+            <a
+              href={linkWhatsApp(WHATSAPP_BIWOV, MENSAJE_WHATSAPP_BIWOV)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-9 inline-flex items-center gap-3 rounded-full bg-white px-8 py-4 text-base font-semibold text-[#03101b] transition-transform duration-300 hover:scale-[1.03] md:text-lg"
+            >
+              <WhatsAppIcon className="h-6 w-6" />
+              Hablemos de tu negocio
+            </a>
           </div>
         </motion.div>
       </Container>

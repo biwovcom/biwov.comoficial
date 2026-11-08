@@ -43,36 +43,28 @@ export function CaseStudies() {
 
   return (
     <section id="casos" className="py-16 md:py-24">
-      <div className="relative isolate mb-14 overflow-hidden py-16 md:py-20">
-        <Image
-          src="https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=1920&q=70"
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-[#0a2642]/80" />
-        <Container className="relative z-10">
-          <span className="mb-3 block text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+      <div className="mb-14">
+        <Container className="!max-w-7xl">
+          <span className="mb-5 block text-xs font-semibold uppercase tracking-[0.22em] text-accent md:text-sm">
             Resultados reales
           </span>
-          <h2 className="max-w-lg text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Negocios con todo conectado
+          <h2 className="max-w-3xl text-4xl font-medium leading-[1.04] text-white sm:text-5xl md:text-6xl">
+            Negocios con <span className="text-accent">todo conectado.</span>
           </h2>
-          <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/75 md:text-base">
+          <p className="mt-5 max-w-xl text-base leading-relaxed text-white/60 md:text-lg">
             Desde sitios en construcción hasta desarrollo a medida y ventas con automatización:
             así se ve en la vida real un negocio con todo conectado.
           </p>
           <div className="mt-7">
-            <Button variant="white" onClick={() => open()}>
+            <Button size="lg" onClick={() => open()}>
               Agenda una llamada
             </Button>
           </div>
         </Container>
       </div>
 
-      <Container>
-        <div className="grid gap-6 md:grid-cols-2">
+      <Container className="!max-w-7xl">
+        <div className="grid items-start gap-6 md:grid-cols-2">
           {CASOS_EXITO.map((caso, i) => {
             const desktopImgs = caso.imagenes?.filter((img) => img.tipo === "desktop") ?? [];
             const mobileImg = caso.imagenes?.find((img) => img.tipo === "mobile");

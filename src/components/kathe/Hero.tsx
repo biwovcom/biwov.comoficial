@@ -12,19 +12,19 @@ import { DescargarPdfButton } from "./DescargarPdfButton";
 export function Hero() {
 
   return (
-    <section className="relative isolate flex flex-col overflow-hidden bg-[#03101b] pb-14 pt-[340px] sm:pt-[420px] md:min-h-[100svh] md:justify-center md:pb-20 md:pt-32">
+    <section className="relative isolate flex flex-col overflow-hidden bg-[#03101b] pb-14 pt-[340px] sm:pt-[420px] md:min-h-[min(100svh,980px)] md:justify-center md:pb-20 md:pt-32">
       <div className="absolute inset-x-0 top-0 h-[400px] sm:h-[480px] md:inset-0 md:h-auto">
       <Image
-        src="/kathe-banner.png"
+        src="/kathe-fundadora.png"
         alt="Katherine Usma Aristizábal, fundadora de biwov_"
         fill
         priority
         sizes="100vw"
         className="object-cover object-[68%_top] md:object-[right_center] print:hidden"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#03101b] via-[#03101b]/20 to-transparent md:bg-gradient-to-r md:from-[#03101b] md:via-[#03101b]/60 md:to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#03101b] via-[#03101b]/20 to-transparent md:bg-gradient-to-r md:from-[#03101b] md:via-[#03101b]/75 md:to-transparent" />
       </div>
-      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-bg-base to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-bg-deep to-transparent" />
 
       <div className="absolute right-6 top-24 z-10 print:hidden">
         <DescargarPdfButton />
@@ -35,15 +35,15 @@ export function Hero() {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="max-w-[56rem]"
+          className="max-w-[40rem]"
         >
           <span className="mb-6 block text-xs font-semibold uppercase tracking-[0.2em] text-accent">
             Katherine Usma Aristizábal · Fundadora de biwov_
           </span>
-          <h1 className="text-[2.6rem] font-semibold leading-[1] tracking-[-0.045em] text-white sm:text-6xl md:text-[4rem] xl:text-[5rem]">
+          <h1 className="text-[2.6rem] font-semibold leading-[1] tracking-[-0.045em] text-white sm:text-6xl md:text-[3.75rem] xl:text-[4.5rem]">
             Convierto ideas
             <br />
-            <span className="text-accent md:whitespace-nowrap">en sistemas que venden.</span>
+            <span className="text-accent">en sistemas que venden.</span>
           </h1>
           <p className="mt-7 max-w-xl text-base leading-relaxed text-white/80 md:text-xl md:leading-relaxed">
             Implementadora de ecosistemas digitales: estrategia, contenido, campañas y

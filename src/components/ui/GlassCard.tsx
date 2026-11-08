@@ -10,10 +10,10 @@ export function GlassCard({
   return (
     <div
       className={cn(
-        "rounded-3xl backdrop-blur-xl",
+        "rounded-[1.75rem] backdrop-blur-xl",
         variant === "light"
           ? "border border-border-light bg-bg-light-elevated shadow-[0_8px_30px_-16px_rgba(46,91,126,0.25)]"
-          : "border border-border-glass bg-white/[0.03] shadow-[0_8px_40px_-16px_rgba(0,0,0,0.6)]",
+          : "border border-white/[0.07] bg-[#0b2236]/70 shadow-[0_8px_40px_-16px_rgba(0,0,0,0.6)]",
         className,
       )}
       {...props}
