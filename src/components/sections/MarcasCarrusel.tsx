@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { cn } from "@/lib/utils";
+import { ChatSimulacion } from "./ChatSimulacion";
 
 interface Marca {
   nombre: string;
@@ -13,6 +14,8 @@ interface Marca {
   wordmarkClass: string;
   url: string;
   imagen?: string;
+  /** En vez de una captura, muestra la simulación animada del chatbot. */
+  simulacion?: boolean;
 }
 
 const MARCAS: Marca[] = [
@@ -45,10 +48,11 @@ const MARCAS: Marca[] = [
     imagen: "/marcas/lina-valencia.webp",
   },
   {
-    nombre: "FV Arquitectura",
-    wordmark: "FV",
-    wordmarkClass: "font-black tracking-[0.1em] text-5xl md:text-6xl",
-    url: "https://fvarquitectura.com.co",
+    nombre: "Asistente con IA en WhatsApp",
+    wordmark: "Chatbot IA",
+    wordmarkClass: "font-semibold tracking-[-0.02em]",
+    url: "/#servicios",
+    simulacion: true,
   },
 ];
 
@@ -60,9 +64,11 @@ export function MarcasCarrusel() {
 
   useEffect(() => {
     if (pausado) return;
-    const id = window.setInterval(() => setActiva((a) => (a + 1) % MARCAS.length), INTERVALO_MS);
-    return () => window.clearInterval(id);
-  }, [pausado]);
+    // La simulación del chatbot necesita más tiempo para que se vea la conversación completa.
+    const espera = MARCAS[activa].simulacion ? 13000 : INTERVALO_MS;
+    const id = window.setTimeout(() => setActiva((a) => (a + 1) % MARCAS.length), espera);
+    return () => window.clearTimeout(id);
+  }, [pausado, activa]);
 
   return (
     <section className="py-16 md:py-24">
@@ -90,17 +96,22 @@ export function MarcasCarrusel() {
               <a
                 key={m.nombre}
                 href={m.url}
-                target="_blank"
-                rel="noopener noreferrer"
+                target={m.url.startsWith("http") ? "_blank" : undefined}
+                rel={m.url.startsWith("http") ? "noopener noreferrer" : undefined}
                 onMouseEnter={() => {
                   setPausado(true);
                   setActiva(i);
                 }}
                 onFocus={() => setActiva(i)}
-                aria-label={`Ver el sitio de ${m.nombre}`}
+                aria-label={m.simulacion ? m.nombre : `Ver el sitio de ${m.nombre}`}
                 style={{ flexGrow: esActiva ? 3.2 : 1 }}
                 className="group relative min-w-0 basis-0 overflow-hidden rounded-[1.75rem] border border-white/[0.08] bg-gradient-to-b from-[#0d2b45] to-[#06182a] transition-[flex-grow] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
               >
+                {m.simulacion && (
+                  <div className={cn("absolute inset-0 transition-opacity duration-700", esActiva ? "opacity-100" : "opacity-0")}>
+                    <ChatSimulacion activo={esActiva} />
+                  </div>
+                )}
                 {m.imagen && (
                   <Image
                     src={m.imagen}
@@ -118,7 +129,7 @@ export function MarcasCarrusel() {
                 <div
                   className={cn(
                     "absolute inset-0 flex flex-col items-center justify-center bg-[radial-gradient(80%_60%_at_50%_40%,rgba(0,194,232,0.14),transparent_70%)] px-4 text-center transition-opacity duration-500",
-                    esActiva && m.imagen ? "opacity-0" : "opacity-100",
+                    esActiva && (m.imagen || m.simulacion) ? "opacity-0" : "opacity-100",
                   )}
                 >
                   <span className={cn("text-2xl text-white md:text-3xl", m.wordmarkClass)}>
@@ -147,20 +158,24 @@ export function MarcasCarrusel() {
           <a
             key={m.nombre}
             href={m.url}
-            target="_blank"
-            rel="noopener noreferrer"
+            target={m.url.startsWith("http") ? "_blank" : undefined}
+            rel={m.url.startsWith("http") ? "noopener noreferrer" : undefined}
             className="relative h-[420px] w-[78vw] shrink-0 snap-center overflow-hidden rounded-[1.5rem] border border-white/[0.08] bg-gradient-to-b from-[#0d2b45] to-[#06182a]"
           >
-            {m.imagen ? (
+            {m.simulacion ? (
+              <ChatSimulacion />
+            ) : m.imagen ? (
               <Image src={m.imagen} alt={`Sitio web de ${m.nombre}`} fill sizes="80vw" className="object-cover object-top" />
             ) : (
               <span className={cn("absolute inset-0 flex items-center justify-center text-3xl text-white", m.wordmarkClass)}>
                 {m.wordmark}
               </span>
             )}
-            <span className="absolute bottom-4 left-4 rounded-full bg-[#03101b]/75 px-4 py-2 text-sm font-semibold text-white backdrop-blur-md">
-              {m.nombre}
-            </span>
+            {!m.simulacion && (
+              <span className="absolute bottom-4 left-4 rounded-full bg-[#03101b]/75 px-4 py-2 text-sm font-semibold text-white backdrop-blur-md">
+                {m.nombre}
+              </span>
+            )}
           </a>
         ))}
       </div>
