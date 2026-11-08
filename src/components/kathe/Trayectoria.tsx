@@ -42,12 +42,12 @@ export function Trayectoria() {
 
       <div
         ref={trackRef}
-        className="scrollbar-none mt-10 flex gap-5 overflow-x-auto scroll-smooth px-6 pb-2 snap-x snap-mandatory md:px-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))]"
+        className="scrollbar-none mt-10 flex gap-5 overflow-x-auto scroll-smooth px-6 pb-2 snap-x snap-mandatory md:px-[max(2rem,calc((100vw-80rem)/2+2rem))] scroll-px-6 md:scroll-px-[max(2rem,calc((100vw-80rem)/2+2rem))]"
       >
         {TRAYECTORIA.map((hito) => (
-          <GlassCard key={hito.anio} className="w-72 shrink-0 snap-start p-6">
-            <span className="text-xs font-semibold uppercase tracking-wide text-accent">{hito.anio}</span>
-            <h3 className="mt-1 text-lg font-semibold text-white">{hito.titulo}</h3>
+          <GlassCard key={hito.anio} className="w-80 shrink-0 snap-start p-7">
+            <span className="text-4xl font-medium tracking-[-0.04em] text-accent">{hito.anio}</span>
+            <h3 className="mt-4 text-xl font-medium text-white">{hito.titulo}</h3>
             <p className="mt-2 text-sm text-text-secondary">{hito.detalle}</p>
           </GlassCard>
         ))}

@@ -7,7 +7,7 @@ export function SectionHeading({
   eyebrow,
   title,
   description,
-  align = "center",
+  align = "left",
   variant = "dark",
   className,
 }: {
@@ -34,7 +34,7 @@ export function SectionHeading({
       {eyebrow && (
         <span
           className={cn(
-            "mb-5 inline-block text-xs font-semibold tracking-[0.2em] uppercase",
+            "mb-5 inline-block text-xs font-semibold tracking-[0.22em] uppercase md:text-sm",
             light ? "text-[#0088a8]" : "text-accent",
           )}
         >

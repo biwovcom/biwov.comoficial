@@ -29,9 +29,10 @@ export function Faq() {
     <section className="py-16 md:py-24">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <Container>
+        <div className="grid gap-10 md:grid-cols-[0.9fr_1.1fr] md:gap-16">
         <SectionHeading eyebrow="Preguntas frecuentes" title="Lo que más nos preguntan" />
 
-        <div className="mx-auto mt-12 max-w-2xl space-y-3">
+        <div className="space-y-3">
           {FAQ.map((item, i) => {
             const estaAbierta = abierta === i;
             return (
@@ -66,6 +67,7 @@ export function Faq() {
               </GlassCard>
             );
           })}
+        </div>
         </div>
       </Container>
     </section>

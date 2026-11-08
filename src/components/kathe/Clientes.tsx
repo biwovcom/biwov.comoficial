@@ -18,12 +18,12 @@ export function Clientes() {
             const contenido = (
               <GlassCard className="h-full p-7 transition-colors group-hover:border-accent/40">
                 <div className="flex items-center justify-between gap-2">
-                  <h3 className="text-lg font-semibold text-white">{cliente.nombre}</h3>
+                  <h3 className="text-xl font-medium text-white md:text-2xl">{cliente.nombre}</h3>
                   {cliente.url && (
                     <ExternalLink className="h-4 w-4 shrink-0 text-text-secondary transition-colors group-hover:text-accent" />
                   )}
                 </div>
-                <p className="mt-2 text-sm text-text-secondary">{cliente.descripcion}</p>
+                <p className="mt-2 text-base text-white/55">{cliente.descripcion}</p>
                 {cliente.resultado && (
                   <p className="mt-4 rounded-xl bg-accent/10 px-4 py-2.5 text-sm font-medium text-white">
                     {cliente.resultado}

@@ -15,11 +15,11 @@ export function MisionVision() {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <GlassCard className="h-full p-8">
-              <span className="text-xs font-semibold uppercase tracking-wide text-accent">
+            <GlassCard className="h-full p-8 md:p-12">
+              <span className="text-xs font-semibold uppercase tracking-[0.22em] text-accent md:text-sm">
                 Misión
               </span>
-              <p className="mt-3 text-base leading-relaxed text-text-secondary md:text-lg">
+              <p className="mt-5 text-xl font-medium leading-snug tracking-[-0.02em] text-white md:text-[1.75rem]">
                 Ayudamos a los empresarios a dejar de trabajar con
                 herramientas sueltas y a unificarlas en un sistema digital
                 ordenado, con pasos claros que les permitan entender cómo
@@ -33,11 +33,11 @@ export function MisionVision() {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <GlassCard className="h-full p-8">
-              <span className="text-xs font-semibold uppercase tracking-wide text-accent">
+            <GlassCard className="h-full p-8 md:p-12">
+              <span className="text-xs font-semibold uppercase tracking-[0.22em] text-accent md:text-sm">
                 Visión 2031
               </span>
-              <p className="mt-3 text-base leading-relaxed text-text-secondary md:text-lg">
+              <p className="mt-5 text-xl font-medium leading-snug tracking-[-0.02em] text-white md:text-[1.75rem]">
                 Ser la agencia referente en Latinoamérica en negocios
                 conectados digitalmente para pequeñas y medianas empresas,
                 reconocida por llevar a los negocios del desorden digital a

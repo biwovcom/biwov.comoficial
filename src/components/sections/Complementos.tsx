@@ -137,10 +137,10 @@ export function Complementos({ moneda, trm }: { moneda: Moneda; trm: number }) {
     <div id="complementos-section" className="print-host mt-16 border-t border-border-light pt-16">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <span className="inline-block rounded-full border border-border-light bg-white/[0.04] px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-accent">
+          <span className="block text-xs font-semibold uppercase tracking-[0.22em] text-accent md:text-sm">
             Complementos
           </span>
-          <h3 className="mt-3 text-2xl font-semibold text-text-on-light sm:text-3xl">
+          <h3 className="mt-5 text-4xl font-medium leading-[1.04] text-white sm:text-5xl">
             ¿Necesitas algo más?
           </h3>
         </div>
@@ -149,7 +149,7 @@ export function Complementos({ moneda, trm }: { moneda: Moneda; trm: number }) {
             type="button"
             onClick={() => desplazar(-1)}
             aria-label="Anterior"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-border-light text-text-on-light transition-colors hover:bg-white"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-border-light text-text-on-light transition-colors hover:bg-white/10"
           >
             <ChevronLeft size={18} />
           </button>
@@ -157,7 +157,7 @@ export function Complementos({ moneda, trm }: { moneda: Moneda; trm: number }) {
             type="button"
             onClick={() => desplazar(1)}
             aria-label="Siguiente"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-border-light text-text-on-light transition-colors hover:bg-white"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-border-light text-text-on-light transition-colors hover:bg-white/10"
           >
             <ChevronRight size={18} />
           </button>
@@ -171,7 +171,7 @@ export function Complementos({ moneda, trm }: { moneda: Moneda; trm: number }) {
         {COMPLEMENTOS.map((item) => (
           <div
             key={item.titulo}
-            className="flex w-[300px] shrink-0 snap-start flex-col rounded-3xl border border-border-glass bg-[#0a2642] p-6 shadow-[0_12px_40px_-16px_rgba(46,91,126,0.35)]"
+            className="card-universo flex w-[320px] shrink-0 snap-start flex-col rounded-[1.75rem] p-7"
           >
             <h4 className="text-base font-semibold text-white">{item.titulo}</h4>
             <p className="mt-1.5 flex-1 text-sm text-text-secondary">{item.detalle}</p>

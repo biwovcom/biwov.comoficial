@@ -33,7 +33,7 @@ export function NeedsPaths() {
           description="Elige el plan que más suena a ti y mira en qué casos encaja."
         />
 
-        <div className="mx-auto mt-10 flex max-w-md justify-center gap-2">
+        <div className="mt-10 flex max-w-md gap-2">
           {PLANES_TABS.map((plan) => (
             <button
               key={plan}
@@ -42,7 +42,7 @@ export function NeedsPaths() {
               className={cn(
                 "flex-1 rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
                 activo === plan
-                  ? "border-accent bg-gradient-brand text-white"
+                  ? "border-white bg-white text-[#03101b]"
                   : "border-border-glass text-text-secondary hover:border-accent/40 hover:text-white",
               )}
             >
@@ -51,7 +51,7 @@ export function NeedsPaths() {
           ))}
         </div>
 
-        <div className="mx-auto mt-8 max-w-2xl space-y-2.5">
+        <div className="mt-8 max-w-3xl space-y-2.5">
           <AnimatePresence mode="wait">
             <motion.div
               key={activo}
@@ -79,7 +79,7 @@ export function NeedsPaths() {
           </AnimatePresence>
         </div>
 
-        <div className="mt-10 flex justify-center">
+        <div className="mt-10 flex">
           <Button size="lg" onClick={() => open()}>
             Haz tu diagnóstico gratis
           </Button>

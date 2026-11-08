@@ -13,7 +13,8 @@ import { Herramientas } from "@/components/kathe/Herramientas";
 import { Cierre } from "@/components/kathe/Cierre";
 
 export const metadata: Metadata = {
-  title: "Katherine Usma Aristizábal — Fundadora de biwov_",
+  title: "Katherine Usma Aristizábal, fundadora de biwov",
+  alternates: { canonical: "https://biwov.com/kathe" },
   description:
     "Fundadora de biwov_. Implementadora de Ecosistemas Digitales: landing pages, CRM, automatizaciones, lanzamientos y pauta para negocios en Latinoamérica.",
   openGraph: {
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
     description:
       "Fundadora de biwov_. Implementadora de Ecosistemas Digitales: landing pages, CRM, automatizaciones, lanzamientos y pauta para negocios en Latinoamérica.",
     url: "https://biwov.com/kathe",
-    images: ["/kathe.png"],
+    images: ["/kathe-fundadora.png"],
     type: "profile",
   },
   twitter: {
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
     title: "Katherine Usma Aristizábal — Fundadora de biwov_",
     description:
       "Fundadora de biwov_. Implementadora de Ecosistemas Digitales para negocios en Latinoamérica.",
-    images: ["/kathe.png"],
+    images: ["/kathe-fundadora.png"],
   },
 };
 

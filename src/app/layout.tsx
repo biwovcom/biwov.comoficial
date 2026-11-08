@@ -3,32 +3,64 @@ import { Nunito, Inter, MuseoModerno, Montserrat } from "next/font/google";
 import "./globals.css";
 import { QuoterProvider } from "@/components/quoter/QuoterProvider";
 import { SiteChrome } from "@/components/layout/SiteChrome";
-import { INSTAGRAM_BIWOV, WHATSAPP_BIWOV } from "@/lib/contacto";
+import { INSTAGRAM_BIWOV, INSTAGRAM_KATHE, TIKTOK_KATHE, WHATSAPP_BIWOV } from "@/lib/contacto";
 
 const organizationJsonLd = {
   "@context": "https://schema.org",
-  "@type": "Organization",
-  name: "biwov",
-  alternateName: "biwov_",
-  url: "https://biwov.com",
-  logo: "https://biwov.com/favicon.ico",
-  description:
-    "Agencia de marketing digital y automatización para negocios en Colombia y Latinoamérica: páginas web, CRM, producción de contenido, campañas en Meta y automatización de WhatsApp conectados en un solo sistema.",
-  slogan: "Desde que te ven hasta que pagan.",
-  areaServed: ["Colombia", "Latinoamérica"],
-  knowsLanguage: "es",
-  sameAs: [INSTAGRAM_BIWOV],
-  contactPoint: {
-    "@type": "ContactPoint",
-    contactType: "customer service",
-    telephone: WHATSAPP_BIWOV,
-    areaServed: "CO",
-    availableLanguage: "Spanish",
-  },
-  founder: {
-    "@type": "Person",
-    name: "Katherine Usma Aristizábal",
-  },
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://biwov.com/#organizacion",
+      name: "biwov",
+      alternateName: ["biwov_", "Kathe Digital"],
+      url: "https://biwov.com",
+      logo: "https://biwov.com/icon.svg",
+      description:
+        "Agencia de marketing digital y automatización para negocios en Colombia y Latinoamérica: páginas web, CRM, producción de contenido, campañas en Meta y automatización de WhatsApp con inteligencia artificial conectados en un solo sistema.",
+      slogan: "Tu negocio puede vender más y mejor.",
+      foundingDate: "2023-08",
+      areaServed: ["Colombia", "Latinoamérica"],
+      knowsLanguage: "es",
+      knowsAbout: [
+        "Marketing digital",
+        "Publicidad en Meta Ads",
+        "WhatsApp Business y API de WhatsApp",
+        "CRM y embudos de venta",
+        "Automatización con inteligencia artificial",
+        "Landing pages y sitios web",
+        "Producción de contenido para redes sociales",
+        "SEO y GEO",
+      ],
+      sameAs: [INSTAGRAM_BIWOV],
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "customer service",
+        telephone: WHATSAPP_BIWOV,
+        areaServed: "CO",
+        availableLanguage: "Spanish",
+      },
+      founder: { "@id": "https://biwov.com/kathe#persona" },
+    },
+    {
+      "@type": "Person",
+      "@id": "https://biwov.com/kathe#persona",
+      name: "Katherine Usma Aristizábal",
+      alternateName: "Kathe Digital",
+      jobTitle: "Fundadora de biwov · Implementadora de ecosistemas digitales",
+      url: "https://biwov.com/kathe",
+      image: "https://biwov.com/kathe-fundadora.png",
+      sameAs: [INSTAGRAM_KATHE, TIKTOK_KATHE],
+      worksFor: { "@id": "https://biwov.com/#organizacion" },
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://biwov.com/#sitio",
+      url: "https://biwov.com",
+      name: "biwov",
+      inLanguage: "es-CO",
+      publisher: { "@id": "https://biwov.com/#organizacion" },
+    },
+  ],
 };
 
 const inter = Inter({
@@ -58,7 +90,14 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://biwov.com"),
-  title: "biwov — Agencia de marketing digital y automatización en Colombia",
+  title: {
+    default: "biwov — Agencia de marketing digital y automatización en Colombia",
+    template: "%s | biwov",
+  },
+  applicationName: "biwov",
+  authors: [{ name: "Katherine Usma Aristizábal", url: "https://biwov.com/kathe" }],
+  creator: "biwov",
+  category: "marketing digital",
   description:
     "Agencia de marketing digital que conecta tus redes, tu WhatsApp, tu CRM y la inteligencia artificial en un solo sistema: páginas web, producción de contenido, campañas en Meta y automatización de WhatsApp para que tu negocio venda más sin que tengas que hacerlo todo tú.",
   keywords: [
@@ -72,10 +111,13 @@ export const metadata: Metadata = {
     "producción de contenido para redes sociales",
     "automatización con inteligencia artificial",
     "negocio conectado",
+    "SEO y GEO",
+    "blog de marketing digital",
     "biwov",
   ],
   alternates: {
     canonical: "https://biwov.com",
+    types: { "application/rss+xml": "https://biwov.com/blog/rss.xml" },
   },
   robots: {
     index: true,

@@ -7,6 +7,7 @@ import { NeedsPaths } from "@/components/sections/NeedsPaths";
 import { ComoTrabajamos } from "@/components/sections/ComoTrabajamos";
 import { FounderTeaser } from "@/components/sections/FounderTeaser";
 import { Faq } from "@/components/sections/Faq";
+import { BlogTeaser } from "@/components/sections/BlogTeaser";
 import { FinalCTA } from "@/components/sections/FinalCTA";
 
 export default function Home() {
@@ -21,6 +22,7 @@ export default function Home() {
       <ComoTrabajamos />
       <FounderTeaser />
       <Faq />
+      <BlogTeaser />
       <FinalCTA />
     </>
   );

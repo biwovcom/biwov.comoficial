@@ -16,7 +16,7 @@ export function Eventos() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="mt-10 flex flex-wrap items-center justify-center gap-3"
+          className="mt-10 flex flex-wrap items-center gap-3"
         >
           {EVENTOS_KATHE.map((evento) =>
             evento.url ? (

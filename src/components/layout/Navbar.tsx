@@ -19,6 +19,7 @@ const LINKS = [
   { href: "/tienda#planes", label: "Planes" },
   { href: "/tienda", label: "Tienda" },
   { href: "/#casos", label: "Casos" },
+  { href: "/blog", label: "Blog" },
   { href: "/kathe", label: "Fundadora" },
 ];
 

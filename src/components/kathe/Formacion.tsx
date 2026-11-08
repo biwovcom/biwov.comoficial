@@ -21,11 +21,11 @@ export function Formacion() {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.05 }}
             >
-              <GlassCard className="h-full p-5">
-                <span className="text-xs font-semibold uppercase tracking-wide text-accent">
+              <GlassCard className="h-full p-7">
+                <span className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">
                   {item.categoria}
                 </span>
-                <p className="mt-1.5 text-sm text-white/90">{item.detalle}</p>
+                <p className="mt-3 text-lg font-medium text-white">{item.detalle}</p>
               </GlassCard>
             </motion.div>
           ))}

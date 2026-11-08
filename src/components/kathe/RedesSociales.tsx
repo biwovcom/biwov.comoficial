@@ -129,22 +129,22 @@ export function RedesSociales() {
   return (
     <section className="py-16 md:py-20 print:hidden">
       <Container>
-        <div className="mx-auto max-w-2xl text-center">
-          <span className="inline-block rounded-full border border-border-glass bg-white/[0.03] px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-accent">
+        <div className="max-w-3xl">
+          <span className="block text-xs font-semibold uppercase tracking-[0.22em] text-accent md:text-sm">
             Sígueme en redes
           </span>
-          <h2 className="mt-4 text-2xl font-semibold text-white md:text-3xl">
+          <h2 className="mt-5 text-4xl font-medium leading-[1.04] text-white sm:text-5xl md:text-6xl">
             Contenido diario sobre marketing con propósito
           </h2>
         </div>
 
-        <div className="mx-auto mt-10 grid max-w-3xl gap-6 sm:grid-cols-2">
+        <div className="mt-12 grid max-w-4xl gap-6 sm:grid-cols-2">
           {PERFILES.map((perfil, i) => (
             <TarjetaRed key={perfil.red} perfil={perfil} index={i} />
           ))}
         </div>
 
-        <p className="mx-auto mt-6 max-w-lg text-center text-xs text-text-secondary">
+        <p className="mt-6 max-w-lg text-xs text-text-secondary">
           Seguidores actualizados manualmente. Las miniaturas son un espacio reservado para las
           publicaciones reales — avísame cuando quieras cambiarlas por capturas de tus posts.
         </p>
