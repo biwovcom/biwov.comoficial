@@ -13,7 +13,6 @@ import {
 
 const ECOSISTEMA = [
   { href: "/#servicios", label: "Servicios" },
-  { href: "/tienda#planes", label: "Planes" },
   { href: "/tienda", label: "Tienda" },
   { href: "/#casos", label: "Casos" },
   { href: "/blog", label: "Blog" },
