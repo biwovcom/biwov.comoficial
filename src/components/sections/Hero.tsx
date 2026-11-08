@@ -23,6 +23,7 @@ export function Hero() {
         alt="Katherine Usma Aristizábal, fundadora de biwov_"
         fill
         priority
+        quality={90}
         sizes="100vw"
         className="object-cover object-[68%_top] md:object-[right_center]"
       />

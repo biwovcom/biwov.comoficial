@@ -117,7 +117,16 @@ function PlanDetalleTarjeta({
     multiplicarPrecio(plan.precioDesde, DURACION_MINIMA_MESES),
   );
   const cuotaMontaje = multiplicarPrecio(plan.montajeInicial, 0.5);
-  const totalExtrasCop = extrasSeleccionados.reduce((acc, e) => acc + e.precioCop, 0);
+  const extrasUnicosCop = extrasSeleccionados
+    .filter((e) => e.periodicidad !== "mensual")
+    .reduce((acc, e) => acc + e.precioCop, 0);
+  const extrasMensualesCop = extrasSeleccionados
+    .filter((e) => e.periodicidad === "mensual")
+    .reduce((acc, e) => acc + e.precioCop, 0);
+  // Los extras mensuales se proyectan al mismo periodo mínimo del plan.
+  const totalExtrasCop = extrasUnicosCop + extrasMensualesCop * DURACION_MINIMA_MESES;
+  const mensualidadTotalCop = plan.precioDesde.cop + extrasMensualesCop;
+  const totalGeneralCop = totalSeisMeses.cop + totalExtrasCop;
 
   const confirmar = async ({
     contacto,
@@ -163,7 +172,7 @@ function PlanDetalleTarjeta({
   const lineasExtras = extrasSeleccionados.map(
     (e) => `+ ${e.nombre}: ${formatCopEnMoneda(e.precioCop, moneda, trm)}${e.periodicidad === "mensual" ? " /mes" : ""}`,
   );
-  const mensajeWhatsApp = `¡Hola! 👋 Quiero comprar el Plan ${plan.nombre} (${formatCopEnMoneda(totalSeisMeses.cop, moneda, trm)} por ${DURACION_MINIMA_MESES} meses).${lineasExtras.length ? `\n\nTambién quiero sumar:\n${lineasExtras.join("\n")}\n\nTotal aproximado, lo confirmamos por aquí.` : ""} Ya firmé y confirmé desde el sitio.`;
+  const mensajeWhatsApp = `¡Hola! 👋 Quiero comprar el Plan ${plan.nombre} (${formatCopEnMoneda(totalSeisMeses.cop, moneda, trm)} por ${DURACION_MINIMA_MESES} meses).${lineasExtras.length ? `\n\nTambién quiero sumar:\n${lineasExtras.join("\n")}\n\nTotal estimado: ${formatCopEnMoneda(totalGeneralCop, moneda, trm)}. Lo confirmamos por aquí.` : ""} Ya firmé y confirmé desde el sitio.`;
 
   const itemsPropuesta: ItemPropuesta[] = [
     {
@@ -245,6 +254,44 @@ function PlanDetalleTarjeta({
           />
         </div>
 
+        {/* Resumen que se va sumando a medida que eliges extras. */}
+        <div className="sticky bottom-0 z-10 -mx-2 mt-6 rounded-[1.5rem] border border-accent/30 bg-[#06192a]/95 p-5 backdrop-blur-md">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Tu total</p>
+          <dl className="mt-3 space-y-1.5 text-sm">
+            <div className="flex justify-between gap-3 text-white/80">
+              <dt>Plan {plan.nombre} × {DURACION_MINIMA_MESES} meses</dt>
+              <dd>{formatCopEnMoneda(plan.precioDesde.cop * DURACION_MINIMA_MESES, moneda, trm)}</dd>
+            </div>
+            <div className="flex justify-between gap-3 text-white/80">
+              <dt>Montaje inicial</dt>
+              <dd>{formatCopEnMoneda(plan.montajeInicial.cop, moneda, trm)}</dd>
+            </div>
+            {extrasSeleccionados.map((e) => (
+              <div key={e.id} className="flex justify-between gap-3 text-white/80">
+                <dt className="min-w-0">
+                  + {e.nombre}
+                  {e.periodicidad === "mensual" ? ` × ${DURACION_MINIMA_MESES} meses` : ""}
+                </dt>
+                <dd className="shrink-0">
+                  {formatCopEnMoneda(e.periodicidad === "mensual" ? e.precioCop * DURACION_MINIMA_MESES : e.precioCop, moneda, trm)}
+                </dd>
+              </div>
+            ))}
+          </dl>
+          <div className="mt-3 flex items-end justify-between gap-3 border-t border-white/10 pt-3">
+            <div>
+              <p className="text-xs text-white/55">Total estimado ({DURACION_MINIMA_MESES} meses)</p>
+              <p className="text-xs text-white/55">
+                Mensualidad: {formatCopEnMoneda(mensualidadTotalCop, moneda, trm)}
+                {extrasUnicosCop > 0 && ` · Pagos únicos: ${formatCopEnMoneda(extrasUnicosCop + plan.montajeInicial.cop, moneda, trm)}`}
+              </p>
+            </div>
+            <p className="shrink-0 text-2xl font-semibold tracking-tight text-white">
+              {formatCopEnMoneda(totalGeneralCop, moneda, trm)}
+            </p>
+          </div>
+        </div>
+
         <button
           type="button"
           disabled={descargandoPdf}
@@ -261,7 +308,10 @@ function PlanDetalleTarjeta({
                   valor: formatCopEnMoneda(totalSeisMeses.cop, moneda, trm),
                 },
                 ...(extrasSeleccionados.length
-                  ? [{ label: "Extras seleccionados", valor: formatCopEnMoneda(totalExtrasCop, moneda, trm) }]
+                  ? [
+                      { label: `Extras seleccionados (${DURACION_MINIMA_MESES} meses)`, valor: formatCopEnMoneda(totalExtrasCop, moneda, trm) },
+                      { label: "Total estimado", valor: formatCopEnMoneda(totalGeneralCop, moneda, trm) },
+                    ]
                   : []),
               ],
               formasPago: [
@@ -293,7 +343,7 @@ function PlanDetalleTarjeta({
             <CompraFormulario
               tiposContrato={Array.from(new Set(["plan", ...extrasSeleccionados.map((e) => e.tipoContrato)]))}
               nombreItem={`Plan ${plan.nombre}`}
-              montoFormateado={formatCopEnMoneda(totalSeisMeses.cop + totalExtrasCop, moneda, trm)}
+              montoFormateado={formatCopEnMoneda(totalGeneralCop, moneda, trm)}
               mensajeWhatsApp={mensajeWhatsApp}
               onConfirmar={confirmar}
             />

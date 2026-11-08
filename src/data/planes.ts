@@ -113,8 +113,16 @@ export const PLANES: Plan[] = [
       { label: "Hasta 3 campañas activas al mismo tiempo" },
       { label: "Reporte del camino completo, desde el anuncio hasta la venta" },
       { label: "Guías y herramientas de IA para automatizar tus procesos" },
+      {
+        label: "Las herramientas de trabajo las paga el cliente directamente",
+        subitems: [
+          "GoHighLevel (CRM y automatizaciones): aprox. USD $33 al mes, pagados al proveedor",
+          "Envío de mensajes por la API de WhatsApp y correos masivos, según las tarifas de cada plataforma",
+          "Inversión en pauta publicitaria, pagada directamente a Meta",
+        ],
+      },
     ],
-    precioDesde: { cop: 2400000, usd: 600 },
+    precioDesde: { cop: 3490000, usd: 875 },
     montajeInicial: { cop: 3800000, usd: 950 },
     linkPago: "https://pay.hotmart.com/L107949454H?bid=1791495121348",
   },

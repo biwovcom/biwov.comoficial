@@ -141,6 +141,7 @@ export default function MarketingManizalesPage() {
             alt="Katherine Usma Aristizábal, fundadora de biwov, agencia de marketing digital en Manizales"
             fill
             priority
+            quality={90}
             sizes="100vw"
             className="object-cover object-[68%_top] md:object-[right_center]"
           />

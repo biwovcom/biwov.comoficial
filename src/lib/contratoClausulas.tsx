@@ -110,6 +110,15 @@ export function seccionesPlan(): SeccionContrato[] {
             </li>
           </ul>
           <p className="mt-3">
+            <strong>
+              Las herramientas de trabajo del Plan Escala corren por cuenta del Cliente y no están
+              incluidas en la mensualidad de biwov.
+            </strong>{" "}
+            Esto incluye la suscripción de GoHighLevel, el costo de los mensajes enviados por la API de
+            WhatsApp, el envío de correos masivos y cualquier otra plataforma de pago que se use para
+            operar el sistema. El Cliente las paga directamente a cada proveedor.
+          </p>
+          <p className="mt-3">
             La suscripción mensual de GHL tiene un costo aproximado de <strong>USD $33 al mes</strong>,
             que el Cliente paga directamente al proveedor de la herramienta. Este valor es una
             referencia y puede variar según la tasa de cambio y los ajustes de precio que haga GHL;
