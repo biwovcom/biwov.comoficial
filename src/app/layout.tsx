@@ -19,7 +19,8 @@ const organizationJsonLd = {
         "Agencia de marketing digital y automatización para negocios en Colombia y Latinoamérica: páginas web, CRM, producción de contenido, campañas en Meta y automatización de WhatsApp con inteligencia artificial conectados en un solo sistema.",
       slogan: "Tu negocio puede vender más y mejor.",
       foundingDate: "2023-08",
-      areaServed: ["Colombia", "Latinoamérica"],
+      address: { "@type": "PostalAddress", addressLocality: "Manizales", addressRegion: "Caldas", addressCountry: "CO" },
+      areaServed: ["Manizales", "Caldas", "Colombia", "Latinoamérica"],
       knowsLanguage: "es",
       knowsAbout: [
         "Marketing digital",
@@ -91,7 +92,7 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   metadataBase: new URL("https://biwov.com"),
   title: {
-    default: "biwov — Agencia de marketing digital y automatización en Colombia",
+    default: "biwov — Agencia de marketing digital en Manizales y Colombia",
     template: "%s | biwov",
   },
   applicationName: "biwov",
@@ -103,6 +104,8 @@ export const metadata: Metadata = {
   keywords: [
     "agencia de marketing digital",
     "agencia de marketing digital Colombia",
+    "marketing digital Manizales",
+    "agencia de marketing digital Manizales",
     "automatización de WhatsApp",
     "CRM para negocios",
     "páginas web para negocios",
@@ -125,7 +128,7 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true },
   },
   openGraph: {
-    title: "biwov — Agencia de marketing digital y automatización en Colombia",
+    title: "biwov — Agencia de marketing digital en Manizales y Colombia",
     description:
       "No vendemos servicios sueltos. Conectamos tus herramientas para que trabajen juntas: atraer clientes, venderles y automatizar lo repetitivo.",
     url: "https://biwov.com",
@@ -135,7 +138,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "biwov — Agencia de marketing digital y automatización en Colombia",
+    title: "biwov — Agencia de marketing digital en Manizales y Colombia",
     description:
       "Conectamos tus redes, tu WhatsApp y tus ventas para que tu negocio crezca sin que tengas que hacerlo todo tú.",
   },

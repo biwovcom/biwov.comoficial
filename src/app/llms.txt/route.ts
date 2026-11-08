@@ -43,7 +43,8 @@ export function GET() {
 ## Quiénes somos
 
 - Fundadora: Katherine Usma Aristizábal (Kathe Digital), implementadora de ecosistemas digitales. Perfil: https://biwov.com/kathe
-- Equipo en Colombia. Atención virtual en Colombia y el resto de Latinoamérica.
+- Con sede en Manizales (Caldas, Colombia). Producción de contenido presencial en Manizales y el Eje Cafetero; estrategia, campañas, páginas web y automatizaciones de forma virtual para toda Colombia y Latinoamérica.
+- Página local: https://biwov.com/marketing-digital-manizales
 - Fundada en agosto de 2023. Más de 10 negocios acompañados.
 
 ## Qué resolvemos

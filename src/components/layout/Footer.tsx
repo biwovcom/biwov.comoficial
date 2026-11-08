@@ -16,6 +16,7 @@ const ECOSISTEMA = [
   { href: "/tienda", label: "Tienda" },
   { href: "/#casos", label: "Casos" },
   { href: "/blog", label: "Blog" },
+  { href: "/marketing-digital-manizales", label: "Marketing digital en Manizales" },
   { href: "/kathe", label: "Fundadora" },
 ];
 
