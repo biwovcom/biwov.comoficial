@@ -19,11 +19,11 @@ export function FounderTeaser() {
         >
           <div className="relative aspect-[4/3] overflow-hidden rounded-[1.5rem] md:aspect-auto md:min-h-[460px]">
             <Image
-              src="/kathe.png"
+              src="/kathe-fundadora.png"
               alt="Katherine Usma Aristizábal, fundadora de biwov_"
               fill
               sizes="(max-width: 768px) 100vw, 600px"
-              className="object-cover object-[15%_35%] transition-transform duration-700 group-hover:scale-[1.04]"
+              className="object-cover object-[74%_20%] transition-transform duration-700 group-hover:scale-[1.04]"
             />
           </div>
 
