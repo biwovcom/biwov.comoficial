@@ -10,14 +10,14 @@ interface Mensaje {
   texto: string;
 }
 
-/** Conversación de ejemplo con un negocio ficticio (no es un cliente real). */
+/** Demo del chatbot de WhatsApp de Fashion Lash (punto autorizado Nagaraku). */
 const CONVERSACION: Mensaje[] = [
-  { de: "cliente", texto: "Hola 👋 ¿tienen cupos para el curso de pestañas?" },
-  { de: "bot", texto: "¡Hola! Sí, quedan 4 cupos este mes. ¿Es tu primera vez o ya tienes experiencia?" },
-  { de: "cliente", texto: "Es mi primera vez" },
-  { de: "bot", texto: "Perfecto 🙌 El nivel básico es ideal: incluye kit de materiales y certificado. ¿Te comparto precio y fechas?" },
-  { de: "cliente", texto: "Sí, por favor" },
-  { de: "bot", texto: "Listo ✅ Te paso con una asesora para reservar tu cupo." },
+  { de: "cliente", texto: "Hola 👋 ¿tienen pestañas Nagaraku al por mayor?" },
+  { de: "bot", texto: "¡Hola! Sí 🙌 Somos punto autorizado Nagaraku: vendemos al por mayor y al detal con envíos a todo Colombia. ¿Para qué ciudad sería?" },
+  { de: "cliente", texto: "Para Pereira" },
+  { de: "bot", texto: "Perfecto. ¿Buscas pestañas pelo a pelo, de volumen o insumos como pegamento y pinzas?" },
+  { de: "cliente", texto: "De volumen" },
+  { de: "bot", texto: "Listo ✅ Te comparto el catálogo y te paso con una asesora para armar tu pedido." },
 ];
 
 const PAUSA_ESCRIBIENDO = 1100;
@@ -59,11 +59,11 @@ export function ChatSimulacion({ activo = true }: { activo?: boolean }) {
           <Bot className="h-5 w-5" />
         </span>
         <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-white">Estudio Aurora</p>
+          <p className="truncate text-sm font-semibold text-white">Fashion Lash · Nagaraku</p>
           <p className="text-xs text-[#8696a0]">{escribiendo ? "escribiendo…" : "Asistente con IA · en línea"}</p>
         </div>
         <span className="ml-auto rounded-full border border-white/15 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-white/60">
-          Simulación
+          Demo
         </span>
       </div>
 

@@ -195,7 +195,7 @@ export function QuoterModal() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 20 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="max-h-[90vh] w-full max-w-lg overflow-y-auto scrollbar-none rounded-3xl border border-border-glass bg-bg-base p-6 md:p-8"
+            className="max-h-[90vh] w-full max-w-lg overflow-y-auto scrollbar-none card-universo rounded-[2rem] p-6 md:p-8"
             data-testid="quoter-modal"
           >
             <div className="mb-6 flex items-center justify-between">

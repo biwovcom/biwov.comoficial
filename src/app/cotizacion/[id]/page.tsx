@@ -20,7 +20,7 @@ export default async function CotizacionPublicaPage({ params }: { params: Promis
   if (!cotizacion) notFound();
 
   return (
-    <div className="flex min-h-screen justify-center bg-bg-base px-4 py-16">
+    <div className="flex min-h-screen justify-center bg-bg-deep px-4 py-16">
       <div className="w-full max-w-2xl">
         <div className="mb-8 text-center">
           <p className="font-logo text-2xl font-semibold text-white">biwov</p>

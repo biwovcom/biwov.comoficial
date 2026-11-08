@@ -187,7 +187,7 @@ function PlanDetalleTarjeta({
       initial={{ opacity: 0, y: 20, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 20, scale: 0.98 }}
-      className="scrollbar-none max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-border-glass bg-[#0a2642] p-6 md:p-8"
+      className="scrollbar-none max-h-[90vh] w-full max-w-lg overflow-y-auto card-universo rounded-[2rem] p-6 md:p-8"
     >
       <div className="print:hidden">
         <div className="flex items-start justify-between gap-4">
@@ -285,7 +285,7 @@ function PlanDetalleTarjeta({
             <button
               type="button"
               onClick={() => setMostrarCompra(true)}
-              className="w-full rounded-full bg-gradient-brand px-7 py-3.5 text-base font-medium text-white shadow-[0_6px_20px_-6px_rgba(10,38,66,0.5)] transition-all hover:shadow-[0_8px_26px_-6px_rgba(10,38,66,0.6)]"
+              className="w-full rounded-full bg-white px-7 py-3.5 text-base font-semibold text-[#03101b] shadow-[0_6px_20px_-6px_rgba(10,38,66,0.5)] transition-all hover:scale-[1.02]"
             >
               Comprar ahora
             </button>

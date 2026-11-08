@@ -49,11 +49,11 @@ export function ComoTrabajamos() {
               transition={{ duration: 0.4, delay: i * 0.06 }}
               className="relative"
             >
-              <span className="text-gradient text-3xl font-black">
+              <span className="text-5xl font-medium tracking-[-0.04em] text-accent">
                 {String(paso.numero).padStart(2, "0")}
               </span>
-              <h3 className="mt-3 text-sm font-semibold text-white">{paso.titulo}</h3>
-              <p className="mt-1.5 text-xs leading-relaxed text-text-secondary">{paso.detalle}</p>
+              <h3 className="mt-4 text-xl font-medium text-white">{paso.titulo}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-white/55 md:text-base">{paso.detalle}</p>
             </motion.div>
           ))}
         </div>

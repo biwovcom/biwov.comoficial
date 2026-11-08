@@ -39,7 +39,7 @@ export default async function DiagnosticoPublicoPage({
   const nombrePila = prospecto.nombre.split(" ")[0];
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-bg-base px-4 py-16">
+    <div className="flex min-h-screen items-center justify-center bg-bg-deep px-4 py-16">
       <div className="w-full max-w-2xl">
         <div className="mb-8 text-center">
           <h1 className="font-logo text-2xl font-semibold text-white">biwov</h1>

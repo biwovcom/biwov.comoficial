@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
+import { motion } from "framer-motion";
 import { Search, ShoppingBag } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { ProductoCard } from "@/components/tienda/ProductoCard";
@@ -84,29 +86,105 @@ export function TiendaCatalogo({
 
   return (
     <section id="tienda" className="print-host bg-bg-light">
-      <div className="relative isolate overflow-hidden pb-14 pt-36 md:pb-20 md:pt-44">
+      <div className="relative isolate overflow-hidden pb-14 pt-32 md:pb-20 md:pt-40">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_70%_at_85%_10%,rgba(0,194,232,0.16),transparent_65%)]" />
-        <Container className="relative z-10">
-          <span className="mb-5 block text-xs font-semibold uppercase tracking-[0.22em] text-accent md:text-sm">
-            Tienda biwov_
-          </span>
-          <h1 className="max-w-4xl text-[2.6rem] font-semibold leading-[1] tracking-[-0.045em] text-white sm:text-6xl md:text-7xl">
-            Arma tu ecosistema <span className="text-accent">digital.</span>
-          </h1>
-          <p className="mt-6 max-w-xl text-base leading-relaxed text-white/65 md:text-xl">
-            Elige un plan mensual o agrega servicios sueltos, como en una tienda, a tu propio ritmo.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-x-8 gap-y-2 text-sm text-white/55">
-            <span>Producción propia</span>
-            <span>Cotización inmediata</span>
-            <span>Pago seguro en línea</span>
+        <Container className="relative z-10 grid items-center gap-12 lg:grid-cols-[1.05fr_1fr]">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            <span className="mb-5 block text-xs font-semibold uppercase tracking-[0.22em] text-accent md:text-sm">
+              Tienda biwov_
+            </span>
+            <h1 className="text-[2.6rem] font-semibold leading-[1] tracking-[-0.045em] text-white sm:text-6xl xl:text-7xl">
+              Arma tu ecosistema <span className="text-accent">digital.</span>
+            </h1>
+            <p className="mt-6 max-w-xl text-base leading-relaxed text-white/65 md:text-xl">
+              Elige un plan mensual o agrega servicios sueltos, como en una tienda, a tu propio ritmo.
+            </p>
+            <dl className="mt-9 grid max-w-lg grid-cols-3 gap-4">
+              {[
+                { valor: "3", etiqueta: "planes mensuales" },
+                { valor: "+15", etiqueta: "servicios con precio publicado" },
+                { valor: "COP / USD", etiqueta: "con la tasa del día" },
+              ].map((c) => (
+                <div key={c.etiqueta} className="border-t border-white/15 pt-4">
+                  <dt className="text-2xl font-semibold tracking-tight text-white md:text-3xl">{c.valor}</dt>
+                  <dd className="mt-1 text-xs leading-snug text-white/55 md:text-sm">{c.etiqueta}</dd>
+                </div>
+              ))}
+            </dl>
+          </motion.div>
+
+          {/* Collage de trabajos reales (producción, web y contenido). */}
+          <div className="relative hidden h-[460px] lg:block">
+            <motion.div
+              initial={{ opacity: 0, y: 30, rotate: -2 }}
+              animate={{ opacity: 1, y: 0, rotate: -3 }}
+              transition={{ duration: 0.9, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+              className="card-universo absolute left-0 top-6 w-[56%] rounded-[1.75rem] p-2.5"
+            >
+              <div className="relative aspect-[4/5] overflow-hidden rounded-[1.3rem]">
+                <Image
+                  src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=800&q=70"
+                  alt="Producción y edición de video"
+                  fill
+                  priority
+                  sizes="340px"
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#03101b]/85 to-transparent" />
+                <p className="absolute bottom-4 left-4 right-4 text-sm font-medium text-white">
+                  <span className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-accent">Producción</span>
+                  Fotos, reels y B-Roll
+                </p>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30, rotate: 2 }}
+              animate={{ opacity: 1, y: 0, rotate: 3 }}
+              transition={{ duration: 0.9, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              className="card-universo absolute right-0 top-0 w-[58%] rounded-[1.75rem] p-2.5"
+            >
+              <div className="relative aspect-[16/11] overflow-hidden rounded-[1.3rem]">
+                <Image src="/casos/fashion-lash-desktop.webp" alt="Tienda virtual nagaraku.com.co" fill sizes="360px" className="object-cover object-top" />
+              </div>
+              <p className="px-2 pb-1 pt-3 text-sm font-medium text-white">
+                <span className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-accent">Páginas web</span>
+                Tiendas que venden solas
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              className="card-universo absolute bottom-0 right-[6%] w-[52%] rounded-[1.75rem] p-2.5"
+            >
+              <div className="relative aspect-[16/9] overflow-hidden rounded-[1.3rem]">
+                <Image
+                  src="https://images.unsplash.com/photo-1611746872915-64382b5c76da?auto=format&fit=crop&w=800&q=70"
+                  alt="Atención por WhatsApp con asistente de IA"
+                  fill
+                  sizes="320px"
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-[#03101b]/30" />
+              </div>
+              <p className="px-2 pb-1 pt-3 text-sm font-medium text-white">
+                <span className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-accent">Plan Crecimiento</span>
+                Desde $1.900.000 COP /mes
+              </p>
+            </motion.div>
           </div>
         </Container>
       </div>
 
       <div
         id="planes"
-        className="sticky top-20 z-40 border-b border-border-light bg-bg-light-elevated/95 backdrop-blur-xl"
+        className="sticky top-20 z-40 border-y border-white/[0.06] bg-[#03101b]/90 backdrop-blur-xl"
       >
         <Container className="flex items-center gap-3 py-3">
           <div className="relative max-w-xs flex-1">
@@ -146,7 +224,7 @@ export function TiendaCatalogo({
               className={cn(
                 "shrink-0 rounded-full border px-4 py-1.5 text-xs font-semibold whitespace-nowrap transition-colors",
                 categoriaActiva === cat
-                  ? "border-transparent bg-gradient-brand text-white"
+                  ? "border-white bg-white text-[#03101b]"
                   : "border-border-light bg-white/[0.04] text-text-on-light-secondary hover:text-text-on-light",
               )}
             >

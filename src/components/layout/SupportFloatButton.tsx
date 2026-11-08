@@ -9,7 +9,7 @@ export function SupportFloatButton() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Hablar con soporte"
-      className="bg-gradient-brand fixed left-6 z-50 flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-black/40 transition-transform hover:scale-105"
+      className="fixed border border-white/15 bg-[#0b2236]/90 backdrop-blur-md left-6 z-50 flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-black/40 transition-transform hover:scale-105"
       style={{ bottom: "max(1.5rem, calc(env(safe-area-inset-bottom) + 0.75rem))" }}
     >
       <MessageCircleQuestion className="h-5 w-5" />

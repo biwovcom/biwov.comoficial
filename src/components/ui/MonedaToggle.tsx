@@ -14,7 +14,7 @@ export function MonedaToggle({ moneda, onChange }: { moneda: Moneda; onChange: (
             onClick={() => onChange(m)}
             className={cn(
               "rounded-full px-4 py-1.5 text-xs font-semibold transition-colors",
-              moneda === m ? "bg-gradient-brand text-white" : "text-text-on-light-secondary hover:text-text-on-light",
+              moneda === m ? "bg-white text-[#03101b]" : "text-text-on-light-secondary hover:text-text-on-light",
             )}
           >
             {m === "COP" ? "Pesos colombianos" : "Dólares (USD)"}

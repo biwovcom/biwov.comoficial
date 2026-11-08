@@ -48,10 +48,10 @@ const MARCAS: Marca[] = [
     imagen: "/marcas/lina-valencia.webp",
   },
   {
-    nombre: "Asistente con IA en WhatsApp",
+    nombre: "Fashion Lash · Chatbot con IA",
     wordmark: "Chatbot IA",
     wordmarkClass: "font-semibold tracking-[-0.02em]",
-    url: "/#servicios",
+    url: "https://nagaraku.com.co/",
     simulacion: true,
   },
 ];

@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default function PoliticaDatosPage() {
   return (
-    <div className="min-h-screen bg-bg-base py-24 text-white">
+    <div className="min-h-screen pb-24 pt-32 text-white md:pt-40">
       <Container className="max-w-3xl">
         <div className="mb-10 flex items-center justify-between print:hidden">
           <Link href="/" className="text-sm text-text-secondary hover:text-white">
@@ -23,8 +23,8 @@ export default function PoliticaDatosPage() {
           <ImprimirButton />
         </div>
 
-        <div className="rounded-3xl border border-border-glass bg-white/[0.02] p-8 md:p-12">
-          <h1 className="text-3xl font-semibold text-white md:text-4xl">
+        <div className="card-universo rounded-[2rem] p-8 md:p-14">
+          <h1 className="text-4xl font-semibold leading-[1.05] tracking-[-0.04em] text-white md:text-5xl">
             Política de tratamiento de datos personales
           </h1>
           <p className="mt-2 text-sm text-text-secondary">Versión: {VERSION_POLITICA_DATOS}</p>

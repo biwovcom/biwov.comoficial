@@ -127,7 +127,7 @@ export function ProduccionContenidoDetalle({
               <button
                 type="button"
                 onClick={() => onAdquirir(buscarExtra(`produccion-${nivel.id}`))}
-                className="flex-1 rounded-full bg-gradient-brand px-3 py-2 text-xs font-medium text-white transition-all hover:shadow-[0_6px_18px_-6px_rgba(10,38,66,0.5)]"
+                className="flex-1 rounded-full bg-white px-3 py-2 text-xs font-semibold text-[#03101b] transition-all hover:scale-[1.02]"
               >
                 Adquirir {nivel.nombre}
               </button>
@@ -176,7 +176,7 @@ export function ProduccionContenidoDetalle({
                 <button
                   type="button"
                   onClick={() => onAdquirir(buscarExtra(`video-${paquete.id}`))}
-                  className="flex-1 rounded-full bg-gradient-brand px-3 py-2 text-xs font-medium text-white transition-all hover:shadow-[0_6px_18px_-6px_rgba(10,38,66,0.5)]"
+                  className="flex-1 rounded-full bg-white px-3 py-2 text-xs font-semibold text-[#03101b] transition-all hover:scale-[1.02]"
                 >
                   Adquirir
                 </button>

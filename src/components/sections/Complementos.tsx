@@ -83,7 +83,7 @@ function DetalleComplemento({
                   <button
                     type="button"
                     onClick={() => onAdquirir(extra)}
-                    className="rounded-full bg-gradient-brand px-3 py-1.5 text-xs font-medium whitespace-nowrap text-white transition-all hover:shadow-[0_6px_18px_-6px_rgba(10,38,66,0.5)]"
+                    className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold whitespace-nowrap text-[#03101b] transition-all hover:scale-[1.02]"
                   >
                     Adquirir
                   </button>

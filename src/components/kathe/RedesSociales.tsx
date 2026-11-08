@@ -71,7 +71,7 @@ function TarjetaRed({ perfil, index }: { perfil: RedPerfil; index: number }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="overflow-hidden rounded-3xl border border-border-glass bg-[#0a2642]"
+      className="card-universo overflow-hidden rounded-[2rem]"
     >
       <div className={`relative h-20 bg-gradient-to-r ${perfil.gradiente}`}>
         <span className="absolute right-4 top-4 flex items-center gap-1.5 text-sm font-semibold text-white">

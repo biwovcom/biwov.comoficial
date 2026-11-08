@@ -43,7 +43,7 @@ export function Navbar() {
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-all duration-300",
         scrolled || menuAbierto
-          ? "border-b border-border-glass bg-bg-base/85 backdrop-blur-xl"
+          ? "border-b border-white/[0.06] bg-[#03101b]/85 backdrop-blur-xl"
           : "border-b border-transparent bg-transparent",
       )}
     >
@@ -98,7 +98,7 @@ export function Navbar() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="overflow-hidden border-t border-border-glass bg-bg-base lg:hidden"
+            className="overflow-hidden border-t border-white/[0.06] bg-[#03101b] lg:hidden"
           >
             <Container className="flex flex-col gap-1 py-4">
               {LINKS.map((link) => (

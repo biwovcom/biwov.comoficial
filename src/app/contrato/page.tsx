@@ -47,7 +47,7 @@ export default async function ContratoPage({
   ];
 
   return (
-    <div className="min-h-screen bg-bg-base py-24 text-white">
+    <div className="min-h-screen pb-24 pt-32 text-white md:pt-40">
       <Container className="max-w-3xl">
         <div className="mb-10 flex items-center justify-between print:hidden">
           <Link href="/" className="text-sm text-text-secondary hover:text-white">
@@ -56,14 +56,14 @@ export default async function ContratoPage({
           <ImprimirButton />
         </div>
 
-        <div className="rounded-3xl border border-border-glass bg-white/[0.02] p-8 md:p-12">
-          <p className="mb-2 rounded-full border border-border-glass bg-white/[0.03] px-4 py-1 text-xs font-semibold uppercase tracking-wide text-accent inline-block print:hidden">
+        <div className="card-universo rounded-[2rem] p-8 md:p-14">
+          <p className="mb-3 block text-xs font-semibold uppercase tracking-[0.22em] text-white/50 print:hidden">
             Borrador — pendiente revisión legal
           </p>
-          <span className="text-xs font-semibold uppercase tracking-wide text-accent">
+          <span className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">
             {NOMBRE_TIPO_CONTRATO[tipo]}
           </span>
-          <h1 className="mt-1 text-3xl font-semibold text-white md:text-4xl">
+          <h1 className="mt-3 text-4xl font-semibold leading-[1.05] tracking-[-0.04em] text-white md:text-5xl">
             Contrato de Prestación de Servicios — biwov
           </h1>
           <p className="mt-2 text-sm text-text-secondary">
