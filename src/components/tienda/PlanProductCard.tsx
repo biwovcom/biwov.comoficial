@@ -53,7 +53,19 @@ export function PlanProductCard({
       </div>
       <div className="flex flex-1 flex-col p-4">
         <h4 className="text-sm font-semibold text-white">{plan.nombre}</h4>
-        <p className="mt-1 flex-1 text-xs text-text-secondary line-clamp-2">{plan.claim}</p>
+        <p className="mt-1 text-xs text-text-secondary line-clamp-2">{plan.claim}</p>
+        <ul className="mt-3 flex-1 space-y-1">
+          {plan.incluye.slice(0, 4).map((inc) => (
+            <li key={inc.label} className="line-clamp-2 text-xs text-white/80">
+              <span className="text-accent">✔</span> {inc.label}
+            </li>
+          ))}
+          {plan.incluye.length > 4 && (
+            <li className="text-xs font-medium text-accent/90">
+              + {plan.incluye.length - 4} cosas más incluidas
+            </li>
+          )}
+        </ul>
         <p className="mt-3 text-base font-bold text-accent">
           {formatCopEnMoneda(plan.precioDesde.cop, moneda, trm)}
           <span className="text-xs font-medium text-text-secondary"> /mes</span>

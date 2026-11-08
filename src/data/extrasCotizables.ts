@@ -1,4 +1,5 @@
-import { NIVELES_PRODUCCION, PRODUCCION_VIDEO, PRODUCCION_UGC } from "@/data/addOns";
+import { NIVELES_PRODUCCION, PRODUCCION_CONTENIDO, PRODUCCION_VIDEO, PRODUCCION_UGC } from "@/data/addOns";
+import { formatCopEnMoneda } from "@/lib/moneda";
 import { COMPLEMENTOS } from "@/data/complementos";
 import type { TipoContrato } from "@/lib/contrato";
 
@@ -36,13 +37,17 @@ export const EXTRAS_COTIZABLES: ExtraCotizable[] = [
     periodicidad: "único" as const,
     descripcion: `Jornada de producción de ${nivel.tiempoProduccion}, dirección creativa ${nivel.direccionCreativa.toLowerCase()}.`,
     incluye: [
+      `${nivel.fotografias} fotografías profesionales editadas`,
+      `${nivel.reels} reels (videos verticales) editados y listos para publicar`,
+      `${nivel.clipsBRoll} clips de B-Roll (videos de apoyo, no la toma principal)`,
+      `Tiempo de producción: ${nivel.tiempoProduccion}`,
+      `Dirección creativa ${nivel.direccionCreativa.toLowerCase()}`,
       `Cámara: ${nivel.camara}`,
       `Audio: ${nivel.audio}`,
       `Iluminación: ${nivel.iluminacion}`,
       `Estabilización: ${nivel.estabilizacion}`,
       `Drone: ${nivel.drone}`,
-      `${nivel.fotografias} fotografías, ${nivel.reels} reels, ${nivel.clipsBRoll} clips de B-Roll`,
-      "Construcción de guiones y copys",
+      ...PRODUCCION_CONTENIDO.incluye,
     ],
     noIncluye: ["La subida o publicación del contenido en tus redes sociales"],
   })),
@@ -54,8 +59,16 @@ export const EXTRAS_COTIZABLES: ExtraCotizable[] = [
     precioCop: paquete.precio,
     periodicidad: (paquete.esMensual ? "mensual" : "único") as "único" | "mensual",
     descripcion: PRODUCCION_VIDEO.descripcion,
-    incluye: PRODUCCION_VIDEO.incluye,
-    noIncluye: PRODUCCION_VIDEO.noIncluye,
+    incluye: [
+      `${paquete.cantidadVideos} videos terminados${paquete.esMensual ? " cada mes" : ""}`,
+      `${Math.ceil(paquete.cantidadVideos / 3)} jornada${Math.ceil(paquete.cantidadVideos / 3) === 1 ? "" : "s"} de grabación de 4 horas${paquete.esMensual ? " al mes" : ""}`,
+      ...PRODUCCION_VIDEO.incluye,
+      `Equivale a ${formatCopEnMoneda(Math.round(paquete.precio / paquete.cantidadVideos), "COP", 1)} por video`,
+    ],
+    noIncluye: [
+      "Guiones, copys y dirección creativa (están en los paquetes de Producción de contenido)",
+      "La subida o publicación del contenido en tus redes sociales",
+    ],
   })),
   ...PRODUCCION_UGC.paquetes.map((paquete) => ({
     id: `video-${paquete.id}`,
@@ -65,8 +78,12 @@ export const EXTRAS_COTIZABLES: ExtraCotizable[] = [
     precioCop: paquete.precio,
     periodicidad: (paquete.esMensual ? "mensual" : "único") as "único" | "mensual",
     descripcion: PRODUCCION_UGC.descripcion,
-    incluye: PRODUCCION_UGC.incluye,
-    noIncluye: PRODUCCION_UGC.noIncluye,
+    incluye: [
+      `${paquete.cantidadVideos} video${paquete.cantidadVideos === 1 ? "" : "s"} estilo UGC terminado${paquete.cantidadVideos === 1 ? "" : "s"}`,
+      ...PRODUCCION_UGC.incluye,
+      `Equivale a ${formatCopEnMoneda(Math.round(paquete.precio / paquete.cantidadVideos), "COP", 1)} por video`,
+    ],
+    noIncluye: ["La subida o publicación del contenido en tus redes sociales"],
   })),
   ...(paginasWeb?.items ?? [])
     .filter((item) => item.precioCop !== undefined)

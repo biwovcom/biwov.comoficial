@@ -2,81 +2,89 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { TrendingUp, Globe, Workflow, Megaphone, Users } from "lucide-react";
 import { Container } from "@/components/ui/Container";
-import { Button } from "@/components/ui/Button";
-import { useQuoter } from "@/components/quoter/QuoterProvider";
+import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
+import { linkWhatsApp } from "@/lib/panel/whatsapp";
+import { WHATSAPP_BIWOV, MENSAJE_WHATSAPP_BIWOV } from "@/lib/contacto";
 
-const PILARES = [
-  { Icon: TrendingUp, titulo: "Estrategia digital" },
-  { Icon: Globe, titulo: "Web y tiendas" },
-  { Icon: Workflow, titulo: "Automatizaciones con IA" },
-  { Icon: Megaphone, titulo: "Campañas que convierten" },
-  { Icon: Users, titulo: "Acompañamiento real" },
+const CIFRAS = [
+  { valor: "+10", etiqueta: "negocios acompañados" },
+  { valor: "3 años", etiqueta: "construyendo ecosistemas digitales" },
+  { valor: "~7x", etiqueta: "retorno en pauta (caso FashionLash)" },
 ];
 
 export function Hero() {
-  const { open } = useQuoter();
-
   return (
-    <section className="relative isolate flex min-h-[640px] flex-col justify-end overflow-hidden pt-36 pb-10 md:min-h-[760px] md:pt-44 md:pb-14">
+    <section className="relative isolate flex flex-col overflow-hidden bg-[#03101b] pb-14 pt-[340px] sm:pt-[420px] md:min-h-[100svh] md:justify-center md:pb-20 md:pt-32">
+      {/* Foto de Kathe a sangre: en escritorio ocupa el lado derecho; en móvil queda arriba, detrás del texto. */}
+      <div className="absolute inset-x-0 top-0 h-[400px] sm:h-[480px] md:inset-0 md:h-auto">
       <Image
-        src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1920&q=75"
-        alt=""
+        src="/kathe-banner.png"
+        alt="Katherine Usma Aristizábal, fundadora de biwov_"
         fill
         priority
         sizes="100vw"
-        className="object-cover"
+        className="object-cover object-[68%_top] md:object-[right_center]"
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#0a2642] via-[#0a2642]/85 to-[#0a2642]/45" />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#0a2642] via-transparent to-[#0a2642]/30" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#03101b] via-[#03101b]/20 to-transparent md:bg-gradient-to-r md:from-[#03101b] md:via-[#03101b]/60 md:to-transparent" />
+      </div>
+      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-bg-base to-transparent" />
 
-      <Container className="relative z-10">
+      <Container className="relative z-10 !max-w-7xl">
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
-          className="max-w-xl"
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="max-w-[54rem]"
         >
-          <span className="mb-5 block text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-            Transformación digital, no marketing tradicional
-          </span>
-          <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-[3.4rem] lg:leading-[1.08]">
-            Tu negocio merece un sistema.
+          <h1 className="text-[2.6rem] font-semibold leading-[1] tracking-[-0.045em] text-white sm:text-6xl md:text-[4rem] xl:text-[5rem]">
+            Tu negocio puede
+            <br />
+            <span className="text-accent md:whitespace-nowrap">vender más y mejor.</span>
           </h1>
-          <p className="mt-6 max-w-md text-base leading-relaxed text-white/75 md:text-lg">
-            Estrategia, tecnología y acompañamiento para que vendas más y
-            trabajes con menos esfuerzo.
+          <p className="mt-6 max-w-xl text-base leading-relaxed text-white/80 md:text-xl md:leading-relaxed">
+            Estrategia, contenido, campañas y automatizaciones con IA conectadas en un solo
+            sistema, para que vendas más trabajando con menos esfuerzo.
           </p>
-          <div className="mt-10 flex flex-col items-start gap-4 sm:flex-row">
-            <Button size="lg" variant="white" onClick={() => open()}>
-              Hablemos
-            </Button>
-            <Button
-              size="lg"
-              variant="secondary"
-              onClick={() =>
-                document.getElementById("servicios")?.scrollIntoView({ behavior: "smooth" })
-              }
-            >
-              Conoce nuestros servicios
-            </Button>
-          </div>
         </motion.div>
+
+        <motion.dl
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+          className="mt-9 grid max-w-2xl grid-cols-3 gap-4 sm:gap-10"
+        >
+          {CIFRAS.map((c) => (
+            <div key={c.etiqueta}>
+              <dt className="text-2xl font-semibold tracking-tight text-white md:text-4xl">{c.valor}</dt>
+              <dd className="mt-1 text-xs leading-snug text-white/70 md:text-base">{c.etiqueta}</dd>
+            </div>
+          ))}
+        </motion.dl>
 
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
-          className="mt-16 flex flex-wrap gap-x-8 gap-y-4 border-t border-white/15 pt-6 md:mt-20"
+          transition={{ duration: 0.8, ease: "easeOut", delay: 0.35 }}
+          className="mt-10 flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:gap-10"
         >
-          {PILARES.map(({ Icon, titulo }) => (
-            <div key={titulo} className="flex items-center gap-2">
-              <Icon className="h-4 w-4 shrink-0 text-accent" strokeWidth={1.75} />
-              <span className="text-xs font-medium text-white/80 sm:text-sm">{titulo}</span>
-            </div>
-          ))}
+          <a
+            href={linkWhatsApp(WHATSAPP_BIWOV, MENSAJE_WHATSAPP_BIWOV)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-3 rounded-full bg-white px-7 py-4 text-base font-semibold text-[#03101b] transition-transform duration-300 hover:scale-[1.02] md:px-9 md:py-5 md:text-lg"
+          >
+            <WhatsAppIcon className="h-6 w-6" />
+            Quiero hablar sobre mi negocio
+          </a>
+          <a
+            href="#servicios"
+            className="border-b border-white/70 pb-1 text-base text-white transition-colors hover:border-accent hover:text-accent md:text-lg"
+          >
+            Conoce nuestros servicios
+          </a>
         </motion.div>
+        <p className="mt-5 text-sm text-white/55">Te respondemos por WhatsApp.</p>
       </Container>
     </section>
   );

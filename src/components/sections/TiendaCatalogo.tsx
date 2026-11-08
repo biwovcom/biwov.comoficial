@@ -9,9 +9,10 @@ import { PlanProductCard } from "@/components/tienda/PlanProductCard";
 import { CartDrawer } from "@/components/tienda/CartDrawer";
 import { CotizacionCombinadaModal } from "./CotizacionCombinadaModal";
 import { PlanDetalleModal } from "@/components/planes/PlanDetalleModal";
+import { CompraItemModal } from "@/components/compras/CompraItemModal";
 import { MonedaToggle } from "@/components/ui/MonedaToggle";
 import { PLANES, type Plan } from "@/data/planes";
-import { EXTRAS_COTIZABLES, type CategoriaExtra } from "@/data/extrasCotizables";
+import { EXTRAS_COTIZABLES, type CategoriaExtra, type ExtraCotizable } from "@/data/extrasCotizables";
 import type { Moneda } from "@/lib/moneda";
 import { cn } from "@/lib/utils";
 
@@ -39,6 +40,7 @@ export function TiendaCatalogo({
   const [carrito, setCarrito] = useState<Record<string, number>>({});
   const [carritoAbierto, setCarritoAbierto] = useState(false);
   const [planAbierto, setPlanAbierto] = useState<Plan | null>(null);
+  const [itemAbierto, setItemAbierto] = useState<ExtraCotizable | null>(null);
   const [abrirEnCompra, setAbrirEnCompra] = useState(false);
   const [cotizacionAbierta, setCotizacionAbierta] = useState(false);
 
@@ -113,7 +115,7 @@ export function TiendaCatalogo({
 
       <div
         id="planes"
-        className="sticky top-18 z-40 border-b border-border-light bg-bg-light-elevated/95 backdrop-blur-xl"
+        className="sticky top-20 z-40 border-b border-border-light bg-bg-light-elevated/95 backdrop-blur-xl"
       >
         <Container className="flex items-center gap-3 py-3">
           <div className="relative max-w-xs flex-1">
@@ -190,6 +192,7 @@ export function TiendaCatalogo({
                 trm={trm}
                 cantidad={carrito[item.id] ?? 0}
                 onCambiarCantidad={cambiarCantidad}
+                onVerDetalle={() => setItemAbierto(item)}
               />
             ))}
           </div>
@@ -220,6 +223,13 @@ export function TiendaCatalogo({
         trm={trm}
         abrirEnCompra={abrirEnCompra}
         onClose={() => setPlanAbierto(null)}
+      />
+
+      <CompraItemModal
+        item={itemAbierto}
+        moneda={moneda}
+        trm={trm}
+        onClose={() => setItemAbierto(null)}
       />
 
       <CotizacionCombinadaModal

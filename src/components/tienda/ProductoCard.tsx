@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Minus, Plus, ShoppingCart } from "lucide-react";
+import { ArrowRight, Minus, Plus, ShoppingCart } from "lucide-react";
 import type { ExtraCotizable } from "@/data/extrasCotizables";
 import { ARTE_CATEGORIA } from "@/data/categoriasExtras";
 import { formatCopEnMoneda, type Moneda } from "@/lib/moneda";
@@ -12,12 +12,14 @@ export function ProductoCard({
   trm,
   cantidad,
   onCambiarCantidad,
+  onVerDetalle,
 }: {
   item: ExtraCotizable;
   moneda: Moneda;
   trm: number;
   cantidad: number;
   onCambiarCantidad: (id: string, cantidad: number) => void;
+  onVerDetalle: () => void;
 }) {
   const { icono: Icono, imagen } = ARTE_CATEGORIA[item.categoria];
   const precio = formatCopEnMoneda(item.precioCop, moneda, trm) + (item.periodicidad === "mensual" ? " /mes" : "");
@@ -37,15 +39,29 @@ export function ProductoCard({
         {item.incluye && item.incluye.length > 0 && (
           <ul className="mt-2 flex-1 space-y-1">
             {item.incluye.slice(0, 3).map((inc) => (
-              <li key={inc} className="truncate text-xs text-text-secondary">
+              <li key={inc} className="line-clamp-1 text-xs text-text-secondary">
                 • {inc}
               </li>
             ))}
+            {item.incluye.length > 3 && (
+              <li className="text-xs font-medium text-accent/90">
+                + {item.incluye.length - 3} cosas más incluidas
+              </li>
+            )}
           </ul>
         )}
         <p className="mt-3 text-base font-bold text-accent">{precio}</p>
 
-        <div className="mt-3">
+        <button
+          type="button"
+          onClick={onVerDetalle}
+          className="mt-3 inline-flex items-center justify-center gap-1.5 rounded-full border border-white/20 px-3 py-2 text-xs font-medium text-white transition-colors hover:border-accent/60 hover:text-accent"
+        >
+          Ver detalle
+          <ArrowRight className="h-3.5 w-3.5" />
+        </button>
+
+        <div className="mt-2">
           {cantidad === 0 ? (
             <button
               type="button"

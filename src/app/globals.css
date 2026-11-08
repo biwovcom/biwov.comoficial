@@ -58,7 +58,10 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-heading), ui-sans-serif, system-ui, sans-serif;
+  /* Estilo editorial (referencia fashionycommerce.co): titulares grandes en
+     Inter con interletrado cerrado, en vez de Nunito redondeada. */
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.035em;
 }
 
 ::selection {

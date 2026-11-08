@@ -152,15 +152,16 @@ export function ProduccionContenidoDetalle({
 
         <p className="mt-3 text-xs text-text-secondary">{PRODUCCION_VIDEO.reglaJornada}</p>
 
-        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {PRODUCCION_VIDEO.paquetes.map((paquete) => (
             <div key={paquete.id} className="flex flex-col rounded-2xl border border-border-glass bg-white/[0.02] p-4">
               <p className="text-sm font-semibold text-white">
-                {paquete.cantidadVideos} video{paquete.cantidadVideos === 1 ? "" : "s"}
-                {paquete.esMensual && " / mes"}
+                {paquete.nombre ??
+                  `${paquete.cantidadVideos} video${paquete.cantidadVideos === 1 ? "" : "s"}${paquete.esMensual ? " / mes" : ""}`}
               </p>
               <p className="mt-0.5 text-base font-bold text-accent">
                 {formatCopEnMoneda(paquete.precio, moneda, trm)}
+                {paquete.esMensual && <span className="text-xs font-medium text-text-secondary"> /mes</span>}
               </p>
               <div className="mt-3 flex gap-1.5">
                 <button

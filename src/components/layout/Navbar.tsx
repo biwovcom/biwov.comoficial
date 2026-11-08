@@ -9,14 +9,16 @@ import { Button } from "@/components/ui/Button";
 import { useQuoter } from "@/components/quoter/QuoterProvider";
 import { LINKS_PANEL } from "@/lib/panel/panelConfig";
 import { LogoMark } from "./LogoMark";
+import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
+import { linkWhatsApp } from "@/lib/panel/whatsapp";
+import { WHATSAPP_BIWOV, MENSAJE_WHATSAPP_BIWOV } from "@/lib/contacto";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
   { href: "/#servicios", label: "Servicios" },
   { href: "/tienda#planes", label: "Planes" },
   { href: "/tienda", label: "Tienda" },
-  { href: "/#casos", label: "Casos de éxito" },
-  { href: "/#testimonios", label: "Testimonios" },
+  { href: "/#casos", label: "Casos" },
   { href: "/kathe", label: "Fundadora" },
 ];
 
@@ -45,28 +47,38 @@ export function Navbar() {
           : "border-b border-transparent bg-transparent",
       )}
     >
-      <Container className="flex h-18 items-center justify-between py-4 !max-w-7xl">
-        <Link href="/" className="flex items-center gap-2 font-logo text-xl font-bold text-white">
-          <LogoMark className="h-6 w-6 text-white" />
+      <Container className="flex h-20 items-center justify-between py-4 !max-w-7xl">
+        <Link href="/" className="flex items-center gap-2 font-logo text-2xl font-bold text-white">
+          <LogoMark className="h-7 w-7 text-white" />
           biwov_
         </Link>
-        <nav className="hidden items-center gap-4 xl:gap-5 lg:flex">
+        <nav className="hidden items-center gap-8 xl:gap-10 lg:flex">
           {LINKS.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className="text-sm whitespace-nowrap text-text-secondary transition-colors hover:text-white"
+              className="text-[15px] font-medium whitespace-nowrap text-white/85 transition-colors hover:text-accent"
             >
               {link.label}
             </a>
           ))}
         </nav>
-        <div className="hidden items-center gap-2 xl:gap-3 lg:flex">
-          <Button size="md" variant="secondary" onClick={() => open()}>
+        <div className="hidden items-center gap-5 lg:flex">
+          <button
+            type="button"
+            onClick={() => open()}
+            className="text-[15px] font-medium whitespace-nowrap text-white/85 transition-colors hover:text-accent"
+          >
             Diagnóstico gratis
-          </Button>
-          <a href={LINKS_PANEL.calendario} target="_blank" rel="noopener noreferrer">
-            <Button size="md">Agenda una asesoría</Button>
+          </button>
+          <a
+            href={linkWhatsApp(WHATSAPP_BIWOV, MENSAJE_WHATSAPP_BIWOV)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-[15px] font-semibold text-[#03101b] transition-transform duration-300 hover:scale-[1.03]"
+          >
+            <WhatsAppIcon className="h-5 w-5" />
+            Hablemos
           </a>
         </div>
         <button

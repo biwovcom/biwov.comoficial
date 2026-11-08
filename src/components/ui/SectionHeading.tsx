@@ -26,7 +26,7 @@ export function SectionHeading({
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.6, ease: "easeOut" }}
       className={cn(
-        "max-w-2xl",
+        "max-w-3xl",
         align === "center" ? "mx-auto text-center" : "text-left",
         className,
       )}
@@ -34,10 +34,8 @@ export function SectionHeading({
       {eyebrow && (
         <span
           className={cn(
-            "mb-4 inline-block rounded-full border px-4 py-1.5 text-xs font-semibold tracking-wide uppercase",
-            light
-              ? "border-border-light bg-white text-accent"
-              : "border-border-glass bg-white/[0.03] text-accent",
+            "mb-5 inline-block text-xs font-semibold tracking-[0.2em] uppercase",
+            light ? "text-[#0088a8]" : "text-accent",
           )}
         >
           {eyebrow}
@@ -45,7 +43,7 @@ export function SectionHeading({
       )}
       <h2
         className={cn(
-          "text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl",
+          "text-4xl font-semibold leading-[1.02] sm:text-5xl md:text-6xl",
           light ? "text-text-on-light" : "text-white",
         )}
       >
