@@ -134,7 +134,9 @@ export function MarcasCarrusel() {
             Negocios que confían en nosotros
           </span>
           <p className="mt-3 max-w-2xl text-base text-white/55 md:text-lg">
-            Sitios reales de nuestros clientes y los sistemas que montamos: campañas, CRM, WhatsApp, email y chatbots con IA.
+            <span className="font-medium text-white">Proyectos reales, resultados reales.</span> Descubra cómo
+            ayudamos a nuestros clientes mediante sitios web, campañas digitales, CRM, automatización de
+            WhatsApp y correo electrónico, y chatbots impulsados por Inteligencia Artificial.
           </p>
         </motion.div>
       </Container>
