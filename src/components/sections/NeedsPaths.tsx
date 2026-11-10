@@ -30,7 +30,7 @@ export function NeedsPaths() {
         <SectionHeading
           eyebrow="Encuentra tu camino"
           title="¿Qué necesita tu negocio hoy?"
-          description="Elige el plan que más suena a ti y mira en qué casos encaja."
+          description="Encuentra el plan que mejor se ajusta a tu negocio y mira en qué situaciones te va a dar más resultados."
         />
 
         <div className="mt-10 flex max-w-md gap-2">

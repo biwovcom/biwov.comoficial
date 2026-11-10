@@ -11,7 +11,7 @@ export function Clientes() {
   return (
     <section className="py-16 md:py-20">
       <Container>
-        <SectionHeading eyebrow="Clientes y resultados" title="Negocios que ya confiaron en mí" />
+        <SectionHeading eyebrow="Clientes y resultados" title="Negocios que ya confían en nosotros" />
 
         <div className="mt-14 grid gap-6 md:grid-cols-2">
           {CLIENTES_KATHE.map((cliente, i) => {

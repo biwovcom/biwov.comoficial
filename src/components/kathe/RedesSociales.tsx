@@ -131,7 +131,7 @@ export function RedesSociales() {
       <Container>
         <div className="max-w-3xl">
           <span className="block text-xs font-semibold uppercase tracking-[0.22em] text-accent md:text-sm">
-            Sígueme en redes
+            Síguenos en redes
           </span>
           <h2 className="mt-5 text-4xl font-medium leading-[1.04] text-white sm:text-5xl md:text-6xl">
             Contenido diario sobre marketing con propósito

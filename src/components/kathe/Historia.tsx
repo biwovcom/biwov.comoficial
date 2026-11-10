@@ -9,7 +9,7 @@ export function Historia() {
     <section className="py-16 md:py-20">
       <Container>
         <div className="grid gap-10 md:grid-cols-2 md:gap-16">
-        <SectionHeading eyebrow="Mi historia" title="De redes sociales a ecosistemas completos" />
+        <SectionHeading eyebrow="Nuestra historia" title="De redes sociales a ecosistemas completos" />
         <motion.p
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -17,10 +17,10 @@ export function Historia() {
           transition={{ duration: 0.5 }}
           className="text-lg leading-relaxed text-white/60 md:pt-12 md:text-2xl md:leading-relaxed"
         >
-          Empecé manejando redes sociales para una mueblería en Manizales.
-          Hoy diseño ecosistemas donde marketing, ventas y automatización
-          trabajan como uno solo — con el orden y la planeación que me
-          apasionan.
+          Empezamos manejando las redes sociales de una mueblería en Manizales.
+          Hoy diseñamos ecosistemas digitales donde el marketing, las ventas y la
+          automatización trabajan como uno solo, con el orden y la planeación que
+          nos apasionan.
         </motion.p>
         </div>
       </Container>

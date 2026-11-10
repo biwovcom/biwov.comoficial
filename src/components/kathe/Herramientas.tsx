@@ -9,7 +9,7 @@ export function Herramientas() {
   return (
     <section className="py-16 md:py-20">
       <Container>
-        <SectionHeading eyebrow="Caja de herramientas" title="Con qué trabajo" />
+        <SectionHeading eyebrow="Caja de herramientas" title="Las herramientas que usamos" />
 
         <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {HERRAMIENTAS_KATHE.map((grupo, i) => (

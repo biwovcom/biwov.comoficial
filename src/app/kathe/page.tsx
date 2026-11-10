@@ -8,7 +8,6 @@ import { Trayectoria } from "@/components/kathe/Trayectoria";
 import { ComoTrabajo } from "@/components/kathe/ComoTrabajo";
 import { Clientes } from "@/components/kathe/Clientes";
 import { Formacion } from "@/components/kathe/Formacion";
-import { Eventos } from "@/components/kathe/Eventos";
 import { Herramientas } from "@/components/kathe/Herramientas";
 import { Cierre } from "@/components/kathe/Cierre";
 
@@ -46,7 +45,6 @@ export default function KathePage() {
       <ComoTrabajo />
       <Clientes />
       <Formacion />
-      <Eventos />
       <Herramientas />
       <Cierre />
     </div>

@@ -39,7 +39,8 @@ export function FounderTeaser() {
               Katherine Usma Aristizábal
             </h2>
             <p className="mt-4 max-w-md text-base leading-relaxed text-white/65 md:text-lg">
-              Fundadora de biwov_. Ordenamos tu negocio digital para que escale con claridad.
+              Administradora de Negocios Internacionales y fundadora de biwov_. Con nuestro equipo
+              ordenamos tu negocio digital para que crezca con claridad.
             </p>
 
             <dl className="mt-8 grid max-w-lg grid-cols-3 gap-3">

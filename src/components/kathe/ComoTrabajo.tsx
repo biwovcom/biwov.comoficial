@@ -10,7 +10,7 @@ export function ComoTrabajo() {
     <section className="py-16 md:py-20">
       <Container>
         <div className="grid gap-12 md:grid-cols-[0.9fr_1.1fr] md:gap-16">
-        <SectionHeading eyebrow="Mi método" title="Cómo trabajo" />
+        <SectionHeading eyebrow="Nuestro método" title="Así trabajamos" />
 
         <div className="relative">
           <div className="absolute left-6 top-2 bottom-2 w-px bg-gradient-to-b from-accent/60 via-accent/20 to-transparent" />

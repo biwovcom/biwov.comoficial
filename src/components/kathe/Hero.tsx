@@ -42,13 +42,14 @@ export function Hero() {
             Katherine Usma Aristizábal · Fundadora de biwov_
           </span>
           <h1 className="text-[2.6rem] font-semibold leading-[1] tracking-[-0.045em] text-white sm:text-6xl md:text-[3.75rem] xl:text-[4.5rem]">
-            Convierto ideas
+            Convertimos ideas
             <br />
             <span className="text-accent">en sistemas que venden.</span>
           </h1>
           <p className="mt-7 max-w-xl text-base leading-relaxed text-white/80 md:text-xl md:leading-relaxed">
-            Implementadora de ecosistemas digitales: estrategia, contenido, campañas y
-            automatizaciones con IA para que tu negocio crezca con orden.
+            Administradora de Negocios Internacionales y fundadora de biwov_. Junto a nuestro equipo
+            unimos estrategia, contenido, campañas y automatización con IA para que tu negocio crezca
+            con orden.
           </p>
           <div className="mt-10 flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:gap-10">
             <a
@@ -58,7 +59,7 @@ export function Hero() {
               className="inline-flex items-center gap-3 rounded-full bg-white px-7 py-4 text-base font-semibold text-[#03101b] transition-transform duration-300 hover:scale-[1.02] md:px-9 md:py-5 md:text-lg"
             >
               <WhatsAppIcon className="h-6 w-6" />
-              Escríbeme por WhatsApp
+              Escríbenos por WhatsApp
             </a>
             <a
               href={LINKS_PANEL.calendario}

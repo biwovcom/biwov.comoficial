@@ -51,27 +51,27 @@ export const COMO_TRABAJO: PasoComoTrabajo[] = [
   {
     numero: 1,
     titulo: "Diagnóstico",
-    frase: "Analizo tu negocio, tus herramientas actuales y tu objetivo real de crecimiento.",
+    frase: "Analizamos tu negocio, las herramientas que ya usas y hasta dónde quieres crecer.",
   },
   {
     numero: 2,
     titulo: "Diseño del plan",
-    frase: "Defino qué piezas necesitas y cómo se van a conectar entre sí.",
+    frase: "Definimos qué piezas necesitas y cómo se van a conectar entre sí.",
   },
   {
     numero: 3,
     titulo: "Implementación",
-    frase: "Construyo cada componente: contenido, canales, CRM, sitio y publicidad.",
+    frase: "Construimos cada pieza: contenido, canales, CRM, sitio web y publicidad.",
   },
   {
     numero: 4,
     titulo: "Automatización",
-    frase: "Conecto todo con automatizaciones e IA para que el sistema trabaje por ti.",
+    frase: "Conectamos todo con automatizaciones e IA para que el sistema trabaje por ti.",
   },
   {
     numero: 5,
     titulo: "Escala",
-    frase: "Mido, optimizo y hago crecer todo junto con tu negocio.",
+    frase: "Medimos, ajustamos y seguimos creciendo de la mano con tu negocio.",
   },
 ];
 
@@ -107,7 +107,7 @@ export const CLIENTES_KATHE: ClienteKathe[] = [
   {
     nombre: "Living House",
     descripcion: "Manejo de redes sociales.",
-    resultado: "Me volvieron a contratar después de terminar el primer ciclo.",
+    resultado: "Nos volvieron a contratar al terminar el primer ciclo.",
   },
   {
     nombre: "Cafenet",
@@ -120,29 +120,38 @@ export const CLIENTES_KATHE: ClienteKathe[] = [
 ];
 
 export interface ItemFormacion {
-  categoria: string;
+  /** Institución o evento, se muestra como "logo". */
+  institucion: string;
+  /** Estilo del logo (color y tipografía) para que se vea llamativo. */
+  estilo: "udemy" | "invictus" | "hotmart" | "polisura" | "javi" | "silicon" | "neutro";
   detalle: string;
+  tipo: "Curso" | "Conferencia" | "Evento" | "Mentoría" | "Formación";
 }
 
-export const FORMACION_KATHE: ItemFormacion[] = [
-  { categoria: "Profesional", detalle: "Administración de Negocios Internacionales (2022)" },
-  { categoria: "Técnica", detalle: "UX/UI, HTML y CSS" },
-  { categoria: "Mentoría", detalle: "Fabián Castro G" },
-  { categoria: "Contenido para pauta", detalle: "Curso de Bárbara Bruna" },
-  { categoria: "Campañas publicitarias", detalle: "Formación con Juan Ads" },
-  { categoria: "En curso", detalle: "Programa de Javi Rodríguez" },
+export const PROFESION_KATHE = "Administradora de Negocios Internacionales";
+
+export const CONOCIMIENTOS_KATHE = [
+  "UX y UI",
+  "Marketing digital",
+  "HTML y CSS",
+  "Pauta en Meta",
+  "Contenido para pauta",
+  "CRM y automatización",
+  "Lanzamientos digitales",
 ];
 
-export interface EventoKathe {
-  nombre: string;
-  url?: string;
-}
-
-export const EVENTOS_KATHE: EventoKathe[] = [
-  { nombre: "Invictus" },
-  { nombre: "Hotmart" },
-  { nombre: "El Silicon Valley", url: "https://www.instagram.com/elsiliconvalley" },
-  { nombre: "La Cumbre de Javi Rodríguez" },
+export const FORMACION_KATHE: ItemFormacion[] = [
+  { institucion: "Udemy", estilo: "udemy", tipo: "Curso", detalle: "UX y UI" },
+  { institucion: "Udemy", estilo: "udemy", tipo: "Curso", detalle: "Marketing digital" },
+  { institucion: "Udemy", estilo: "udemy", tipo: "Curso", detalle: "HTML y CSS" },
+  { institucion: "Polisura", estilo: "polisura", tipo: "Curso", detalle: "Cursos de marketing digital" },
+  { institucion: "Invictus", estilo: "invictus", tipo: "Conferencia", detalle: "Conferencias de negocios y marketing" },
+  { institucion: "Hotmart", estilo: "hotmart", tipo: "Conferencia", detalle: "Conferencias de lanzamientos y productos digitales" },
+  { institucion: "Mentes Millonarias", estilo: "javi", tipo: "Evento", detalle: "Evento y curso de Javi Rodríguez" },
+  { institucion: "El Silicon Valley", estilo: "silicon", tipo: "Evento", detalle: "Comunidad y eventos de tecnología" },
+  { institucion: "Fabián Castro G", estilo: "neutro", tipo: "Mentoría", detalle: "Mentoría en negocios digitales" },
+  { institucion: "Bárbara Bruna", estilo: "neutro", tipo: "Formación", detalle: "Contenido para pauta" },
+  { institucion: "Juan Ads", estilo: "neutro", tipo: "Formación", detalle: "Campañas publicitarias" },
 ];
 
 export interface GrupoHerramientas {
