@@ -72,7 +72,14 @@ export const PLANES: Plan[] = [
         ],
       },
       { label: "Asistente con IA que filtra a los curiosos y te pasa los interesados" },
-      { label: "3 videos y 2 imágenes de contenido cada mes, grabados y editados por nosotros" },
+      {
+        label: "8 videos y 2 imágenes de contenido cada mes, grabados y editados por nosotros",
+        subitems: [
+          "3 jornadas de grabación de 4 horas al mes (cada jornada rinde hasta 3 videos terminados)",
+          "Grabación con equipo profesional: cámara, audio e iluminación",
+          "Edición, corrección de color y entrega en formato vertical, listos para publicar",
+        ],
+      },
     ],
     precioDesde: { cop: 1900000, usd: 475 },
     montajeInicial: { cop: 1800000, usd: 450 },
@@ -108,6 +115,14 @@ export const PLANES: Plan[] = [
           "Flujo de recompra para que tus clientes vuelvan a comprarte",
           "Flujo de remarketing para volver a buscar a quienes no compraron la primera vez",
           "Lista organizada de todos tus clientes con etapas de venta",
+        ],
+      },
+      {
+        label: "12 videos y 2 imágenes de contenido cada mes, grabados y editados por nosotros (en lugar de los 8 del Plan Crecimiento)",
+        subitems: [
+          "4 jornadas de grabación de 4 horas al mes (cada jornada rinde hasta 3 videos terminados)",
+          "Grabación con equipo profesional: cámara, audio e iluminación",
+          "Edición, corrección de color y entrega en formato vertical, listos para publicar",
         ],
       },
       { label: "Hasta 3 campañas activas al mismo tiempo" },

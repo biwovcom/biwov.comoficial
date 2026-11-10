@@ -1,10 +1,10 @@
 export type TipoContrato = "plan" | "sitio-web" | "produccion" | "campana-meta";
 
 export const VERSION_CONTRATO: Record<TipoContrato, string> = {
-  plan: "2026-11-08-v6",
-  "sitio-web": "2026-10-22-v1",
-  produccion: "2026-10-22-v1",
-  "campana-meta": "2026-10-22-v1",
+  plan: "2026-11-10-v7",
+  "sitio-web": "2026-11-10-v2",
+  produccion: "2026-11-10-v2",
+  "campana-meta": "2026-11-10-v2",
 };
 
 export const NOMBRE_TIPO_CONTRATO: Record<TipoContrato, string> = {

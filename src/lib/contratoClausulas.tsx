@@ -1,6 +1,9 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import type { TipoContrato } from "@/lib/contrato";
+import { PLANES, DURACION_MINIMA_MESES } from "@/data/planes";
+import { NIVELES_PRODUCCION, PRODUCCION_CONTENIDO, PRODUCCION_UGC, PRODUCCION_VIDEO } from "@/data/addOns";
+import { COMPLEMENTOS } from "@/data/complementos";
 
 export interface SeccionContrato {
   titulo: string;
@@ -64,8 +67,275 @@ export function seccionPartesYObjeto(tipo: TipoContrato): SeccionContrato[] {
   ];
 }
 
+
+const cop = (valor: number) => `$${valor.toLocaleString("es-CO")} COP`;
+
+function Lista({ items }: { items: ReactNode[] }) {
+  return (
+    <ul className="mt-2 list-disc space-y-1.5 pl-5">
+      {items.map((item, i) => (
+        <li key={i}>{item}</li>
+      ))}
+    </ul>
+  );
+}
+
+function Bloque({ titulo, children }: { titulo: ReactNode; children: ReactNode }) {
+  return (
+    <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.03] p-5 print:border-black/20">
+      <h3 className="text-base font-semibold text-white">{titulo}</h3>
+      {children}
+    </div>
+  );
+}
+
+function seccionAlcancePlanes(): SeccionContrato {
+  return {
+    titulo: "Alcance detallado de cada plan",
+    contenido: (
+      <>
+        <p>
+          El Cliente recibe lo que corresponde al plan que eligió. A continuación se detalla, plan
+          por plan, todo lo que incluye. Lo que no aparezca en esta lista no hace parte del plan y
+          se cotiza aparte.
+        </p>
+        {PLANES.map((plan) => (
+          <Bloque
+            key={plan.id}
+            titulo={
+              <>
+                Plan {plan.nombre}: {cop(plan.precioDesde.cop)} al mes · montaje inicial{" "}
+                {cop(plan.montajeInicial.cop)}
+              </>
+            }
+          >
+            <p className="mt-1 text-sm text-white/60">{plan.paraQuien}</p>
+            <ul className="mt-3 list-disc space-y-2 pl-5">
+              {plan.incluye.map((item) => (
+                <li key={item.label}>
+                  <strong className="font-semibold text-white">{item.label}</strong>
+                  {item.subitems && (
+                    <ul className="mt-1.5 list-[circle] space-y-1 pl-5">
+                      {item.subitems.map((sub) => (
+                        <li key={sub}>{sub}</li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-3 text-sm">
+              Compromiso mínimo: {DURACION_MINIMA_MESES} meses. Inversión mínima del periodo:{" "}
+              <strong>{cop(plan.precioDesde.cop * DURACION_MINIMA_MESES + plan.montajeInicial.cop)}</strong>{" "}
+              ({DURACION_MINIMA_MESES} mensualidades más el montaje inicial).
+            </p>
+          </Bloque>
+        ))}
+        <Bloque titulo="Videos incluidos en los planes Crecimiento y Escala">
+          <Lista
+            items={[
+              <>
+                <strong>Plan Crecimiento:</strong> 8 videos y 2 imágenes de contenido al mes, en 3
+                jornadas de grabación de 4 horas.
+              </>,
+              <>
+                <strong>Plan Escala:</strong> 12 videos y 2 imágenes de contenido al mes, en 4
+                jornadas de grabación de 4 horas.
+              </>,
+              PRODUCCION_VIDEO.reglaJornada,
+              "Los videos se graban con equipo profesional (cámara, audio e iluminación), se editan con corrección de color y se entregan en formato vertical, listos para publicar.",
+              "Las ideas y los guiones de los videos salen del plan de trabajo semanal del plan.",
+              "Las jornadas se agendan con el Cliente; si necesita cambiar la fecha, debe avisar con mínimo 48 horas de anticipación.",
+              "Si el Cliente necesita más videos en el mes, puede sumar 4 videos adicionales por $900.000 COP.",
+              "Las jornadas de producción completas (Start, Professional y Signature) no hacen parte de los planes y se cotizan aparte.",
+            ]}
+          />
+        </Bloque>
+        <Bloque titulo="Lo que no incluye ningún plan">
+          <Lista
+            items={[
+              "La inversión en pauta publicitaria, que el Cliente paga directamente a Meta.",
+              "El costo de los mensajes por la API de WhatsApp y de los correos masivos.",
+              "Las suscripciones de herramientas de IA o de otras plataformas de pago que se usen.",
+              "En el Plan Escala, la suscripción de GoHighLevel (aprox. USD $33 al mes), que paga el Cliente.",
+              "Un sitio web completo de varias páginas: los planes incluyen páginas de una sola pantalla (landing pages).",
+              "La renovación del dominio a partir del segundo año.",
+            ]}
+          />
+        </Bloque>
+      </>
+    ),
+  };
+}
+
+function seccionAlcanceSitioWeb(): SeccionContrato {
+  const web = COMPLEMENTOS.find((c) => c.titulo === "Páginas web y sitios web adicionales");
+  return {
+    titulo: "Alcance detallado del servicio",
+    contenido: (
+      <>
+        <p>
+          El Cliente recibe la opción que eligió en su cotización. Estas son las opciones y lo que
+          incluye cada una:
+        </p>
+        <Bloque titulo={`Landing page (1 página): ${cop(1129000)}`}>
+          <Lista
+            items={[
+              "Una sola pantalla enfocada en una acción puntual: que la persona escriba, agende una cita o deje sus datos.",
+              "Diseño, maquetación y publicación de la página.",
+              "Hosting y dominio incluidos durante el primer año.",
+              "No incluye conexión por API a la campaña publicitaria (se puede sumar como add-on).",
+            ]}
+          />
+        </Bloque>
+        <Bloque titulo={`Sitio web de 5 páginas: ${cop(1799000)}`}>
+          <Lista
+            items={[
+              "Hasta 5 páginas internas (por ejemplo: inicio, nosotros, servicios, blog o portafolio y contacto).",
+              "Diseño, maquetación y publicación del sitio.",
+              "Hosting y dominio incluidos durante el primer año.",
+            ]}
+          />
+        </Bloque>
+        <Bloque titulo={`Sitio web de 10 páginas: ${cop(2499000)}`}>
+          <Lista
+            items={[
+              "Hasta 10 páginas internas, según la estructura acordada con el Cliente.",
+              "Diseño, maquetación y publicación del sitio.",
+              "Hosting y dominio incluidos durante el primer año.",
+            ]}
+          />
+        </Bloque>
+        <Bloque titulo={`Conexión por API a la campaña publicitaria (add-on): ${cop(350000)}`}>
+          <Lista
+            items={[
+              "Integración técnica para pasar los datos de las personas que llegan por la página a la campaña.",
+              "Se suma a cualquiera de las opciones anteriores.",
+              "No incluye el montaje completo de GoHighLevel ni la gestión de la campaña.",
+            ]}
+          />
+        </Bloque>
+        {web?.nota && <p className="mt-4 text-sm text-white/70">{web.nota}</p>}
+        <p className="mt-3 text-sm">
+          Los textos, imágenes, logos y demás contenido del sitio los entrega el Cliente, salvo que
+          se haya cotizado aparte la producción de ese contenido.
+        </p>
+      </>
+    ),
+  };
+}
+
+function seccionAlcanceProduccion(): SeccionContrato {
+  return {
+    titulo: "Alcance detallado del servicio",
+    contenido: (
+      <>
+        <p>
+          El Cliente recibe el servicio que eligió en su cotización. Estas son las opciones y lo
+          que incluye cada una:
+        </p>
+        {NIVELES_PRODUCCION.map((nivel) => (
+          <Bloque key={nivel.id} titulo={`Producción de contenido ${nivel.nombre}: ${cop(nivel.precio.cop)}`}>
+            <Lista
+              items={[
+                `${nivel.fotografias} fotografías profesionales editadas`,
+                `${nivel.reels} reels (videos verticales) editados y listos para publicar`,
+                `${nivel.clipsBRoll} clips de B-Roll (videos de apoyo)`,
+                `Tiempo de producción: ${nivel.tiempoProduccion}`,
+                `Dirección creativa: ${nivel.direccionCreativa.toLowerCase()}`,
+                `Cámara: ${nivel.camara} · Audio: ${nivel.audio}`,
+                `Iluminación: ${nivel.iluminacion} · Estabilización: ${nivel.estabilizacion}`,
+                `Drone: ${nivel.drone.toLowerCase()}`,
+              ]}
+            />
+          </Bloque>
+        ))}
+        <Bloque titulo="Todos los niveles de producción incluyen">
+          <Lista items={PRODUCCION_CONTENIDO.incluye} />
+        </Bloque>
+        <Bloque titulo="Grabación y edición de video">
+          <p className="mt-1 text-sm text-white/70">{PRODUCCION_VIDEO.descripcion}</p>
+          <Lista
+            items={PRODUCCION_VIDEO.paquetes.map((p) => {
+              const jornadas = Math.ceil(p.cantidadVideos / 3);
+              return (
+                <>
+                  <strong>{p.nombre ?? `${p.cantidadVideos} videos`}:</strong> {cop(p.precio)}
+                  {p.esMensual ? " al mes" : ""} · {jornadas} jornada{jornadas === 1 ? "" : "s"} de
+                  4 horas · {cop(Math.round(p.precio / p.cantidadVideos))} por video
+                </>
+              );
+            })}
+          />
+          <p className="mt-3 text-sm">Cada paquete incluye:</p>
+          <Lista items={[...PRODUCCION_VIDEO.incluye, PRODUCCION_VIDEO.reglaJornada]} />
+          <p className="mt-3 text-sm">
+            No incluye guiones, copys ni dirección creativa (están en los niveles de producción de
+            contenido).
+          </p>
+        </Bloque>
+        <Bloque titulo="Videos estilo UGC">
+          <p className="mt-1 text-sm text-white/70">{PRODUCCION_UGC.descripcion}</p>
+          <Lista
+            items={PRODUCCION_UGC.paquetes.map((p) => (
+              <>
+                <strong>{p.nombre}:</strong> {cop(p.precio)} ·{" "}
+                {cop(Math.round(p.precio / p.cantidadVideos))} por video
+              </>
+            ))}
+          />
+          <p className="mt-3 text-sm">Cada paquete incluye:</p>
+          <Lista items={PRODUCCION_UGC.incluye} />
+        </Bloque>
+        <Bloque titulo="Lo que no incluye ningún servicio de producción">
+          <Lista items={PRODUCCION_CONTENIDO.noIncluye} />
+        </Bloque>
+      </>
+    ),
+  };
+}
+
+function seccionAlcanceCampanaMeta(): SeccionContrato {
+  return {
+    titulo: "Alcance detallado del servicio",
+    contenido: (
+      <>
+        <Bloque titulo={`Gestión mensual de campaña en Meta: ${cop(400000)} al mes`}>
+          <Lista
+            items={[
+              "Montaje de la campaña en Meta (Facebook e Instagram): estructura, públicos y anuncios.",
+              "Seguimiento y optimización de la campaña durante el mes.",
+              "Análisis de resultados.",
+              "Informe mensual de resultados.",
+            ]}
+          />
+        </Bloque>
+        <Bloque titulo="Requisitos y condiciones">
+          <Lista
+            items={[
+              "Para arrancar, el Cliente entrega mínimo 6 piezas creativas (videos o imágenes).",
+              "Permanencia mínima de 3 meses.",
+              "El Cliente da acceso a su cuenta publicitaria y a su página de Facebook e Instagram.",
+            ]}
+          />
+        </Bloque>
+        <Bloque titulo="No incluye">
+          <Lista
+            items={[
+              "La inversión en pauta publicitaria, que el Cliente paga directamente a Meta.",
+              "La creación de las piezas creativas (se pueden cotizar aparte en producción de contenido).",
+              "Páginas web o landing pages (se cotizan aparte).",
+            ]}
+          />
+        </Bloque>
+      </>
+    ),
+  };
+}
+
 export function seccionesPlan(): SeccionContrato[] {
   return [
+    seccionAlcancePlanes(),
     {
       titulo: "Inversión, forma de pago y duración mínima",
       contenido: (
@@ -352,6 +622,7 @@ function seccionRetractoYAbandonoUnico(): SeccionContrato[] {
 
 export function seccionesSitioWeb(): SeccionContrato[] {
   return [
+    seccionAlcanceSitioWeb(),
     seccionFormaPagoUnico(),
     {
       titulo: "Dominio y hosting",
@@ -383,6 +654,7 @@ export function seccionesSitioWeb(): SeccionContrato[] {
 
 export function seccionesProduccion(): SeccionContrato[] {
   return [
+    seccionAlcanceProduccion(),
     seccionFormaPagoUnico(
       <p className="mt-3">
         Todo pedido está sujeto a un monto mínimo de orden de $150.000 COP. La fecha de la jornada
@@ -409,6 +681,7 @@ export function seccionesProduccion(): SeccionContrato[] {
 
 export function seccionesCampanaMeta(): SeccionContrato[] {
   return [
+    seccionAlcanceCampanaMeta(),
     {
       titulo: "Inversión, forma de pago y permanencia",
       contenido: (
