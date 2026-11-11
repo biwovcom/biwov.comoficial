@@ -46,8 +46,6 @@ export interface PropuestaCliente {
   titulo: string;
   subtitulo: string;
   sector: string;
-  fechaInicio: string;
-  fechaFin: string;
   duracionMeses: number;
   valorMensual: number;
   incluye: BloqueIncluye[];
@@ -69,8 +67,6 @@ const ORTODONCIA: PropuestaCliente = {
   subtitulo:
     "Campañas, comunidad y contenido para que más personas conozcan tu consultorio, confíen en ti y agenden.",
   sector: "Consultorio de ortodoncia",
-  fechaInicio: "15 de noviembre de 2026",
-  fechaFin: "15 de febrero de 2027",
   duracionMeses: 3,
   valorMensual: 1_000_000,
   incluye: [
@@ -121,7 +117,7 @@ const ORTODONCIA: PropuestaCliente = {
   ],
   plan: [
     {
-      cuando: "Desde el 15 de noviembre",
+      cuando: "Al firmar el contrato",
       titulo: "Diagnóstico y arranque",
       detalle: [
         "Firmado el contrato, empezamos con el diagnóstico y la revisión de tus redes sociales.",
@@ -149,7 +145,7 @@ const ORTODONCIA: PropuestaCliente = {
       ],
     },
     {
-      cuando: "15 de febrero de 2027",
+      cuando: "Al cumplir el tercer mes",
       titulo: "Evaluación y continuidad",
       detalle: [
         "Revisamos los resultados de los 3 meses.",
@@ -176,7 +172,7 @@ const ORTODONCIA: PropuestaCliente = {
       valor: 940_000,
       condiciones: [
         "Se paga en efectivo después del tercer mes.",
-        "70% ($658.000) anticipado, el 15 de febrero de 2027.",
+        "70% ($658.000) anticipado, el día en que se cumple el tercer mes.",
         "30% ($282.000) al finalizar el proceso.",
       ],
     },
@@ -196,3 +192,19 @@ export function propuestaPorSlug(slug: string): PropuestaCliente | undefined {
 }
 
 export const copPropuesta = (n: number) => `$${n.toLocaleString("es-CO")}`;
+
+/** "2026-11-15" → "15 de noviembre de 2026" (sin líos de zona horaria). */
+export function fechaLarga(iso: string): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  if (!m) return "";
+  const fecha = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+  return new Intl.DateTimeFormat("es-CO", { dateStyle: "long", timeZone: "UTC" }).format(fecha);
+}
+
+/** Suma meses a una fecha "AAAA-MM-DD" y la devuelve en el mismo formato. */
+export function sumarMeses(iso: string, meses: number): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  if (!m) return "";
+  const fecha = new Date(Date.UTC(+m[1], +m[2] - 1 + meses, +m[3]));
+  return fecha.toISOString().slice(0, 10);
+}

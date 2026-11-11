@@ -24,6 +24,7 @@ import {
 import { ContratoPropuesta } from "@/components/propuestas/ContratoPropuesta";
 import {
   copPropuesta,
+  fechaLarga,
   type PropuestaCliente as Propuesta,
 } from "@/data/propuestasClientes";
 import { linkWhatsApp } from "@/lib/panel/whatsapp";
@@ -50,6 +51,7 @@ const DATOS_INICIALES = {
   email: "",
   telefono: "",
   empresa: "",
+  fechaInicio: "",
 };
 
 export function PropuestaCliente({ propuesta: p }: { propuesta: Propuesta }) {
@@ -78,9 +80,10 @@ export function PropuestaCliente({ propuesta: p }: { propuesta: Propuesta }) {
       !datos.nombre.trim() ||
       !datos.cedula.trim() ||
       !datos.email.trim() ||
-      !datos.telefono.trim()
+      !datos.telefono.trim() ||
+      !datos.fechaInicio
     ) {
-      setError("Completa tu nombre, cédula, correo y teléfono.");
+      setError("Completa tu nombre, cédula, correo, teléfono y la fecha de inicio.");
       return;
     }
     if (!aceptaContrato || !aceptaDatos) {
@@ -157,9 +160,9 @@ export function PropuestaCliente({ propuesta: p }: { propuesta: Propuesta }) {
         <div className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-4">
           {[
             {
-              icono: CalendarDays,
-              etiqueta: "Iniciamos",
-              valor: p.fechaInicio,
+              icono: Video,
+              etiqueta: "Contenido",
+              valor: "12 guiones + 3 reels por semana",
             },
             {
               icono: Clock,
@@ -398,7 +401,7 @@ export function PropuestaCliente({ propuesta: p }: { propuesta: Propuesta }) {
               </h3>
               <p className="mt-2 text-text-secondary">
                 Firmado el {fechaHora(resultado.firmadoEn)}. Empezamos el{" "}
-                {p.fechaInicio}.
+                {fechaLarga(datos.fechaInicio)}.
               </p>
               <div className="mx-auto mt-8 flex max-w-md flex-col gap-3">
                 <a
@@ -470,6 +473,15 @@ export function PropuestaCliente({ propuesta: p }: { propuesta: Propuesta }) {
                     id="p-empresa"
                     autoComplete="organization"
                     {...campo("empresa")}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="p-inicio">Fecha de inicio *</Label>
+                  <Input
+                    id="p-inicio"
+                    type="date"
+                    className="[color-scheme:dark]"
+                    {...campo("fechaInicio")}
                   />
                 </div>
               </div>

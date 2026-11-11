@@ -115,6 +115,7 @@ export default async function ContratoFirmadoPage({ params }: { params: Promise<
                 email: compra.email ?? "",
                 telefono: String(snap.telefono ?? compra.whatsapp ?? ""),
                 empresa: compra.empresa ?? undefined,
+                fechaInicio: typeof snap.fechaInicio === "string" ? snap.fechaInicio : undefined,
               }}
               fechaDiligenciamiento={fechaHora(compra.created_at)}
               firma={{
