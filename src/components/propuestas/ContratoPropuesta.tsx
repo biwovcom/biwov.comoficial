@@ -302,6 +302,21 @@ export function ContratoPropuesta({
           </p>
         </Clausula>
 
+        <Clausula n={sig()} titulo="Confidencialidad de claves y accesos">
+          <Lista
+            items={[
+              "Las claves, contraseñas, códigos de verificación y accesos que LA CONTRATANTE entregue son información confidencial.",
+              "LA CONTRATISTA las usa únicamente para ejecutar el servicio contratado. No las comparte, no las vende y no las divulga a terceros; si un aliado de LA CONTRATISTA necesita un acceso para cumplir el servicio, lo recibe con la misma obligación de reserva.",
+              "Siempre que la plataforma lo permita, se trabajará con accesos por rol o invitación (por ejemplo, el administrador comercial de Meta) en lugar de la contraseña principal.",
+              "Las claves se guardan de forma segura y no se piden ni se envían por canales públicos o abiertos.",
+              "LA CONTRATISTA no cambia contraseñas, correos de recuperación ni la titularidad de las cuentas sin autorización escrita dLA CONTRATANTE. LA CONTRATANTE sigue siendo el único dueño de sus cuentas.",
+              "Al terminar el contrato, LA CONTRATISTA retira sus accesos y LA CONTRATANTE debe cambiar las contraseñas que haya compartido.",
+              "LA CONTRATANTE es responsable de activar la verificación en dos pasos y de la seguridad general de sus cuentas. LA CONTRATISTA no responde por accesos indebidos de terceros ajenos a LA CONTRATISTA.",
+              "Esta obligación de confidencialidad sigue vigente después de terminado el contrato.",
+            ]}
+          />
+        </Clausula>
+
         <Clausula n={sig()} titulo="Confidencialidad y datos personales">
           <p>
             Las partes guardarán reserva sobre la información del negocio y de

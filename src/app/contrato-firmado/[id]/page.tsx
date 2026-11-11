@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getSupabaseClient } from "@/lib/supabase";
+import { cargarCompraFirmada, type CompraNormalizada, type FirmaGuardada } from "@/lib/compras/guardarCompra";
 import { ImprimirButton } from "@/components/ui/ImprimirButton";
 import { ContratoPropuesta } from "@/components/propuestas/ContratoPropuesta";
-import { propuestaPorSlug } from "@/data/propuestasClientes";
+import { CONTRATISTA, propuestaPorSlug } from "@/data/propuestasClientes";
 import { NOMBRE_TIPO_CONTRATO, esTipoContrato, type TipoContrato } from "@/lib/contrato";
 import {
   seccionPartesYObjeto,
@@ -22,29 +23,8 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-interface Compra {
-  id: string;
-  created_at: string;
-  tipo: string;
-  item_nombre: string | null;
-  plan_id: string | null;
-  nombre: string;
-  email: string | null;
-  whatsapp: string | null;
-  empresa: string | null;
-  moneda: string;
-  monto: number;
-  snapshot: Record<string, unknown> | null;
-}
-
-interface Firma {
-  tipo_contrato: string;
-  version_contrato: string;
-  nombre_firmante: string;
-  firma_imagen: string;
-  ip: string | null;
-  created_at: string;
-}
+type Compra = CompraNormalizada;
+type Firma = FirmaGuardada;
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -79,18 +59,8 @@ export default async function ContratoFirmadoPage({ params }: { params: Promise<
   const supabase = getSupabaseClient();
   if (!supabase) notFound();
 
-  const [{ data: compra }, { data: firmas }] = await Promise.all([
-    supabase
-      .from("plan_compras")
-      .select("id, created_at, tipo, item_nombre, plan_id, nombre, email, whatsapp, empresa, moneda, monto, snapshot")
-      .eq("id", id)
-      .maybeSingle<Compra>(),
-    supabase
-      .from("contratos_firmados")
-      .select("tipo_contrato, version_contrato, nombre_firmante, firma_imagen, ip, created_at")
-      .eq("referencia_id", id)
-      .returns<Firma[]>(),
-  ]);
+  const compra = await cargarCompraFirmada(supabase, id);
+  const firmas = compra?.firmas ?? [];
 
   if (!compra || !firmas || firmas.length === 0) notFound();
   const firma = firmas[0];
@@ -137,6 +107,14 @@ export default async function ContratoFirmadoPage({ params }: { params: Promise<
 function ContratoCatalogo({ compra, firmas }: { compra: Compra; firmas: Firma[] }) {
   const firma = firmas[0];
   const tipos = firmas.map((f) => f.tipo_contrato).filter(esTipoContrato);
+  const snap = compra.snapshot ?? {};
+  const cliente = {
+    nombre: compra.nombre,
+    cedula: typeof snap.cedula === "string" ? snap.cedula : "",
+    email: compra.email,
+    telefono: compra.whatsapp,
+    empresa: compra.empresa,
+  };
   const moneda = compra.moneda === "USD" ? "US$" : "$";
 
   return (
@@ -147,7 +125,7 @@ function ContratoCatalogo({ compra, firmas }: { compra: Compra; firmas: Firma[] 
           <p className="text-xs text-[#64748b]">Marketing digital · Manizales, Colombia</p>
         </div>
         <div className="text-right text-xs text-[#64748b]">
-          <p>Fecha de firma</p>
+          <p>Fecha de diligenciamiento y firma</p>
           <p className="font-semibold text-[#0f172a]">{fechaHora(firma.created_at)}</p>
         </div>
       </div>
@@ -156,6 +134,7 @@ function ContratoCatalogo({ compra, firmas }: { compra: Compra; firmas: Firma[] 
       <h1 className="mt-6 text-2xl font-bold text-[#0f172a]">Contrato de prestación de servicios — biwov</h1>
       <div className="mt-4 grid gap-2 rounded-2xl border border-[#e2e8f0] p-5 sm:grid-cols-2">
         <p><span className="text-[#64748b]">Cliente: </span><strong className="text-[#0f172a]">{compra.nombre}</strong></p>
+        {cliente.cedula && <p><span className="text-[#64748b]">Cédula: </span>{cliente.cedula}</p>}
         {compra.empresa && <p><span className="text-[#64748b]">Empresa: </span><strong className="text-[#0f172a]">{compra.empresa}</strong></p>}
         {compra.email && <p><span className="text-[#64748b]">Correo: </span>{compra.email}</p>}
         {compra.whatsapp && <p><span className="text-[#64748b]">WhatsApp: </span>{compra.whatsapp}</p>}
@@ -165,7 +144,7 @@ function ContratoCatalogo({ compra, firmas }: { compra: Compra; firmas: Firma[] 
       </div>
 
       {tipos.map((tipo) => {
-        const secciones = [...seccionPartesYObjeto(tipo), ...seccionesEspecificas(tipo), ...seccionesComunesFinal()];
+        const secciones = [...seccionPartesYObjeto(tipo, cliente), ...seccionesEspecificas(tipo), ...seccionesComunesFinal()];
         return (
           <div key={tipo} className="mt-10">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#00a3c4]">{NOMBRE_TIPO_CONTRATO[tipo]}</p>
@@ -181,14 +160,28 @@ function ContratoCatalogo({ compra, firmas }: { compra: Compra; firmas: Firma[] 
         );
       })}
 
-      <div className="mt-10 rounded-2xl border border-[#e2e8f0] p-5">
-        <p className="text-[11px] font-semibold uppercase tracking-wide text-[#64748b]">Firma del cliente</p>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={firma.firma_imagen} alt={`Firma de ${firma.nombre_firmante}`} className="h-24 w-full object-contain" />
-        <p className="mt-2 border-t border-[#cbd5e1] pt-2 text-xs text-[#64748b]">
-          Firmado electrónicamente por {firma.nombre_firmante} el {fechaHora(firma.created_at)}
-          {firma.ip ? ` · IP ${firma.ip}` : ""} · Ley 527 de 1999
-        </p>
+      <div className="mt-10 grid gap-6 sm:grid-cols-2">
+        <div className="rounded-2xl border border-[#e2e8f0] p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-[#64748b]">El proveedor</p>
+          <p className="mt-6 font-logo text-xl text-[#2e5b7e]">{CONTRATISTA.nombre}</p>
+          <p className="mt-2 border-t border-[#cbd5e1] pt-2 text-xs text-[#64748b]">
+            {CONTRATISTA.nombre} · C.C. {CONTRATISTA.cedula}
+            <br />
+            biwov · Manizales
+          </p>
+        </div>
+        <div className="rounded-2xl border border-[#e2e8f0] p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-[#64748b]">El cliente</p>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={firma.firma_imagen} alt={`Firma de ${firma.nombre_firmante}`} className="h-20 w-full object-contain" />
+          <p className="mt-2 border-t border-[#cbd5e1] pt-2 text-xs text-[#64748b]">
+            {firma.nombre_firmante}
+            {cliente.cedula ? ` · C.C. ${cliente.cedula}` : ""}
+            <br />
+            Firmado electrónicamente el {fechaHora(firma.created_at)}
+            {firma.ip ? ` · IP ${firma.ip}` : ""} · Ley 527 de 1999
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -10,11 +10,13 @@ import { ReciboFirmado } from "@/components/propuestas/ReciboFirmado";
 import { linkWhatsApp } from "@/lib/panel/whatsapp";
 import { WHATSAPP_BIWOV } from "@/lib/contacto";
 import { VERSION_CONTRATO, NOMBRE_TIPO_CONTRATO, type TipoContrato } from "@/lib/contrato";
+import { PartesConDatos } from "@/lib/contratoClausulas";
 
-const CONTACTO_INICIAL = { nombre: "", whatsapp: "", email: "", empresa: "" };
+const CONTACTO_INICIAL = { nombre: "", cedula: "", whatsapp: "", email: "", empresa: "" };
 
 export interface ContactoCompra {
   nombre: string;
+  cedula: string;
   whatsapp: string;
   email: string;
   empresa: string;
@@ -51,8 +53,13 @@ export function CompraFormulario({
   const todosLosContratosAceptados = tiposContrato.every((t) => aceptaContratos[t]);
 
   const confirmar = async () => {
-    if (!contacto.nombre.trim() || (!contacto.email.trim() && !contacto.whatsapp.trim())) {
-      setError("Escribe tu nombre y un correo o WhatsApp.");
+    if (
+      !contacto.nombre.trim() ||
+      !contacto.cedula.trim() ||
+      !contacto.email.trim() ||
+      !contacto.whatsapp.trim()
+    ) {
+      setError("Escribe tu nombre, cédula, WhatsApp y correo: con ellos se llena tu contrato.");
       return;
     }
     if (!todosLosContratosAceptados || !aceptaDatos) {
@@ -146,7 +153,8 @@ export function CompraFormulario({
   return (
     <div className="space-y-3 print:hidden">
       <p className="text-sm text-text-secondary">
-        Déjanos tus datos, firma y confirmamos — te escribimos por WhatsApp para coordinar el pago.
+        Déjanos tus datos: se escriben solos en el contrato. Luego lo lees, aceptas y firmas, y al final
+        puedes descargar tu copia firmada.
       </p>
       <div>
         <Label htmlFor="compra-nombre">Nombre completo</Label>
@@ -155,6 +163,15 @@ export function CompraFormulario({
           value={contacto.nombre}
           onChange={(e) => setContacto({ ...contacto, nombre: e.target.value })}
           autoComplete="name"
+        />
+      </div>
+      <div>
+        <Label htmlFor="compra-cedula">Cédula</Label>
+        <Input
+          id="compra-cedula"
+          inputMode="numeric"
+          value={contacto.cedula}
+          onChange={(e) => setContacto({ ...contacto, cedula: e.target.value })}
         />
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
@@ -185,6 +202,21 @@ export function CompraFormulario({
           value={contacto.empresa}
           onChange={(e) => setContacto({ ...contacto, empresa: e.target.value })}
           autoComplete="organization"
+        />
+      </div>
+
+      <div className="rounded-2xl bg-white p-4 text-xs leading-relaxed text-[#334155]">
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-[#64748b]">
+          Así quedan las partes en tu contrato · {new Intl.DateTimeFormat("es-CO", { dateStyle: "long", timeZone: "America/Bogota" }).format(new Date())}
+        </p>
+        <PartesConDatos
+          cliente={{
+            nombre: contacto.nombre,
+            cedula: contacto.cedula,
+            email: contacto.email,
+            telefono: contacto.whatsapp,
+            empresa: contacto.empresa,
+          }}
         />
       </div>
 

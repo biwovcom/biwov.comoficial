@@ -139,9 +139,19 @@ export function PropuestaCliente({ propuesta: p }: { propuesta: Propuesta }) {
             <LogoMark className="h-7 w-7 text-white" />
             biwov_
           </span>
-          <span className="rounded-full border border-border-glass px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-            Propuesta privada
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="hidden rounded-full border border-border-glass px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary sm:inline">
+              Propuesta privada
+            </span>
+            <a
+              href="/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full bg-white px-4 py-2 text-xs font-semibold text-[#03101b] transition-transform hover:scale-[1.03]"
+            >
+              Conoce biwov →
+            </a>
+          </div>
         </div>
       </header>
 
@@ -556,7 +566,9 @@ export function PropuestaCliente({ propuesta: p }: { propuesta: Propuesta }) {
       <footer className="border-t border-border-glass">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-8 text-xs text-text-secondary md:flex-row md:justify-between md:px-8">
           <span>biwov_ · Katherine Usma Aristizábal · Manizales, Colombia</span>
-          <span>Propuesta privada · no compartir</span>
+          <a href="/" target="_blank" rel="noopener noreferrer" className="text-accent hover:text-white">
+            Visita el sitio web de biwov →
+          </a>
         </div>
       </footer>
     </div>

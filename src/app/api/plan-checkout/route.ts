@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSupabaseClient } from "@/lib/supabase";
 import { registrarFirmas } from "@/lib/compras/firmaServer";
+import { insertarCompra } from "@/lib/compras/guardarCompra";
 import { PLANES } from "@/data/planes";
 
 export async function POST(request: Request) {
@@ -13,7 +14,8 @@ export async function POST(request: Request) {
   const empresa = String(body?.empresa ?? "").trim().slice(0, 200) || null;
   const moneda = body?.moneda === "USD" ? "USD" : "COP";
   const monto = Number(body?.monto ?? 0);
-  const snapshot = body?.snapshot ?? {};
+  const cedula = String(body?.cedula ?? "").trim().slice(0, 30);
+  const snapshot = { ...(body?.snapshot ?? {}), cedula, telefono: whatsapp };
   const aceptaContrato = Boolean(body?.aceptaContrato);
   const aceptaDatos = Boolean(body?.aceptaDatos);
   const nombreFirmante = String(body?.nombreFirmante ?? "").trim().slice(0, 200);
@@ -37,9 +39,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Servicio no disponible" }, { status: 503 });
   }
 
-  const { data, error } = await supabase
-    .from("plan_compras")
-    .insert({
+  const compraId = await insertarCompra(supabase, {
       tipo: "plan",
       plan_id: planId,
       nombre,
@@ -51,17 +51,15 @@ export async function POST(request: Request) {
       snapshot,
       acepta_contrato: aceptaContrato,
       acepta_datos: aceptaDatos,
-    })
-    .select("id")
-    .single();
+    });
 
-  if (error || !data) {
+  if (!compraId) {
     return NextResponse.json({ error: "No se pudo registrar. Intenta de nuevo." }, { status: 500 });
   }
 
   const linkContrato = await registrarFirmas(
     supabase,
-    data.id,
+    compraId,
     {
       tiposContrato: ["plan"],
       nombreFirmante,
@@ -74,5 +72,5 @@ export async function POST(request: Request) {
     request,
   );
 
-  return NextResponse.json({ ok: true, id: data.id, linkContrato });
+  return NextResponse.json({ ok: true, id: compraId, linkContrato });
 }

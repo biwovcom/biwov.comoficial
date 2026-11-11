@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSupabaseClient } from "@/lib/supabase";
 import { registrarFirmas } from "@/lib/compras/firmaServer";
+import { insertarCompra } from "@/lib/compras/guardarCompra";
 import {
   fechaLarga,
   propuestaPorSlug,
@@ -76,9 +77,7 @@ export async function POST(
   }
 
   const firmadoEn = new Date().toISOString();
-  const { data, error } = await supabase
-    .from("plan_compras")
-    .insert({
+  const compraId = await insertarCompra(supabase, {
       tipo: "item",
       plan_id: null,
       item_id: `propuesta:${propuesta.slug}`,
@@ -103,11 +102,9 @@ export async function POST(
       },
       acepta_contrato: true,
       acepta_datos: true,
-    })
-    .select("id")
-    .single();
+    });
 
-  if (error || !data) {
+  if (!compraId) {
     return NextResponse.json(
       { error: "No se pudo registrar. Intenta de nuevo." },
       { status: 500 },
@@ -116,7 +113,7 @@ export async function POST(
 
   const linkContrato = await registrarFirmas(
     supabase,
-    data.id,
+    compraId,
     {
       tiposContrato: [`propuesta:${propuesta.slug}`],
       versionPersonalizada: propuesta.version,
@@ -130,5 +127,5 @@ export async function POST(
     request,
   );
 
-  return NextResponse.json({ ok: true, id: data.id, linkContrato, firmadoEn });
+  return NextResponse.json({ ok: true, id: compraId, linkContrato, firmadoEn });
 }

@@ -3,23 +3,9 @@ import { Table, TableHead, TableBody, Th, Tr, Td } from "@/components/ui/Table";
 import { Badge } from "@/components/ui/Badge";
 import { PLANES } from "@/data/planes";
 import { FileSignature } from "lucide-react";
+import { listarCompras, type CompraNormalizada } from "@/lib/compras/guardarCompra";
 
-interface PlanCompra {
-  id: string;
-  created_at: string;
-  tipo: "plan" | "item" | "combo";
-  plan_id: string | null;
-  item_nombre: string | null;
-  nombre: string;
-  email: string | null;
-  whatsapp: string | null;
-  empresa: string | null;
-  moneda: "COP" | "USD";
-  monto: number;
-  acepta_contrato: boolean;
-  acepta_datos: boolean;
-  snapshot: { cedula?: string } | null;
-}
+type PlanCompra = CompraNormalizada;
 
 function nombrePlan(planId: string): string {
   return PLANES.find((p) => p.id === planId)?.nombre ?? planId;
@@ -38,17 +24,14 @@ const ETIQUETA_TIPO: Record<PlanCompra["tipo"], string> = {
 
 export default async function ComprasPage() {
   const supabase = await createSupabaseServerClient();
-  const [{ data: compras }, { data: firmas }] = await Promise.all([
-    supabase
-    .from("plan_compras")
-    .select(
-      "id, created_at, tipo, plan_id, item_nombre, nombre, email, whatsapp, empresa, moneda, monto, acepta_contrato, acepta_datos, snapshot",
-    )
-    .order("created_at", { ascending: false })
-    .returns<PlanCompra[]>(),
+  const [compras, { data: firmas }] = await Promise.all([
+    listarCompras(supabase),
     supabase.from("contratos_firmados").select("referencia_id").returns<{ referencia_id: string }[]>(),
   ]);
-  const firmadas = new Set((firmas ?? []).map((f) => f.referencia_id));
+  const firmadas = new Set([
+    ...(firmas ?? []).map((f) => f.referencia_id),
+    ...compras.filter((c) => c.firmas.length > 0).map((c) => c.id),
+  ]);
 
   return (
     <div>
@@ -75,19 +58,19 @@ export default async function ComprasPage() {
             <Th>Contrato firmado</Th>
           </TableHead>
           <TableBody>
-            {(!compras || compras.length === 0) && (
+            {compras.length === 0 && (
               <Tr>
                 <Td colSpan={10} className="py-8 text-center text-text-secondary">
                   Todavía no hay compras registradas.
                 </Td>
               </Tr>
             )}
-            {compras?.map((c) => (
+            {compras.map((c) => (
               <Tr key={c.id}>
                 <Td>{new Date(c.created_at).toLocaleString("es-CO")}</Td>
                 <Td className="text-white">
                   {c.nombre}
-                  {c.snapshot?.cedula && (
+                  {typeof c.snapshot.cedula === "string" && c.snapshot.cedula && (
                     <span className="block text-xs text-text-secondary">C.C. {c.snapshot.cedula}</span>
                   )}
                 </Td>

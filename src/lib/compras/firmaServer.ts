@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { VERSION_CONTRATO, esTipoContrato } from "@/lib/contrato";
 import { marcarComoCliente } from "@/lib/compras/marcarCliente";
+import { guardarFirmas } from "@/lib/compras/guardarCompra";
 
 export interface DatosFirmaServer {
   /** Tipos del catálogo ("plan", "produccion"…) o el slug de una propuesta a la medida. */
@@ -22,9 +23,9 @@ export function linkContratoFirmado(request: Request, referenciaId: string) {
 }
 
 /**
- * Guarda la firma (Ley 527 de 1999: nombre, imagen, IP, navegador y versión
- * exacta del contrato) y deja a la persona marcada como cliente en el panel.
- * Devuelve el link a la copia firmada que pueden descargar las dos partes.
+ * Guarda la firma (Ley 527 de 1999: nombre, imagen, IP, navegador, fecha y
+ * versión exacta del contrato) y deja a la persona marcada como cliente en el
+ * panel. Devuelve el link a la copia firmada que pueden descargar las dos partes.
  */
 export async function registrarFirmas(
   supabase: SupabaseClient,
@@ -34,23 +35,21 @@ export async function registrarFirmas(
 ) {
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
   const userAgent = request.headers.get("user-agent");
+  const ahora = new Date().toISOString();
 
-  const filas = datos.tiposContrato.map((tipo) => ({
-    referencia_tipo: "plan_compra" as const,
-    referencia_id: referenciaId,
-    tipo_contrato: tipo,
-    version_contrato: esTipoContrato(tipo)
-      ? VERSION_CONTRATO[tipo]
-      : (datos.versionPersonalizada ?? tipo),
-    nombre_firmante: datos.nombreFirmante,
-    firma_imagen: datos.firmaImagenBase64,
-    email: datos.email,
-    whatsapp: datos.whatsapp,
-    ip,
-    user_agent: userAgent,
-  }));
-
-  await supabase.from("contratos_firmados").insert(filas);
+  await guardarFirmas(
+    supabase,
+    referenciaId,
+    datos.tiposContrato.map((tipo) => ({
+      tipo_contrato: tipo,
+      version_contrato: esTipoContrato(tipo) ? VERSION_CONTRATO[tipo] : (datos.versionPersonalizada ?? tipo),
+      nombre_firmante: datos.nombreFirmante,
+      firma_imagen: datos.firmaImagenBase64,
+      ip,
+      user_agent: userAgent,
+      created_at: ahora,
+    })),
+  );
 
   const linkContrato = linkContratoFirmado(request, referenciaId);
   await marcarComoCliente(supabase, {
