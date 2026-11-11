@@ -293,3 +293,23 @@ h6 {
     mask-image: none !important;
   }
 }
+
+/* Contratos del catálogo mostrados sobre papel blanco (copia firmada). */
+.contrato-claro {
+  color: #334155;
+}
+.contrato-claro .text-white,
+.contrato-claro .text-white\/60,
+.contrato-claro .text-text-secondary {
+  color: #0f172a;
+}
+.contrato-claro .text-white\/60,
+.contrato-claro .text-text-secondary {
+  color: #64748b;
+}
+.contrato-claro .text-accent {
+  color: #00a3c4;
+}
+.contrato-claro .border-white\/10 {
+  border-color: #e2e8f0;
+}

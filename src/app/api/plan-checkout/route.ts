@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSupabaseClient } from "@/lib/supabase";
 import { registrarFirmas } from "@/lib/compras/firmaServer";
+import { PLANES } from "@/data/planes";
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
@@ -58,7 +59,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "No se pudo registrar. Intenta de nuevo." }, { status: 500 });
   }
 
-  await registrarFirmas(
+  const linkContrato = await registrarFirmas(
     supabase,
     data.id,
     {
@@ -67,9 +68,11 @@ export async function POST(request: Request) {
       firmaImagenBase64,
       email,
       whatsapp,
+      empresa,
+      detalle: `Plan ${PLANES.find((p) => p.id === planId)?.nombre ?? planId}`,
     },
     request,
   );
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, id: data.id, linkContrato });
 }

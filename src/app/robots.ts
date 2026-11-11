@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const PRIVADO = ["/panel", "/admin", "/api", "/cotizacion", "/diagnostico"];
+const PRIVADO = ["/panel", "/admin", "/api", "/cotizacion", "/diagnostico", "/propuesta", "/contrato-firmado"];
 
 /**
  * Se permite explícitamente a los rastreadores de buscadores con IA (GEO):

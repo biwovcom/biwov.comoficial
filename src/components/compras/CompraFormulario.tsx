@@ -37,7 +37,7 @@ export function CompraFormulario({
     aceptaDatos: boolean;
     nombreFirmante: string;
     firmaImagenBase64: string;
-  }) => Promise<{ ok: boolean; error?: string }>;
+  }) => Promise<{ ok: boolean; error?: string; linkContrato?: string }>;
 }) {
   const [contacto, setContacto] = useState(CONTACTO_INICIAL);
   const [aceptaContratos, setAceptaContratos] = useState<Record<string, boolean>>({});
@@ -46,6 +46,7 @@ export function CompraFormulario({
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [enviado, setEnviado] = useState(false);
+  const [linkContrato, setLinkContrato] = useState<string | null>(null);
 
   const todosLosContratosAceptados = tiposContrato.every((t) => aceptaContratos[t]);
 
@@ -84,6 +85,7 @@ export function CompraFormulario({
     } else {
       window.open(urlWhatsApp, "_blank");
     }
+    setLinkContrato(resultado.linkContrato ?? null);
     setEnviado(true);
   };
 
@@ -107,6 +109,16 @@ export function CompraFormulario({
               Abrir WhatsApp
             </Button>
           </a>
+          {linkContrato && (
+            <a
+              href={linkContrato}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-accent/40 py-2.5 text-xs font-medium text-white transition-colors hover:border-accent"
+            >
+              Ver y descargar el contrato firmado
+            </a>
+          )}
           <button
             type="button"
             onClick={() => window.print()}

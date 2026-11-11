@@ -22,7 +22,9 @@ export function SiteChrome({ children }: { children: ReactNode }) {
   const sinChrome =
     pathname?.startsWith("/panel") ||
     pathname?.startsWith("/diagnostico") ||
-    pathname?.startsWith("/cotizacion");
+    pathname?.startsWith("/cotizacion") ||
+    pathname?.startsWith("/propuesta") ||
+    pathname?.startsWith("/contrato-firmado");
 
   // Permite compartir un link directo (ej: biwov.com/?diagnostico=1) que
   // abre de una vez el formulario del diagnóstico gratis, sin que el

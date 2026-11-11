@@ -94,7 +94,8 @@ export function CotizacionCombinadaModal({
       const data = await res.json().catch(() => null);
       return { ok: false, error: data?.error };
     }
-    return { ok: true };
+    const data = await res.json().catch(() => null);
+    return { ok: true, linkContrato: data?.linkContrato as string | undefined };
   };
 
   return (
