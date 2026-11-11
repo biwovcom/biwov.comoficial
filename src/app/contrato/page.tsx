@@ -9,6 +9,7 @@ import {
   seccionesSitioWeb,
   seccionesProduccion,
   seccionesCampanaMeta,
+  seccionesAutomatizacion,
   seccionesComunesFinal,
 } from "@/lib/contratoClausulas";
 
@@ -26,6 +27,8 @@ function seccionesEspecificas(tipo: TipoContrato) {
       return seccionesProduccion();
     case "campana-meta":
       return seccionesCampanaMeta();
+    case "automatizacion":
+      return seccionesAutomatizacion();
     case "plan":
     default:
       return seccionesPlan();
