@@ -53,11 +53,11 @@ function ItemTarjeta({
 }) {
   const [descargandoPdf, setDescargandoPdf] = useState(false);
   const [errorPdf, setErrorPdf] = useState<string | null>(null);
-  const precioFormateado = formatCopEnMoneda(item.precioCop, moneda, trm) + (item.periodicidad === "mensual" ? " /mes" : "");
+  const precioFormateado = (item.desde ? "Desde " : "") + formatCopEnMoneda(item.precioCop, moneda, trm) + (item.periodicidad === "mensual" ? " /mes" : "");
   const monto = moneda === "USD" ? Math.round(item.precioCop / trm) : item.precioCop;
   const formasPago =
     item.periodicidad === "mensual"
-      ? ["Pago mensual por adelantado", "Transferencia o PSE, se coordina por WhatsApp"]
+      ? ["Pago mensual por anticipado, en los primeros 5 días de cada mes", "Transferencia o PSE, se coordina por WhatsApp"]
       : ["50% anticipado, 50% contra entrega", "Transferencia o PSE, se coordina por WhatsApp"];
 
   const confirmar = async ({
@@ -138,6 +138,7 @@ function ItemTarjeta({
           </ul>
         )}
         <p className="mt-4 text-lg font-semibold text-white">{precioFormateado}</p>
+        {item.nota && <p className="mt-1 text-xs text-accent/90">{item.nota}</p>}
 
         <button
           type="button"

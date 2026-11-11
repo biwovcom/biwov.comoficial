@@ -8,9 +8,7 @@ import { COMPLEMENTOS } from "@/data/complementos";
 import { useTRM } from "@/hooks/useTRM";
 import type { Moneda } from "@/lib/moneda";
 
-// "Producción", "Páginas web" y "Campaña en Meta" ya están en el catálogo de
-// arriba; la asesoría es lo único que no tiene tarjeta propia, así que se
-// muestra sola en vez de repetir toda la sección de complementos.
+// La asesoría 1 a 1 es lo único que no tiene tarjeta en el catálogo.
 const ASESORIA = COMPLEMENTOS.find((c) => c.titulo === "Asesoría personalizada");
 
 export function TiendaExperiencia() {
@@ -29,7 +27,7 @@ export function TiendaExperiencia() {
                   Asesoría personalizada
                 </span>
                 <h2 className="mt-5 text-4xl font-medium leading-[1.04] text-white sm:text-5xl">
-                  ¿Prefieres hacerlo tú? <span className="text-accent">Te guío 1 a 1.</span>
+                  ¿Prefieres hacerlo tú? <span className="text-accent">Te guiamos 1 a 1.</span>
                 </h2>
                 <p className="mt-5 max-w-md text-lg leading-relaxed text-white/60">{ASESORIA.detalle}</p>
                 {ASESORIA.linkAgendar && (

@@ -7,22 +7,29 @@ import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Button } from "@/components/ui/Button";
-import { SITUACIONES_NEGOCIO, NOMBRES_PLAN, type PlanId } from "@/data/queNecesita";
+import { SITUACIONES_NEGOCIO } from "@/data/queNecesita";
+import { LINEAS, type LineaId } from "@/data/lineas";
 import { useQuoter } from "@/components/quoter/QuoterProvider";
 import { cn } from "@/lib/utils";
 
-const PLANES_TABS: PlanId[] = ["esencial", "crecimiento", "escala"];
+const NOMBRE_CORTO: Record<LineaId, string> = {
+  direccion: "Que me guíen",
+  gestion: "Que lo hagan por mí",
+  produccion: "Fotos y videos",
+  automatizacion: "Automatizar",
+  ecosistemas: "Página web",
+};
 
 export function NeedsPaths() {
   const { open } = useQuoter();
   const router = useRouter();
-  const [activo, setActivo] = useState<PlanId>("esencial");
+  const [activo, setActivo] = useState<LineaId>("direccion");
 
   const irAlPlan = () => {
-    router.push("/tienda#planes");
+    router.push(`/tienda#${activo}`);
   };
 
-  const situaciones = SITUACIONES_NEGOCIO.filter((s) => s.plan === activo);
+  const situaciones = SITUACIONES_NEGOCIO.filter((s) => s.linea === activo);
 
   return (
     <section className="py-16 md:py-24">
@@ -30,23 +37,23 @@ export function NeedsPaths() {
         <SectionHeading
           eyebrow="Encuentra tu camino"
           title="¿Qué necesita tu negocio hoy?"
-          description="Encuentra el plan que mejor se ajusta a tu negocio y mira en qué situaciones te va a dar más resultados."
+          description="Elige lo que más se parece a tu caso y te llevamos directo a las opciones y precios que te sirven."
         />
 
-        <div className="mt-10 flex max-w-md gap-2">
-          {PLANES_TABS.map((plan) => (
+        <div className="scrollbar-none mt-10 flex gap-2 overflow-x-auto">
+          {LINEAS.map(({ id: plan }) => (
             <button
               key={plan}
               type="button"
               onClick={() => setActivo(plan)}
               className={cn(
-                "flex-1 rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                "shrink-0 whitespace-nowrap rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
                 activo === plan
                   ? "border-white bg-white text-[#03101b]"
                   : "border-border-glass text-text-secondary hover:border-accent/40 hover:text-white",
               )}
             >
-              {NOMBRES_PLAN[plan]}
+              {NOMBRE_CORTO[plan]}
             </button>
           ))}
         </div>

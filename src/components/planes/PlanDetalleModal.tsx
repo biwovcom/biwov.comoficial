@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, ChevronDown, Printer } from "lucide-react";
 import { DURACION_MINIMA_MESES, type ItemPlan, type Plan } from "@/data/planes";
+import { lineaPorId } from "@/data/lineas";
 import { EXTRAS_COTIZABLES } from "@/data/extrasCotizables";
 import { formatCopEnMoneda, sumarPrecios, multiplicarPrecio, type Moneda } from "@/lib/moneda";
 import { cn } from "@/lib/utils";
@@ -116,7 +117,8 @@ function PlanDetalleTarjeta({
     plan.montajeInicial,
     multiplicarPrecio(plan.precioDesde, DURACION_MINIMA_MESES),
   );
-  const cuotaMontaje = multiplicarPrecio(plan.montajeInicial, 0.5);
+  const tieneMontaje = plan.montajeInicial.cop > 0;
+  const linea = lineaPorId(plan.linea);
   const extrasUnicosCop = extrasSeleccionados
     .filter((e) => e.periodicidad !== "mensual")
     .reduce((acc, e) => acc + e.precioCop, 0);
@@ -170,7 +172,7 @@ function PlanDetalleTarjeta({
   };
 
   const lineasExtras = extrasSeleccionados.map(
-    (e) => `+ ${e.nombre}: ${formatCopEnMoneda(e.precioCop, moneda, trm)}${e.periodicidad === "mensual" ? " /mes" : ""}`,
+    (e) => `+ ${e.nombre}: ${e.desde ? "desde " : ""}${formatCopEnMoneda(e.precioCop, moneda, trm)}${e.periodicidad === "mensual" ? " /mes" : ""}`,
   );
   const mensajeWhatsApp = `¡Hola! 👋 Quiero comprar el Plan ${plan.nombre} (${formatCopEnMoneda(totalSeisMeses.cop, moneda, trm)} por ${DURACION_MINIMA_MESES} meses).${lineasExtras.length ? `\n\nTambién quiero sumar:\n${lineasExtras.join("\n")}\n\nTotal estimado: ${formatCopEnMoneda(totalGeneralCop, moneda, trm)}. Lo confirmamos por aquí.` : ""} Ya firmé y confirmé desde el sitio.`;
 
@@ -179,6 +181,7 @@ function PlanDetalleTarjeta({
       nombre: `Plan ${plan.nombre}`,
       descripcion: plan.paraQuien,
       incluye: plan.incluye.flatMap((i) => [i.label, ...(i.subitems ?? [])]),
+      noIncluye: plan.noIncluye,
       precio: `${formatCopEnMoneda(plan.precioDesde.cop, moneda, trm)} al mes`,
     },
     ...extrasSeleccionados.map((e) => ({
@@ -202,7 +205,7 @@ function PlanDetalleTarjeta({
         <div className="flex items-start justify-between gap-4">
           <div>
             <span className="text-xs font-semibold uppercase tracking-wide text-accent">
-              Plan {plan.nombre}
+              Plan {plan.nombre} · {linea.nombre}
             </span>
             <h2 className="mt-1 text-2xl font-semibold text-white">{plan.claim}</h2>
           </div>
@@ -211,6 +214,9 @@ function PlanDetalleTarjeta({
           </button>
         </div>
 
+        <span className="mt-3 inline-block rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-xs font-semibold text-white">
+          {linea.etiqueta}
+        </span>
         <p className="mt-4 text-sm leading-relaxed text-text-secondary">{plan.paraQuien}</p>
 
         <p className="mt-6 text-xs font-semibold uppercase tracking-wide text-text-secondary">Qué incluye</p>
@@ -220,16 +226,30 @@ function PlanDetalleTarjeta({
           ))}
         </ul>
 
+        {plan.noIncluye.length > 0 && (
+          <>
+            <p className="mt-6 text-xs font-semibold uppercase tracking-wide text-text-secondary">No incluye</p>
+            <ul className="mt-3 space-y-1.5">
+              {plan.noIncluye.map((no) => (
+                <li key={no} className="text-xs text-white/50">
+                  ✕ {no}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+
         <div className="mt-6 rounded-2xl border border-border-glass bg-white/[0.02] p-5">
           <p className="text-base font-semibold text-white">
             {formatCopEnMoneda(plan.precioDesde.cop, moneda, trm)} al mes
           </p>
+          {tieneMontaje && (
+            <p className="mt-1 text-xs text-text-secondary">
+              + montaje inicial de {formatCopEnMoneda(plan.montajeInicial.cop, moneda, trm)}
+            </p>
+          )}
           <p className="mt-1 text-xs text-text-secondary">
-            + montaje inicial de {formatCopEnMoneda(plan.montajeInicial.cop, moneda, trm)}
-          </p>
-          <p className="mt-1 text-xs text-text-secondary">
-            La inversión en pauta publicitaria (lo que le pagas directamente a Meta) va aparte; la
-            definimos juntos según tu negocio.
+  La inversión en pauta publicitaria (lo que le pagas directamente a Meta) va aparte.
           </p>
 
           <div className="mt-4 border-t border-border-glass pt-4">
@@ -238,8 +258,8 @@ function PlanDetalleTarjeta({
               tiempo real que toma ver resultados.
             </p>
             <p className="mt-2 text-xs text-text-secondary">
-              ¿Prefieres diferir el montaje inicial? Puedes pagarlo en 2 cuotas iguales de{" "}
-              {formatCopEnMoneda(cuotaMontaje.cop, moneda, trm)}, sin recargo: una al iniciar y otra al segundo mes.
+              La mensualidad se paga por anticipado en los primeros 5 días de cada mes. Sin montaje
+              inicial.
             </p>
           </div>
         </div>
@@ -262,10 +282,12 @@ function PlanDetalleTarjeta({
               <dt>Plan {plan.nombre} × {DURACION_MINIMA_MESES} meses</dt>
               <dd>{formatCopEnMoneda(plan.precioDesde.cop * DURACION_MINIMA_MESES, moneda, trm)}</dd>
             </div>
-            <div className="flex justify-between gap-3 text-white/80">
-              <dt>Montaje inicial</dt>
-              <dd>{formatCopEnMoneda(plan.montajeInicial.cop, moneda, trm)}</dd>
-            </div>
+            {tieneMontaje && (
+              <div className="flex justify-between gap-3 text-white/80">
+                <dt>Montaje inicial</dt>
+                <dd>{formatCopEnMoneda(plan.montajeInicial.cop, moneda, trm)}</dd>
+              </div>
+            )}
             {extrasSeleccionados.map((e) => (
               <div key={e.id} className="flex justify-between gap-3 text-white/80">
                 <dt className="min-w-0">
@@ -315,8 +337,8 @@ function PlanDetalleTarjeta({
                   : []),
               ],
               formasPago: [
-                "Montaje inicial en 1 o 2 cuotas iguales (sin recargo)",
-                "Mensualidad del plan, mes a mes",
+                "Mensualidad del plan por anticipado, en los primeros 5 días de cada mes",
+                "Servicios de pago único: 50% anticipado y 50% contra entrega",
                 "Transferencia o PSE, se coordina por WhatsApp",
               ],
               validez: `Compromiso mínimo de ${DURACION_MINIMA_MESES} meses.`,

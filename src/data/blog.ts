@@ -569,7 +569,7 @@ export const ARTICULOS: Articulo[] = [
         titulo: "Grabar varios videos en una sola jornada",
         parrafos: [
           "La forma más eficiente es producir por bloques. Como referencia, una jornada de grabación de 4 horas rinde hasta 3 videos terminados con buena calidad, incluyendo cambios de plano y tomas de apoyo (B-Roll).",
-          "En biwov ofrecemos paquetes de grabación y edición de 3, 6 y 8 videos al mes, o jornadas completas de producción con fotos, reels y B-Roll según el nivel.",
+          "En biwov tenemos dos modalidades: producciones donde nosotros grabamos y editamos (6, 8 o 12 videos por sesión, con fotos y B-Roll en los niveles más altos), o edición de los videos que tú grabas con tu celular, con guiones y asesoría de grabación.",
         ],
       },
     ],

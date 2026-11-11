@@ -12,7 +12,7 @@ const catalogoJsonLd = {
     ...PLANES.map((p) => ({
       "@type": "Offer",
       name: `Plan ${p.nombre}`,
-      description: p.resumen,
+      description: `${p.resumen} ${p.paraQuien}`,
       price: p.precioDesde.cop,
       priceCurrency: "COP",
       priceSpecification: {
@@ -37,7 +37,7 @@ const catalogoJsonLd = {
 export const metadata: Metadata = {
   title: "Tienda: planes y servicios de marketing digital con precios",
   description:
-    "Precios publicados de planes mensuales de marketing digital, producción de contenido, grabación de video, páginas web y campañas en Meta para negocios en Colombia.",
+    "Precios publicados de planes mensuales de dirección estratégica y gestión de redes, producción de video, automatización con WhatsApp e IA, email marketing, páginas web y campañas en Meta para negocios en Colombia.",
   alternates: {
     canonical: "https://biwov.com/tienda",
   },

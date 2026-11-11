@@ -68,7 +68,7 @@ export function PaqueteClienteForm({
             list="paquetes-sugeridos"
             value={paquete}
             onChange={(e) => setPaquete(e.target.value)}
-            placeholder="Ej: Plan Crecimiento"
+            placeholder="Ej: Gestión Crecimiento"
           />
           <datalist id="paquetes-sugeridos">
             {PLANES.map((p) => (

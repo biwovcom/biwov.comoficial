@@ -1,6 +1,6 @@
-import { PLANES } from "@/data/planes";
-import { NIVELES_PRODUCCION, PRODUCCION_VIDEO } from "@/data/addOns";
-import { COMPLEMENTOS } from "@/data/complementos";
+import { PLANES, DURACION_MINIMA_MESES } from "@/data/planes";
+import { LINEAS } from "@/data/lineas";
+import { EXTRAS_COTIZABLES, CATEGORIAS_POR_LINEA } from "@/data/extrasCotizables";
 import { articulosOrdenados } from "@/data/blog";
 
 /**
@@ -12,25 +12,23 @@ export const dynamic = "force-static";
 const cop = (n: number) => `$${n.toLocaleString("es-CO")} COP`;
 
 export function GET() {
-  const planes = PLANES.map(
-    (p) =>
-      `- **Plan ${p.nombre}** (${cop(p.precioDesde.cop)}/mes, montaje inicial ${cop(p.montajeInicial.cop)}): ${p.resumen} ${p.paraQuien}`,
-  ).join("\n");
-
-  const produccion = NIVELES_PRODUCCION.map(
-    (n) =>
-      `- ${n.nombre} (${cop(n.precio.cop)} por jornada de ${n.tiempoProduccion}): ${n.fotografias} fotografías, ${n.reels} reels y ${n.clipsBRoll} clips de B-Roll.`,
-  ).join("\n");
-
-  const videos = PRODUCCION_VIDEO.paquetes
-    .map((p) => `- ${p.nombre ?? `${p.cantidadVideos} videos`}: ${cop(p.precio)}${p.esMensual ? " al mes" : ""}`)
-    .join("\n");
-
-  const web =
-    COMPLEMENTOS.find((c) => c.titulo.startsWith("Páginas web"))
-      ?.items?.filter((i) => i.precioCop)
-      .map((i) => `- ${i.label}: ${cop(i.precioCop!)}`)
-      .join("\n") ?? "";
+  const catalogo = LINEAS.map((linea) => {
+    const planes = PLANES.filter((p) => p.linea === linea.id)
+      .map((p) => `- **${p.nombre}** (${cop(p.precioDesde.cop)}/mes): ${p.resumen} ${p.paraQuien}`)
+      .join("\n");
+    const servicios = CATEGORIAS_POR_LINEA[linea.id]
+      .map((cat) => {
+        const items = EXTRAS_COTIZABLES.filter((e) => e.categoria === cat)
+          .map(
+            (e) =>
+              `- ${e.nombre}: ${e.desde ? "desde " : ""}${cop(e.precioCop)}${e.periodicidad === "mensual" ? "/mes" : " (pago único)"}${e.descripcion ? `. ${e.descripcion}` : ""}`,
+          )
+          .join("\n");
+        return `### ${cat}\n\n${items}`;
+      })
+      .join("\n\n");
+    return `## ${linea.numero}. ${linea.nombre} — ${linea.etiqueta}\n\n${linea.promesa}\n\n${[planes, servicios].filter(Boolean).join("\n\n")}`;
+  }).join("\n\n");
 
   const articulos = articulosOrdenados()
     .map((a) => `- [${a.titulo}](https://biwov.com/blog/${a.slug}): ${a.enResumen}`)
@@ -55,28 +53,17 @@ export function GET() {
 - Falta de una página web que convierta visitas en contactos y de un CRM que ordene a los clientes.
 - Tareas repetitivas que se pueden automatizar con inteligencia artificial.
 
-## Planes mensuales (compromiso mínimo de 6 meses)
+## Servicios y precios
 
-${planes}
+Los planes mensuales tienen un compromiso mínimo de ${DURACION_MINIMA_MESES} meses y se pagan por anticipado. La pauta publicitaria, las licencias y el consumo de las plataformas se pagan aparte.
 
-## Producción de contenido (por jornada)
+${catalogo}
 
-${produccion}
+## Asesoría personalizada
 
-## Grabación y edición de video
+- Sesión 1 a 1 de 90 minutos con Kathe, con análisis previo del negocio.
 
-${videos}
-
-## Páginas web (incluyen hosting y dominio el primer año)
-
-${web}
-
-## Otros servicios
-
-- Gestión de campaña en Meta: $400.000 COP/mes (la inversión en pauta la paga el cliente directamente a Meta; permanencia mínima 3 meses).
-- Asesoría personalizada 1 a 1 de 90 minutos con Kathe.
-
-Precios en pesos colombianos; no incluyen impuestos ni retenciones. Precios vigentes y en dólares: https://biwov.com/tienda
+Precios en pesos colombianos; no incluyen IVA ni retenciones. Precios vigentes y en dólares: https://biwov.com/tienda
 
 ## Blog (guías de marketing digital)
 

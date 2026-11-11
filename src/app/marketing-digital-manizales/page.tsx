@@ -63,7 +63,7 @@ const SERVICIOS = [
 const PREGUNTAS = [
   {
     pregunta: "¿Cuánto cuesta el marketing digital en Manizales?",
-    respuesta: `En biwov los planes mensuales van desde ${cop(PLANES[0].precioDesde.cop)} COP (Plan ${PLANES[0].nombre}) hasta ${cop(PLANES[PLANES.length - 1].precioDesde.cop)} COP (Plan ${PLANES[PLANES.length - 1].nombre}), y una jornada de producción de contenido arranca en ${cop(NIVELES_PRODUCCION[0].precio.cop)} COP. La inversión en pauta se paga aparte, directamente a Meta.`,
+    respuesta: `En biwov los planes mensuales van desde ${cop(Math.min(...PLANES.map((p) => p.precioDesde.cop)))} COP (dirección estratégica, donde tú ejecutas) hasta ${cop(Math.max(...PLANES.map((p) => p.precioDesde.cop)))} COP (gestión integral, donde lo hacemos todo por ti), y la producción de contenido arranca en ${cop(NIVELES_PRODUCCION[0].precio.cop)} COP. La inversión en pauta se paga aparte, directamente a Meta.`,
   },
   {
     pregunta: "¿Trabajan solo con negocios de Manizales?",
@@ -78,7 +78,7 @@ const PREGUNTAS = [
   {
     pregunta: "¿Cuánto tiempo tarda en verse resultados?",
     respuesta:
-      "Las campañas en Meta empiezan a dar datos útiles en una o dos semanas. Para ver una tendencia estable y optimizar con criterio, planeamos mínimo tres a seis meses; por eso los planes tienen un compromiso mínimo de 6 meses.",
+      "Las campañas en Meta empiezan a dar datos útiles en una o dos semanas. Para ver una tendencia estable y optimizar con criterio, planeamos mínimo tres meses; por eso los planes mensuales tienen un compromiso mínimo de 3 meses.",
   },
 ];
 
@@ -214,10 +214,12 @@ export default function MarketingManizalesPage() {
             {PLANES.map((p) => (
               <Link
                 key={p.id}
-                href="/tienda#planes"
+                href={`/tienda#${p.linea}`}
                 className="card-universo group rounded-[1.75rem] p-8 transition-transform duration-500 hover:-translate-y-1"
               >
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">Plan</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">
+                  {p.linea === "direccion" ? "Tú ejecutas, te dirigimos" : "Lo hacemos por ti"}
+                </p>
                 <h3 className="mt-2 text-3xl font-medium text-white">{p.nombre}</h3>
                 <p className="mt-3 text-base text-white/60">{p.claim}</p>
                 <p className="mt-8 text-3xl font-semibold tracking-tight text-white">

@@ -4,96 +4,40 @@ export interface NivelProduccion {
   id: "start" | "professional" | "signature";
   nombre: string;
   precio: PrecioDual;
-  camara: string;
-  audio: string;
-  iluminacion: string;
-  estabilizacion: string;
-  drone: string;
+  idealPara: string;
+  /** Equipo y nivel de producción. */
+  equipo: string;
   direccionCreativa: string;
+  guiones: string;
   tiempoProduccion: string;
-  fotografias: number;
+  /** Duración máxima de cada video, en segundos. */
+  duracionReel: number;
   reels: number;
+  fotografias: number;
   clipsBRoll: number;
 }
 
+/**
+ * Producción audiovisual dirigida por biwov: la grabación la hace un productor
+ * aliado y biwov dirige, coordina y responde por la calidad del resultado.
+ */
 export const PRODUCCION_CONTENIDO = {
-  descripcion: "Producción integral de contenido para marcas.",
-  idealPara:
-    "Empresas que necesitan generar contenido profesional para varias semanas en una sola jornada.",
+  descripcion:
+    "Producción audiovisual dirigida por biwov: planeamos, dirigimos y respondemos por el resultado; la grabación la hace nuestro equipo de productores aliados.",
   incluye: [
     "Brief creativo y reunión de planeación",
-    "Definición de objetivos y Shot List",
-    "Construcción de guiones y copys",
-    "Dirección creativa y de poses/talento",
-    "Producción fotográfica y audiovisual",
-    "Iluminación",
+    "Shot list (lista de tomas) y guiones",
+    "Dirección creativa en la grabación",
+    "Grabación presencial y fotografía",
     "Edición profesional y corrección de color",
-    "Optimización para redes y organización",
+    "Entrega organizada y optimizada para redes",
+    "1 ronda de ajustes sobre el material entregado",
   ],
-  noIncluye: ["La subida o publicación del contenido en tus redes sociales"],
-};
-
-export interface PaqueteProduccionVideo {
-  id: string;
-  cantidadVideos: number;
-  precio: number; // COP
-  esMensual?: boolean;
-  /** Si se da, reemplaza el nombre autogenerado ("3 videos", etc.). */
-  nombre?: string;
-}
-
-/**
- * Servicio aparte de los niveles Start/Professional/Signature: aquí solo se
- * va a grabar y editar, sin dirección creativa ni guiones. Se cotiza por
- * cantidad de videos, no por jornada de producción completa.
- */
-export const PRODUCCION_VIDEO = {
-  descripcion:
-    "Grabación y edición profesional de tus videos: nosotros ponemos la cámara, la luz y la edición; tú solo decides de qué quieres hablar.",
-  incluye: [
-    "Grabación con equipo profesional (cámara, audio e iluminación)",
-    "Edición y corrección de color",
-    "Entrega en formato vertical, lista para publicar",
+  noIncluye: [
+    "La publicación del contenido en tus redes sociales",
+    "Desplazamientos fuera de Manizales (se cotizan aparte)",
+    "Locaciones, modelos, vestuario o utilería que se alquilen",
   ],
-  noIncluye: [] as string[],
-  minimoVideos: 3,
-  reglaJornada: "Una jornada de grabación de 4 horas rinde hasta 3 videos terminados.",
-  notaPrecio: "Mientras más videos grabes de una vez, menor es el costo por video: desde $270.000 por video (3 videos) hasta $250.000 por video en el paquete mensual de 8.",
-  paquetes: [
-    { id: "3-videos", cantidadVideos: 3, precio: 810000 },
-    { id: "6-videos", cantidadVideos: 6, precio: 1560000 },
-    { id: "8-videos-mes", cantidadVideos: 8, precio: 2000000, esMensual: true, nombre: "8 videos al mes" },
-    {
-      id: "4-adicionales-plan",
-      cantidadVideos: 4,
-      precio: 900000,
-      nombre: "4 videos adicionales (si ya tienes un plan)",
-    },
-  ] as PaqueteProduccionVideo[],
-};
-
-/**
- * UGC (contenido generado por usuario/creador): servicio aparte de
- * PRODUCCION_VIDEO, con su propia curva de descuento por volumen. Se cobra
- * por video individual, no por jornada ni por paquete mensual.
- */
-export const PRODUCCION_UGC = {
-  descripcion:
-    "Grabación y edición de video estilo UGC (contenido generado por creador): cercano, auténtico, pensado para pauta y redes.",
-  incluye: [
-    "Grabación con equipo profesional (cámara, audio e iluminación)",
-    "Edición y corrección de color",
-    "Entrega en formato vertical, lista para publicar",
-  ],
-  noIncluye: [] as string[],
-  notaPrecio: "Entre más videos UGC grabes de una vez, menor es el costo por video.",
-  paquetes: [
-    { id: "ugc-x1", cantidadVideos: 1, precio: 459000, nombre: "Grabación y edición UGC x1 video" },
-    { id: "ugc-x2", cantidadVideos: 2, precio: 900000, nombre: "Grabación y edición UGC x2 videos" },
-    { id: "ugc-x3", cantidadVideos: 3, precio: 1320000, nombre: "Grabación y edición UGC x3 videos" },
-    { id: "ugc-x4", cantidadVideos: 4, precio: 1720000, nombre: "Grabación y edición UGC x4 videos" },
-    { id: "ugc-x5", cantidadVideos: 5, precio: 2100000, nombre: "Grabación y edición UGC x5 videos" },
-  ] as PaqueteProduccionVideo[],
 };
 
 // Valores en USD son una referencia aproximada (tasa ~4.000 COP/USD).
@@ -101,46 +45,43 @@ export const NIVELES_PRODUCCION: NivelProduccion[] = [
   {
     id: "start",
     nombre: "Start",
-    precio: { cop: 799000, usd: 200 },
-    camara: "iPhone",
-    audio: "Micrófono básico",
-    iluminacion: "Luz natural / RGB portátil",
-    estabilizacion: "Gimbal móvil",
-    drone: "No incluido",
+    precio: { cop: 1890000, usd: 475 },
+    idealPara: "Para marcas que necesitan videos constantes para sus redes.",
+    equipo: "Audio e iluminación según la producción contratada",
     direccionCreativa: "Básica",
-    tiempoProduccion: "4 horas",
-    fotografias: 15,
-    reels: 3,
-    clipsBRoll: 10,
+    guiones: "Planificación de contenidos y guiones",
+    tiempoProduccion: "Hasta 4 horas",
+    duracionReel: 60,
+    reels: 6,
+    fotografias: 0,
+    clipsBRoll: 0,
   },
   {
     id: "professional",
     nombre: "Professional",
-    precio: { cop: 1959000, usd: 490 },
-    camara: "Sony + Lente",
-    audio: "Hollyland",
-    iluminacion: "Kit de iluminación",
-    estabilizacion: "Hohem",
-    drone: "Opcional",
+    precio: { cop: 2490000, usd: 625 },
+    idealPara: "Para marcas que necesitan videos y fotos profesionales para varias semanas.",
+    equipo: "Producción audiovisual profesional",
     direccionCreativa: "Avanzada",
-    tiempoProduccion: "8 horas",
-    fotografias: 30,
-    reels: 6,
-    clipsBRoll: 20,
+    guiones: "Guiones y planificación",
+    tiempoProduccion: "Hasta 6 horas",
+    duracionReel: 60,
+    reels: 8,
+    fotografias: 15,
+    clipsBRoll: 10,
   },
   {
     id: "signature",
     nombre: "Signature",
-    precio: { cop: 2999000, usd: 750 },
-    camara: "Sony + Lente Cine",
-    audio: "Hollyland + grabadora",
-    iluminacion: "Iluminación completa",
-    estabilizacion: "Hohem + accesorios",
-    drone: "Incluido",
+    precio: { cop: 3490000, usd: 875 },
+    idealPara: "Para empresas que necesitan una producción de alto nivel y un banco amplio de contenido.",
+    equipo: "Producción audiovisual avanzada",
     direccionCreativa: "Completa",
-    tiempoProduccion: "12 horas",
-    fotografias: 50,
-    reels: 10,
-    clipsBRoll: 40,
+    guiones: "Conceptualización de contenidos y guiones",
+    tiempoProduccion: "Hasta 8 horas",
+    duracionReel: 60,
+    reels: 12,
+    fotografias: 30,
+    clipsBRoll: 20,
   },
 ];

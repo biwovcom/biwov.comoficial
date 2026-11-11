@@ -22,13 +22,18 @@ export function ProductoCard({
   onVerDetalle: () => void;
 }) {
   const { icono: Icono, imagen } = ARTE_CATEGORIA[item.categoria];
-  const precio = formatCopEnMoneda(item.precioCop, moneda, trm) + (item.periodicidad === "mensual" ? " /mes" : "");
+  const precio = (item.desde ? "Desde " : "") + formatCopEnMoneda(item.precioCop, moneda, trm) + (item.periodicidad === "mensual" ? " /mes" : "");
 
   return (
     <div className="card-universo group flex flex-col rounded-[1.75rem] p-2.5 transition-transform duration-500 hover:-translate-y-1">
       <div className="relative h-32 overflow-hidden rounded-[1.25rem]">
         <Image src={imagen} alt="" fill sizes="300px" className="object-cover" />
         <div className="absolute inset-0 bg-[#03101b]/40" />
+        {item.recomendado && (
+          <span className="absolute left-2 top-2 rounded bg-accent px-2 py-1 text-[9px] font-bold uppercase tracking-wide text-[#0a2642]">
+            Recomendado
+          </span>
+        )}
         <span className="absolute bottom-2 left-2 flex h-8 w-8 items-center justify-center rounded-lg border border-white/25 bg-[#03101b]/70 backdrop-blur-sm">
           <Icono className="h-4 w-4 text-white" />
         </span>
@@ -51,6 +56,7 @@ export function ProductoCard({
           </ul>
         )}
         <p className="mt-4 text-xl font-semibold tracking-tight text-white">{precio}</p>
+        {item.nota && <p className="mt-1 text-xs text-accent/90">{item.nota}</p>}
 
         <button
           type="button"

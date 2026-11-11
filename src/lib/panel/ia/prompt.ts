@@ -1,3 +1,4 @@
+import { CATEGORIAS_EXTRA } from "@/data/extrasCotizables";
 import { BLOQUES_DIAGNOSTICO } from "@/lib/panel/diagnosticoLargo";
 import type { RespuestaLegible } from "@/lib/panel/filtroRapido";
 import type { RespuestasDiagnosticoLargo } from "@/lib/panel/diagnosticoLargo";
@@ -24,21 +25,19 @@ Reglas de coherencia adicionales:
 - Sé honesta y directa sobre qué NO se recomienda por ahora y por qué, igual que serías honesta con un amigo.
 
 REGLA ADICIONAL — plan real y extras de la tienda (planRecomendado / extrasRecomendados):
-Además del "paquete" interno de arriba, tienes que recomendar UN plan real de los 3 que vende biwov_ hoy
-(Esencial, Crecimiento o Escala — el catálogo completo con precios está más abajo) y, si aplica, extras
-sueltos del catálogo real. Esto es lo que Kathe usa para armar la cotización que le llega al prospecto,
-así que los nombres de los extras deben coincidir lo más exacto posible con el "nombre" real del catálogo.
+Además del "paquete" interno de arriba, tienes que recomendar UN plan mensual real de los 6 que vende
+biwov_ hoy (el catálogo completo con precios está más abajo) y, si aplica, extras sueltos del catálogo real.
+Los planes se dividen en dos líneas: Dirección estratégica (biwov guía, el cliente ejecuta) y Gestión de
+marketing (biwov lo hace por el cliente). Esto es lo que Kathe usa para armar la cotización que le llega al
+prospecto, así que los nombres de los extras deben coincidir lo más exacto posible con el "nombre" real del
+catálogo.
 
-Guía para elegir el plan (etapa del negocio → plan):
-- "empezando" (sin presencia ordenada, sin pauta corriendo todavía) → Plan Esencial. Todavía NO necesita
-  página web propia ni automatizaciones — eso sería gastar en algo que no va a aprovechar aún.
-- "vende-irregular" y el cuello de botella es CAPTACIÓN o CONVERSIÓN y ya tiene algo de tráfico/leads que
-  filtrar → Plan Crecimiento (incluye 1 página web para filtrar leads + asistente con IA).
-- "vende-estable-escalar" o el cuello de botella es OPERACIÓN (no da abasto, necesita seguimiento
-  automático de varios clientes a la vez) → Plan Escala.
-- Si el negocio no tiene todavía ni contenido ni pauta corriendo, NO recomiendes página web ni
-  automatizaciones como obligatorias — ofrécelas como extra opcional ("obligatorio: false") solo si de
-  verdad acelerarían el paso siguiente, explicando que por ahora no son indispensables.
+Guía para elegir el plan:
+- Si quiere aprender y ejecutar con su propio equipo, o tiene poco presupuesto → planes de Dirección estratégica ("direccion", "crecimiento-estrategico" o "growth-partner" si ya tiene equipo interno de marketing o ventas).
+- Si no tiene tiempo y quiere delegar sus redes → planes de Gestión ("gestion-esencial" con 1 red, "gestion-crecimiento" con hasta 2 redes, "gestion-integral" si quiere delegar casi toda la operación).
+- Si apenas está empezando, no le recomiendes páginas web ni automatizaciones como obligatorias; sería gastar en algo que todavía no va a aprovechar.
+- Si le llegan muchos mensajes y no da abasto, o quiere seguimiento automático → sugiere como extra WhatsApp Business o Email marketing.
+- Si necesita contenido grabado profesionalmente, sugiere Producción Start, Professional o Signature; si graba con su celular, Edición de reels.
 
 Para "extrasRecomendados": marca "obligatorio: true" solo en lo que el negocio necesita sí o sí para
 resolver su cuello de botella principal; todo lo demás que podría ayudar pero no es indispensable va con
@@ -59,12 +58,7 @@ function formatearCatalogoReal(): string {
       `- ${p.nombre} (id: "${p.id}") — ${p.claim}. ${p.paraQuien} Desde ${fmtCop(p.precioDesde.cop)}/mes.`,
   ).join("\n");
 
-  const categorias: CategoriaExtra[] = [
-    "Producción de contenido",
-    "Grabación y edición de video",
-    "Páginas web",
-    "Campaña en Meta",
-  ];
+  const categorias: CategoriaExtra[] = CATEGORIAS_EXTRA;
   const extras = categorias
     .map((cat) => {
       const items = EXTRAS_COTIZABLES.filter((e) => e.categoria === cat)

@@ -1,5 +1,6 @@
 "use client";
 
+import { CATEGORIAS_EXTRA } from "@/data/extrasCotizables";
 import { useState } from "react";
 import { Download, FileText, X } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
@@ -12,13 +13,6 @@ import { EXTRAS_COTIZABLES, type CategoriaExtra } from "@/data/extrasCotizables"
 import { descargarPropuestaPdf } from "@/lib/pdf/descargarPropuesta";
 import { propuestaDesdeRecomendacion } from "@/lib/propuestas/propuestaDesdeRecomendacion";
 import { AnalisisImprimible } from "./AnalisisImprimible";
-
-const CATEGORIAS_EXTRA: CategoriaExtra[] = [
-  "Producción de contenido",
-  "Grabación y edición de video",
-  "Páginas web",
-  "Campaña en Meta",
-];
 
 function archivoABase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -637,7 +631,7 @@ export function AnalisisForm({
               update({
                 extrasRecomendados: [
                   ...contenido.extrasRecomendados,
-                  { nombre: "", categoria: "Producción de contenido", obligatorio: false, justificacion: "" },
+                  { nombre: "", categoria: "Producción audiovisual", obligatorio: false, justificacion: "" },
                 ],
               })
             }

@@ -170,8 +170,8 @@ export function calcularSemaforo(r: RespuestasFiltro, moneda: Moneda): Resultado
  * negocio, no en qué tan buen prospecto es.
  */
 export function planSugerido(r: RespuestasFiltro): Plan["id"] {
-  if (r.objetivo === "sin-presencia") return "esencial";
-  if (r.cumplimientoVentas === "cumple-constante") return "escala";
-  if (r.objetivo === "no-calificados" || r.meta === "proceso-automatizado") return "crecimiento";
-  return "esencial";
+  if (r.objetivo === "sin-presencia") return "gestion-esencial";
+  if (r.cumplimientoVentas === "cumple-constante") return "gestion-integral";
+  if (r.objetivo === "no-calificados" || r.meta === "proceso-automatizado") return "gestion-crecimiento";
+  return "crecimiento-estrategico";
 }

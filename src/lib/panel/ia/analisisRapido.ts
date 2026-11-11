@@ -1,3 +1,5 @@
+import { CATEGORIAS_EXTRA } from "@/data/extrasCotizables";
+import { PLAN_IDS } from "@/data/planes";
 import { z } from "zod";
 import type { RespuestaLegible } from "@/lib/panel/filtroRapido";
 import { PLANES } from "@/data/planes";
@@ -10,19 +12,14 @@ export const AnalisisRapidoSchema = z.object({
   resumenCorto: z.string(),
 
   planRecomendado: z.object({
-    plan: z.enum(["esencial", "crecimiento", "escala"]),
+    plan: z.enum(PLAN_IDS),
     justificacion: z.string(),
   }),
 
   extrasRecomendados: z.array(
     z.object({
       nombre: z.string(),
-      categoria: z.enum([
-        "Producción de contenido",
-        "Grabación y edición de video",
-        "Páginas web",
-        "Campaña en Meta",
-      ]),
+      categoria: z.enum(CATEGORIAS_EXTRA as [CategoriaExtra, ...CategoriaExtra[]]),
       obligatorio: z.boolean(),
       justificacion: z.string(),
     }),
@@ -33,10 +30,12 @@ export type AnalisisRapido = z.infer<typeof AnalisisRapidoSchema>;
 
 const SYSTEM_PROMPT = `Actúa como un Director de Marketing Digital Senior de biwov_, una agencia que diseña "Ecosistemas Digitales Inteligentes". Un visitante acaba de llenar un filtro rápido en el sitio web (no un diagnóstico completo). Con esa poca información, dale una primera lectura honesta y recomienda el plan real y los extras reales que más le convienen, en español simple y directo.
 
-Guía para elegir el plan según la etapa del negocio:
-- Si no tiene presencia digital ordenada o apenas está empezando → Plan Esencial. No le recomiendes página web ni automatizaciones todavía — sería gastar en algo que no va a aprovechar aún.
-- Si ya tiene algo de contenido o pauta pero le llegan interesados sin calificar, o quiere automatizar el seguimiento → Plan Crecimiento.
-- Si ya cumple sus metas de ventas de forma constante y quiere escalar → Plan Escala.
+Guía para elegir el plan:
+- Si quiere aprender y ejecutar con su propio equipo, o tiene poco presupuesto → planes de Dirección estratégica ("direccion", "crecimiento-estrategico" o "growth-partner" si ya tiene equipo interno de marketing o ventas).
+- Si no tiene tiempo y quiere delegar sus redes → planes de Gestión ("gestion-esencial" con 1 red, "gestion-crecimiento" con hasta 2 redes, "gestion-integral" si quiere delegar casi toda la operación).
+- Si apenas está empezando, no le recomiendes páginas web ni automatizaciones como obligatorias; sería gastar en algo que todavía no va a aprovechar.
+- Si le llegan muchos mensajes y no da abasto, o quiere seguimiento automático → sugiere como extra WhatsApp Business o Email marketing.
+- Si necesita contenido grabado profesionalmente, sugiere Producción Start, Professional o Signature; si graba con su celular, Edición de reels.
 
 Para "extrasRecomendados": marca "obligatorio: true" solo en lo que necesita sí o sí; todo lo demás que podría ayudar pero no es indispensable va con "obligatorio: false". Como la información es limitada (solo el filtro rápido, sin diagnóstico completo), sé conservadora: recomienda pocos extras y solo los muy evidentes. Nunca inventes datos que la persona no dio — si hace falta más información para estar segura, dilo en "resumenCorto".
 
@@ -48,12 +47,7 @@ function formatearCatalogoReal(): string {
       `- ${p.nombre} (id: "${p.id}") — ${p.claim}. ${p.paraQuien} Desde ${fmtCop(p.precioDesde.cop)}/mes.`,
   ).join("\n");
 
-  const categorias: CategoriaExtra[] = [
-    "Producción de contenido",
-    "Grabación y edición de video",
-    "Páginas web",
-    "Campaña en Meta",
-  ];
+  const categorias: CategoriaExtra[] = CATEGORIAS_EXTRA;
   const extras = categorias
     .map((cat) => {
       const items = EXTRAS_COTIZABLES.filter((e) => e.categoria === cat)

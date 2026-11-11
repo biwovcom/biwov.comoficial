@@ -80,12 +80,12 @@ export function propuestaDesdeRecomendacion({
     totales: [
       { label: "Mensualidad total", valor: formatCopEnMoneda(totalMensual, "COP", 1) },
       ...(totalUnico > 0
-        ? [{ label: "Pago único (montaje/producción)", valor: formatCopEnMoneda(totalUnico, "COP", 1) }]
+        ? [{ label: "Pagos únicos (proyectos y producción)", valor: formatCopEnMoneda(totalUnico, "COP", 1) }]
         : []),
     ],
     formasPago: [
-      "Montaje inicial en 1 o 2 cuotas iguales (sin recargo)",
-      "Mensualidad del plan, mes a mes",
+      "Mensualidad del plan por anticipado, en los primeros 5 días de cada mes",
+      "Servicios de pago único: 50% anticipado y 50% contra entrega",
       "Transferencia o PSE, se coordina por WhatsApp",
     ],
     validez: `Compromiso mínimo de ${DURACION_MINIMA_MESES} meses.`,

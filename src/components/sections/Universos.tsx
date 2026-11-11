@@ -73,7 +73,7 @@ function MediaPlanes() {
     <div className="absolute inset-0 flex items-center justify-center bg-[radial-gradient(70%_60%_at_50%_45%,rgba(0,194,232,0.12),transparent_70%)]">
       <Orbitas />
       <div className="relative w-[78%] max-w-sm space-y-3">
-        {PLANES.map((plan, i) => (
+        {PLANES.filter((p) => p.recomendado || p.id === "direccion" || p.id === "gestion-esencial").map((plan, i) => (
           <motion.div
             key={plan.id}
             initial={{ opacity: 0, x: i % 2 ? 30 : -30 }}
@@ -82,13 +82,15 @@ function MediaPlanes() {
             transition={{ duration: 0.6, delay: 0.2 + i * 0.15 }}
             className={cn(
               "flex items-center justify-between rounded-2xl border px-4 py-3 shadow-[0_12px_30px_-12px_rgba(0,0,0,0.6)] backdrop-blur-md",
-              plan.id === "crecimiento"
+              plan.recomendado
                 ? "border-accent/60 bg-[#0e3150] md:scale-105"
                 : "border-white/10 bg-[#0a2642]/90",
             )}
           >
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-accent">Plan</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-accent">
+                {plan.linea === "direccion" ? "Tú ejecutas" : "Lo hacemos por ti"}
+              </p>
               <p className="text-base font-semibold text-white">{plan.nombre}</p>
             </div>
             <p className="text-sm font-semibold text-white">
@@ -185,10 +187,10 @@ function MediaContenido() {
           <Camera className="h-4 w-4" /> Producción
         </p>
         <p className="mt-1 text-xl font-medium text-white md:text-2xl">
-          {start.fotografias} fotos · {start.reels} reels · {start.clipsBRoll} clips de B-Roll
+          {start.reels} videos editados · {start.tiempoProduccion.toLowerCase()} de grabación
         </p>
         <p className="mt-1 flex items-center gap-2 text-sm text-white/70">
-          <Clapperboard className="h-4 w-4" /> Desde {formatoCop(start.precio.cop)} COP por jornada
+          <Clapperboard className="h-4 w-4" /> Desde {formatoCop(start.precio.cop)} COP por producción
         </p>
       </div>
     </>
@@ -227,13 +229,13 @@ export function Universos() {
       <Container className="!max-w-7xl grid gap-5 md:grid-cols-2 md:gap-6">
         <Tarjeta
           numero="01"
-          etiqueta="Planes"
-          titulo="Un plan mensual para ordenar y vender"
-          texto="Estrategia, campañas en Meta, contenido y acompañamiento en un solo plan, según la etapa de tu negocio."
+          etiqueta="Planes mensuales"
+          titulo="Te dirigimos o lo hacemos por ti"
+          texto="Elige entre planes de dirección estratégica, donde tú ejecutas y nosotros te guiamos, o planes de gestión, donde manejamos tus redes por ti."
           media={<MediaPlanes />}
           acciones={
             <>
-              <Link href="/tienda#planes" className={BTN_BLANCO}>
+              <Link href="/tienda#gestion" className={BTN_BLANCO}>
                 Ver planes
               </Link>
               <button type="button" onClick={() => open()} className={BTN_BORDE}>
@@ -250,20 +252,25 @@ export function Universos() {
           delay={0.1}
           media={<MediaAutomatizacion />}
           acciones={
-            <a href={whatsapp} target="_blank" rel="noopener noreferrer" className={BTN_BLANCO}>
-              <WhatsAppIcon className="h-5 w-5" />
-              Hablemos
-            </a>
+            <>
+              <Link href="/tienda#automatizacion" className={BTN_BLANCO}>
+                Ver precios
+              </Link>
+              <a href={whatsapp} target="_blank" rel="noopener noreferrer" className={BTN_BORDE}>
+                <WhatsAppIcon className="h-5 w-5" />
+                Hablemos
+              </a>
+            </>
           }
         />
         <Tarjeta
           numero="03"
           etiqueta="Producción de contenido"
           titulo="Contenido que hace que te elijan"
-          texto="Fotos, reels y B-Roll grabados y editados por nosotros, con guion y dirección creativa."
+          texto="Nosotros grabamos y editamos con guion y dirección creativa, o tú grabas y nosotros te guiamos y editamos."
           media={<MediaContenido />}
           acciones={
-            <Link href="/tienda" className={BTN_BLANCO}>
+            <Link href="/tienda#produccion" className={BTN_BLANCO}>
               Ver paquetes
             </Link>
           }
@@ -277,9 +284,9 @@ export function Universos() {
           media={<MediaWeb />}
           acciones={
             <>
-              <a href="#casos" className={BTN_BLANCO}>
-                Ver casos
-              </a>
+              <Link href="/tienda#ecosistemas" className={BTN_BLANCO}>
+                Ver precios
+              </Link>
               <a href={whatsapp} target="_blank" rel="noopener noreferrer" className={BTN_BORDE}>
                 <MessageCircle className="h-4 w-4" />
                 Cotizar mi página

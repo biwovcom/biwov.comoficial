@@ -1,3 +1,6 @@
+import type { CategoriaExtra } from "@/data/extrasCotizables";
+import { CATEGORIAS_EXTRA } from "@/data/extrasCotizables";
+import { PLAN_IDS } from "@/data/planes";
 import { z } from "zod";
 
 export type PaqueteId =
@@ -92,7 +95,7 @@ export const AnalisisIASchema = z.object({
   // para armar la cotización real que le llega al prospecto. ---
   planRecomendado: z.object({
     // Debe coincidir exactamente con un id de PLANES en src/data/planes.ts.
-    plan: z.enum(["esencial", "crecimiento", "escala"]),
+    plan: z.enum(PLAN_IDS),
     justificacion: z.string(),
   }),
 
@@ -101,12 +104,7 @@ export const AnalisisIASchema = z.object({
       // Debe coincidir, lo más exacto posible, con el "nombre" de un ítem real
       // de EXTRAS_COTIZABLES en src/data/extrasCotizables.ts.
       nombre: z.string(),
-      categoria: z.enum([
-        "Producción de contenido",
-        "Grabación y edición de video",
-        "Páginas web",
-        "Campaña en Meta",
-      ]),
+      categoria: z.enum(CATEGORIAS_EXTRA as [CategoriaExtra, ...CategoriaExtra[]]),
       // true = lo necesita sí o sí para resolver su cuello de botella.
       // false = se lo ofrecemos como opción adicional, no es indispensable.
       obligatorio: z.boolean(),

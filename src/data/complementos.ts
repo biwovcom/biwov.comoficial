@@ -18,56 +18,9 @@ export interface Complemento {
 
 export const COMPLEMENTOS: Complemento[] = [
   {
-    titulo: "Producción de contenido",
-    detalle: "Fotografía y video profesional para tu marca, en 3 niveles según tu necesidad.",
-    tipo: "produccion",
-  },
-  {
-    titulo: "Páginas web y sitios web adicionales",
-    detalle:
-      "Landing page (una sola pantalla enfocada en una acción puntual) o sitio web de varias páginas, según lo que necesites. Todos incluyen hosting y dominio.",
-    items: [
-      {
-        label: "Landing page (1 página, sin conexión API)",
-        precio: "$1.129.000 COP",
-        precioCop: 1129000,
-      },
-      {
-        label: "Sitio web de 5 páginas",
-        precio: "$1.799.000 COP",
-        precioCop: 1799000,
-      },
-      {
-        label: "Sitio web de 10 páginas",
-        precio: "$2.499.000 COP",
-        precioCop: 2499000,
-      },
-      {
-        label: "Conexión por API a la campaña publicitaria (add-on, se integra a cualquiera de los anteriores)",
-        precio: "$350.000 COP",
-        precioCop: 350000,
-      },
-    ],
-    nota: "Todos incluyen hosting y dominio. La conexión por API es solo la integración técnica para pasar los leads de la página a la campaña; no incluye el montaje completo de GHL ni la gestión de la campaña.",
-  },
-  {
-    titulo: "Campaña publicitaria en Meta",
-    detalle: "Para cuando solo necesitas que te armemos y gestionemos la campaña, sin un plan completo.",
-    items: [
-      {
-        label: "Gestión mensual (montaje, seguimiento, optimización, análisis e informe mensual)",
-        precio: "$400.000 COP/mes",
-        precioCop: 400000,
-      },
-      { label: "Requisito para arrancar: mínimo 6 piezas creativas (videos o imágenes)", precio: "A cargo del cliente" },
-      { label: "Permanencia mínima", precio: "3 meses" },
-    ],
-    nota: "La inversión en pauta publicitaria la paga el cliente directamente a Meta; no está incluida en el valor de la gestión.",
-  },
-  {
     titulo: "Asesoría personalizada",
     detalle:
-      "Una sesión 1 a 1 con Kathe si prefieres una guía puntual para ejecutar tú misma, en vez de un plan completo.",
+      "Una sesión 1 a 1 con Kathe si prefieres una guía puntual para ejecutar tú mismo, en vez de un plan mensual.",
     items: [
       { label: "Sesión de asesoría personalizada (90 minutos)" },
       { label: "Análisis de tu negocio y tus redes antes de la sesión", precio: "Incluido" },
