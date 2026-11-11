@@ -239,7 +239,7 @@ export const EXTRAS_COTIZABLES: ExtraCotizable[] = [
     precioCop: 1290000,
     periodicidad: "único",
     descripcion: "Tu WhatsApp responde solo lo básico y te pasa a quien necesita un asesor.",
-    nota: "Mantenimiento opcional: $290.000 /mes",
+    nota: "Mensualidad del chatbot: $450.000 /mes (incluye la plataforma)",
     incluye: [
       "Configuración del canal",
       "Menú de bienvenida",
@@ -248,20 +248,33 @@ export const EXTRAS_COTIZABLES: ExtraCotizable[] = [
       "Captura de nombre y teléfono",
       "Derivación a un asesor humano",
       "Pruebas y capacitación",
+      "Requiere la mensualidad del chatbot ($450.000 /mes), que incluye la licencia de la plataforma",
     ],
-    noIncluye: NO_INCLUYE_CONSUMO,
+    noIncluye: [
+      "La mensualidad del chatbot (se paga aparte cada mes)",
+      "Cargos de Meta por mensajes de WhatsApp y consumo de IA (tokens)",
+    ],
   },
   {
     id: "wa-starter-mant",
-    nombre: "Mantenimiento WhatsApp Starter",
+    nombre: "Mensualidad chatbot WhatsApp Starter",
     categoria: "WhatsApp y agentes de IA",
     linea: "automatizacion",
     tipoContrato: "automatizacion",
-    precioCop: 290000,
+    precioCop: 450000,
     periodicidad: "mensual",
-    descripcion: "Mantenemos, revisamos y ajustamos tu WhatsApp Starter cada mes.",
-    incluye: ["Revisión mensual del funcionamiento", "Ajustes menores a flujos y respuestas", "Soporte en horario laboral"],
-    noIncluye: NO_INCLUYE_CONSUMO,
+    descripcion:
+      "Pago mensual para que tu chatbot siga funcionando: incluye la licencia de la plataforma, la revisión y los ajustes.",
+    incluye: [
+      "Licencia mensual de la plataforma del chatbot",
+      "Revisión mensual del funcionamiento",
+      "Ajustes menores a flujos y respuestas",
+      "Soporte en horario laboral",
+    ],
+    noIncluye: [
+      "Cargos de Meta por mensajes de WhatsApp y consumo de IA (tokens)",
+      "Licencias de otras herramientas (CRM o correo)",
+    ],
   },
   {
     id: "wa-business",

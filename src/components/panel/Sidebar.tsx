@@ -2,14 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import {
-  BookOpen,
+import {
   Calculator,
   Clock,
-  CreditCard,
-  MessageSquareText,
-  Menu,
-  Package,
+  CreditCard,
+  Menu,
   Users2,
   UserPlus,
   X,
@@ -20,10 +17,7 @@ const LINKS = [
   { href: "/panel/prospectos", label: "Prospectos", icon: Users2 },
   { href: "/panel/prospectos/nuevo", label: "Nuevo prospecto", icon: UserPlus },
   { href: "/panel/cotizaciones", label: "Cotizaciones", icon: Calculator },
-  { href: "/panel/paquetes", label: "Paquetes", icon: Package },
   { href: "/panel/compras", label: "Compras de planes", icon: CreditCard },
-  { href: "/panel/guia", label: "Guía rápida", icon: BookOpen },
-  { href: "/panel/plantillas", label: "Plantillas y guiones", icon: MessageSquareText },
   { href: "/panel/tiempos", label: "Tiempos", icon: Clock },
 ];
 
