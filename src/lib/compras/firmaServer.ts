@@ -16,6 +16,9 @@ export interface DatosFirmaServer {
   ciudad?: string | null;
   /** Qué firmó, para el historial del cliente en el panel. */
   detalle: string;
+  monto?: number;
+  moneda?: "COP" | "USD";
+  cedula?: string | null;
 }
 
 export function linkContratoFirmado(request: Request, referenciaId: string) {
@@ -33,7 +36,8 @@ export async function registrarFirmas(
   datos: DatosFirmaServer,
   request: Request,
 ) {
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
   const userAgent = request.headers.get("user-agent");
   const ahora = new Date().toISOString();
 
@@ -42,7 +46,9 @@ export async function registrarFirmas(
     referenciaId,
     datos.tiposContrato.map((tipo) => ({
       tipo_contrato: tipo,
-      version_contrato: esTipoContrato(tipo) ? VERSION_CONTRATO[tipo] : (datos.versionPersonalizada ?? tipo),
+      version_contrato: esTipoContrato(tipo)
+        ? VERSION_CONTRATO[tipo]
+        : (datos.versionPersonalizada ?? tipo),
       nombre_firmante: datos.nombreFirmante,
       firma_imagen: datos.firmaImagenBase64,
       ip,
@@ -60,6 +66,9 @@ export async function registrarFirmas(
     ciudad: datos.ciudad,
     detalle: datos.detalle,
     linkContrato,
+    monto: datos.monto,
+    moneda: datos.moneda,
+    cedula: datos.cedula,
   });
 
   return linkContrato;

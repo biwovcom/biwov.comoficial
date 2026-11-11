@@ -24,6 +24,8 @@ import { RedesSocialesLinks } from "@/components/panel/RedesSocialesLinks";
 import { EditarClasificacion } from "@/components/panel/EditarClasificacion";
 import { EditarDatosContacto } from "@/components/panel/EditarDatosContacto";
 import { PaqueteClienteForm } from "@/components/panel/PaqueteClienteForm";
+import { ContratosFirmadosCliente, comprasDelProspecto } from "@/components/panel/ContratosFirmadosCliente";
+import { listarCompras } from "@/lib/compras/guardarCompra";
 import type { RespuestasDiagnosticoLargo } from "@/lib/panel/diagnosticoLargo";
 
 interface FiltroRespuestaFila {
@@ -52,6 +54,8 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
   if (!prospecto) {
     notFound();
   }
+
+  const contratosFirmados = comprasDelProspecto(await listarCompras(supabase), prospecto);
 
   const { data: filtro } = await supabase
     .from("filtro_respuestas")
@@ -234,6 +238,8 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
             </div>
           )}
         </GlassCard>
+
+        <ContratosFirmadosCliente compras={contratosFirmados} />
 
         <GlassCard className="p-6">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-text-secondary">

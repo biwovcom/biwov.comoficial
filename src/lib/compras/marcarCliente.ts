@@ -10,6 +10,9 @@ export interface DatosNuevoCliente {
   detalle: string;
   /** Link a la copia del contrato firmado. */
   linkContrato: string;
+  monto?: number;
+  moneda?: "COP" | "USD";
+  cedula?: string | null;
 }
 
 const soloDigitos = (v: string) => v.replace(/\D/g, "");
@@ -20,14 +23,23 @@ const soloDigitos = (v: string) => v.replace(/\D/g, "");
  * "Cliente"; si no, se crea. En los dos casos queda una nota en su historial
  * con lo que firmó y el link al contrato. Nunca rompe la compra si falla.
  */
-export async function marcarComoCliente(supabase: SupabaseClient, datos: DatosNuevoCliente) {
+export async function marcarComoCliente(
+  supabase: SupabaseClient,
+  datos: DatosNuevoCliente,
+) {
   try {
     const email = datos.email?.trim().toLowerCase() || null;
-    const digitos = datos.whatsapp ? soloDigitos(datos.whatsapp).slice(-10) : "";
+    const digitos = datos.whatsapp
+      ? soloDigitos(datos.whatsapp).slice(-10)
+      : "";
 
     let existente: { id: string } | null = null;
     if (email) {
-      const { data } = await supabase.from("prospectos").select("id").ilike("email", email).limit(1);
+      const { data } = await supabase
+        .from("prospectos")
+        .select("id")
+        .ilike("email", email)
+        .limit(1);
       existente = data?.[0] ?? null;
     }
     if (!existente && digitos.length >= 7) {
@@ -36,15 +48,37 @@ export async function marcarComoCliente(supabase: SupabaseClient, datos: DatosNu
         .select("id, whatsapp")
         .ilike("whatsapp", `%${digitos.slice(-7)}%`)
         .limit(20);
-      existente = data?.find((p) => soloDigitos(p.whatsapp ?? "").endsWith(digitos)) ?? null;
+      existente =
+        data?.find((p) => soloDigitos(p.whatsapp ?? "").endsWith(digitos)) ??
+        null;
     }
+
+    const ahora = new Date().toISOString();
+    const paquete = {
+      paquete_adquirido: datos.detalle.slice(0, 300),
+      ...(datos.monto
+        ? {
+            costo_paquete: datos.monto,
+            costo_paquete_moneda: datos.moneda ?? "COP",
+          }
+        : {}),
+      contrato_aceptado: true,
+      contrato_aceptado_en: ahora,
+    };
 
     let prospectoId: string | null = existente?.id ?? null;
     if (prospectoId) {
-      await supabase
+      const cambios = {
+        categoria: "cliente",
+        paso_actual: "ganado",
+        updated_at: ahora,
+      };
+      const { error } = await supabase
         .from("prospectos")
-        .update({ categoria: "cliente", paso_actual: "ganado", updated_at: new Date().toISOString() })
+        .update({ ...cambios, ...paquete })
         .eq("id", prospectoId);
+      if (error)
+        await supabase.from("prospectos").update(cambios).eq("id", prospectoId);
     } else {
       const { data } = await supabase
         .from("prospectos")
@@ -57,6 +91,8 @@ export async function marcarComoCliente(supabase: SupabaseClient, datos: DatosNu
           canal_origen: "Firma de contrato en línea",
           categoria: "cliente",
           paso_actual: "ganado",
+          notas: datos.cedula ? `C.C. ${datos.cedula}` : null,
+          ...paquete,
         })
         .select("id")
         .single();
@@ -67,7 +103,7 @@ export async function marcarComoCliente(supabase: SupabaseClient, datos: DatosNu
       await supabase.from("prospecto_historial").insert({
         prospecto_id: prospectoId,
         tipo: "Contrato firmado",
-        contenido: `Firmó en línea: ${datos.detalle}.\nCopia del contrato firmado: ${datos.linkContrato}`,
+        contenido: `Firmó en línea: ${datos.detalle}.${datos.cedula ? `\nCédula: ${datos.cedula}` : ""}${datos.monto ? `\nValor: $${datos.monto.toLocaleString("es-CO")} ${datos.moneda ?? "COP"}` : ""}\nCopia del contrato firmado: ${datos.linkContrato}`,
       });
     }
   } catch {

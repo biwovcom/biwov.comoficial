@@ -8,26 +8,49 @@ export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
 
   const tipo = body?.tipo === "combo" ? "combo" : "item";
-  const itemId = String(body?.itemId ?? "").trim().slice(0, 200) || null;
-  const itemNombre = String(body?.itemNombre ?? "").trim().slice(0, 300);
-  const nombre = String(body?.nombre ?? "").trim().slice(0, 200);
-  const email = String(body?.email ?? "").trim().slice(0, 200) || null;
-  const whatsapp = String(body?.whatsapp ?? "").trim().slice(0, 50) || null;
-  const empresa = String(body?.empresa ?? "").trim().slice(0, 200) || null;
+  const itemId =
+    String(body?.itemId ?? "")
+      .trim()
+      .slice(0, 200) || null;
+  const itemNombre = String(body?.itemNombre ?? "")
+    .trim()
+    .slice(0, 300);
+  const nombre = String(body?.nombre ?? "")
+    .trim()
+    .slice(0, 200);
+  const email =
+    String(body?.email ?? "")
+      .trim()
+      .slice(0, 200) || null;
+  const whatsapp =
+    String(body?.whatsapp ?? "")
+      .trim()
+      .slice(0, 50) || null;
+  const empresa =
+    String(body?.empresa ?? "")
+      .trim()
+      .slice(0, 200) || null;
   const moneda = body?.moneda === "USD" ? "USD" : "COP";
   const monto = Number(body?.monto ?? 0);
-  const cedula = String(body?.cedula ?? "").trim().slice(0, 30);
+  const cedula = String(body?.cedula ?? "")
+    .trim()
+    .slice(0, 30);
   const snapshot = { ...(body?.snapshot ?? {}), cedula, telefono: whatsapp };
   const aceptaContrato = Boolean(body?.aceptaContrato);
   const aceptaDatos = Boolean(body?.aceptaDatos);
-  const nombreFirmante = String(body?.nombreFirmante ?? "").trim().slice(0, 200);
+  const nombreFirmante = String(body?.nombreFirmante ?? "")
+    .trim()
+    .slice(0, 200);
   const firmaImagenBase64 = String(body?.firmaImagenBase64 ?? "");
   const tiposContrato = Array.isArray(body?.tiposContrato)
     ? body.tiposContrato.filter(esTipoContrato)
     : [];
 
   if (!itemNombre || !nombre || (!email && !whatsapp)) {
-    return NextResponse.json({ error: "Escribe tu nombre y un correo o WhatsApp." }, { status: 400 });
+    return NextResponse.json(
+      { error: "Escribe tu nombre y un correo o WhatsApp." },
+      { status: 400 },
+    );
   }
   if (!aceptaContrato || !aceptaDatos || tiposContrato.length === 0) {
     return NextResponse.json(
@@ -41,33 +64,50 @@ export async function POST(request: Request) {
 
   const supabase = getSupabaseClient();
   if (!supabase) {
-    return NextResponse.json({ error: "Servicio no disponible" }, { status: 503 });
+    return NextResponse.json(
+      { error: "Servicio no disponible" },
+      { status: 503 },
+    );
   }
 
   const compraId = await insertarCompra(supabase, {
-      tipo,
-      plan_id: null,
-      item_id: itemId,
-      item_nombre: itemNombre,
-      nombre,
-      email,
-      whatsapp,
-      empresa,
-      moneda,
-      monto,
-      snapshot,
-      acepta_contrato: aceptaContrato,
-      acepta_datos: aceptaDatos,
-    });
+    tipo,
+    plan_id: null,
+    item_id: itemId,
+    item_nombre: itemNombre,
+    nombre,
+    email,
+    whatsapp,
+    empresa,
+    moneda,
+    monto,
+    snapshot,
+    acepta_contrato: aceptaContrato,
+    acepta_datos: aceptaDatos,
+  });
 
   if (!compraId) {
-    return NextResponse.json({ error: "No se pudo registrar. Intenta de nuevo." }, { status: 500 });
+    return NextResponse.json(
+      { error: "No se pudo registrar. Intenta de nuevo." },
+      { status: 500 },
+    );
   }
 
   const linkContrato = await registrarFirmas(
     supabase,
     compraId,
-    { tiposContrato, nombreFirmante, firmaImagenBase64, email, whatsapp, empresa, detalle: itemNombre },
+    {
+      tiposContrato,
+      nombreFirmante,
+      firmaImagenBase64,
+      email,
+      whatsapp,
+      empresa,
+      monto,
+      moneda,
+      cedula,
+      detalle: itemNombre,
+    },
     request,
   );
 

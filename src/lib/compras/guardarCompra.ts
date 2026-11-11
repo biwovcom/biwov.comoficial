@@ -50,8 +50,15 @@ export interface CompraNormalizada {
  * (tipo, item_id, item_nombre), la guarda con las columnas básicas y deja esos
  * datos dentro de "snapshot", para que la firma nunca falle por eso.
  */
-export async function insertarCompra(supabase: SupabaseClient, fila: FilaCompra): Promise<string | null> {
-  const completa = await supabase.from("plan_compras").insert(fila).select("id").single();
+export async function insertarCompra(
+  supabase: SupabaseClient,
+  fila: FilaCompra,
+): Promise<string | null> {
+  const completa = await supabase
+    .from("plan_compras")
+    .insert(fila)
+    .select("id")
+    .single();
   if (!completa.error && completa.data) return completa.data.id as string;
 
   const basica = await supabase
@@ -64,27 +71,53 @@ export async function insertarCompra(supabase: SupabaseClient, fila: FilaCompra)
       empresa: fila.empresa,
       moneda: fila.moneda,
       monto: fila.monto,
-      snapshot: { ...fila.snapshot, tipo: fila.tipo, item_id: fila.item_id ?? null, item_nombre: fila.item_nombre ?? null },
+      snapshot: {
+        ...fila.snapshot,
+        tipo: fila.tipo,
+        item_id: fila.item_id ?? null,
+        item_nombre: fila.item_nombre ?? null,
+      },
       acepta_contrato: fila.acepta_contrato,
       acepta_datos: fila.acepta_datos,
     })
     .select("id")
     .single();
   if (basica.error || !basica.data) {
-    console.error("No se pudo guardar la compra", completa.error?.message, basica.error?.message);
+    console.error(
+      "No se pudo guardar la compra",
+      completa.error?.message,
+      basica.error?.message,
+    );
     return null;
   }
   return basica.data.id as string;
 }
 
 /** Guarda las firmas en la tabla de firmas y, siempre, también dentro de la compra. */
-export async function guardarFirmas(supabase: SupabaseClient, compraId: string, firmas: FirmaGuardada[]) {
-  await supabase.from("contratos_firmados").insert(
-    firmas.map((f) => ({ ...f, referencia_tipo: "plan_compra", referencia_id: compraId })),
-  );
-  const { data } = await supabase.from("plan_compras").select("snapshot").eq("id", compraId).maybeSingle();
+export async function guardarFirmas(
+  supabase: SupabaseClient,
+  compraId: string,
+  firmas: FirmaGuardada[],
+) {
+  await supabase
+    .from("contratos_firmados")
+    .insert(
+      firmas.map((f) => ({
+        ...f,
+        referencia_tipo: "plan_compra",
+        referencia_id: compraId,
+      })),
+    );
+  const { data } = await supabase
+    .from("plan_compras")
+    .select("snapshot")
+    .eq("id", compraId)
+    .maybeSingle();
   const snapshot = (data?.snapshot as Record<string, unknown> | null) ?? {};
-  await supabase.from("plan_compras").update({ snapshot: { ...snapshot, firmas } }).eq("id", compraId);
+  await supabase
+    .from("plan_compras")
+    .update({ snapshot: { ...snapshot, firmas } })
+    .eq("id", compraId);
 }
 
 function normalizar(fila: Record<string, unknown>): CompraNormalizada {
@@ -95,7 +128,8 @@ function normalizar(fila: Record<string, unknown>): CompraNormalizada {
     created_at: String(fila.created_at),
     tipo,
     plan_id: tipo === "plan" ? ((fila.plan_id as string | null) ?? null) : null,
-    item_nombre: ((fila.item_nombre ?? snap.item_nombre) as string | null) ?? null,
+    item_nombre:
+      ((fila.item_nombre ?? snap.item_nombre) as string | null) ?? null,
     nombre: String(fila.nombre ?? ""),
     email: (fila.email as string | null) ?? null,
     whatsapp: (fila.whatsapp as string | null) ?? null,
@@ -110,20 +144,35 @@ function normalizar(fila: Record<string, unknown>): CompraNormalizada {
 }
 
 /** Lista de compras para el panel (sin la imagen de la firma, para que cargue rápido). */
-export async function listarCompras(supabase: SupabaseClient): Promise<CompraNormalizada[]> {
-  const { data } = await supabase.from("plan_compras").select("*").order("created_at", { ascending: false });
+export async function listarCompras(
+  supabase: SupabaseClient,
+): Promise<CompraNormalizada[]> {
+  const { data } = await supabase
+    .from("plan_compras")
+    .select("*")
+    .order("created_at", { ascending: false });
   return (data ?? []).map((f) => normalizar(f as Record<string, unknown>));
 }
 
 /** Una compra con sus firmas (de la tabla de firmas o, si no existe, de la propia compra). */
-export async function cargarCompraFirmada(supabase: SupabaseClient, id: string): Promise<CompraNormalizada | null> {
-  const { data } = await supabase.from("plan_compras").select("*").eq("id", id).maybeSingle();
+export async function cargarCompraFirmada(
+  supabase: SupabaseClient,
+  id: string,
+): Promise<CompraNormalizada | null> {
+  const { data } = await supabase
+    .from("plan_compras")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
   if (!data) return null;
   const compra = normalizar(data as Record<string, unknown>);
   const { data: firmas, error } = await supabase
     .from("contratos_firmados")
-    .select("tipo_contrato, version_contrato, nombre_firmante, firma_imagen, ip, created_at")
+    .select(
+      "tipo_contrato, version_contrato, nombre_firmante, firma_imagen, ip, created_at",
+    )
     .eq("referencia_id", id);
-  if (!error && firmas && firmas.length > 0) compra.firmas = firmas as FirmaGuardada[];
+  if (!error && firmas && firmas.length > 0)
+    compra.firmas = firmas as FirmaGuardada[];
   return compra;
 }
