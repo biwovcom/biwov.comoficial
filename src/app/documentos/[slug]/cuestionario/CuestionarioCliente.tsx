@@ -11,7 +11,7 @@ import { linkWhatsApp } from "@/lib/panel/whatsapp";
  * mientras la persona escribe (puede cerrar y volver) y se envían por
  * WhatsApp, por correo o se descargan en PDF.
  */
-export function CuestionarioCliente({ d }: { d: DocumentosCliente }) {
+export function CuestionarioCliente({ d, porProspecto = false }: { d: DocumentosCliente; porProspecto?: boolean }) {
   const KEY = `biwov-cuestionario-${d.slug}`;
   const preguntas = useMemo(
     () => d.cuestionario.grupos.flatMap((g) => g.preguntas),
@@ -54,7 +54,7 @@ export function CuestionarioCliente({ d }: { d: DocumentosCliente }) {
         const r = await fetch("/api/documentos/cuestionario", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ slug: d.slug, respuestas: respRef.current, enviado: final }),
+          body: JSON.stringify({ ...(porProspecto ? { prospectoId: d.prospectoId } : { slug: d.slug }), respuestas: respRef.current, enviado: final }),
           keepalive: true,
         });
         setEstadoNube(r.ok ? "ok" : "error");
@@ -64,7 +64,7 @@ export function CuestionarioCliente({ d }: { d: DocumentosCliente }) {
         return false;
       }
     },
-    [d.slug],
+    [d.slug, d.prospectoId, porProspecto],
   );
 
   useEffect(() => {

@@ -25,6 +25,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
     pathname?.startsWith("/cotizacion") ||
     pathname?.startsWith("/propuesta") ||
     pathname?.startsWith("/documentos") ||
+    pathname?.startsWith("/inicio") ||
     pathname?.startsWith("/contrato-firmado");
 
   // Permite compartir un link directo (ej: biwov.com/?diagnostico=1) que

@@ -201,3 +201,89 @@ export const DOCUMENTOS_CLIENTES: DocumentosCliente[] = [ORTODONCIA];
 
 export const documentosPorSlug = (slug: string) =>
   DOCUMENTOS_CLIENTES.find((d) => d.slug === slug);
+
+/**
+ * Cuestionario de inicio GENERAL: sirve para cualquier cliente que firme, sin programar nada.
+ * Se abre en /inicio/<id del prospecto> (el enlace se copia desde su ficha en el panel) y las
+ * respuestas quedan en el Historial de ese mismo prospecto (no se crea otro registro).
+ */
+export const CUESTIONARIO_GENERAL: DocumentosCliente["cuestionario"] = {
+  intro:
+    "Este cuestionario es la base de todo el trabajo. Con tus respuestas analizamos tu negocio y tus redes, definimos a quién le vamos a hablar, cuánto y cómo invertir en publicidad, qué contenido vamos a crear y armamos el plan de trabajo. Responde con la mayor claridad posible; si no sabes un dato exacto, un aproximado nos sirve.",
+  grupos: [
+    {
+      titulo: "Tus sueños y metas",
+      preguntas: [
+        "Si tuvieras una lámpara mágica y pudieras pedir un deseo para tu negocio, ¿qué pedirías?",
+        "Al terminar nuestro trabajo juntos, ¿qué resultado haría que digas “valió la pena”? (por ejemplo: cuántos clientes nuevos al mes, cuánto vender, cuántos seguidores o reseñas)",
+      ],
+    },
+    {
+      titulo: "Tu negocio",
+      preguntas: [
+        "Cuéntanos tu negocio en pocas palabras: qué vendes, desde cuándo y cómo empezó.",
+        "¿Cuáles son tus redes, página web y datos oficiales de contacto (WhatsApp, dirección, horario)?",
+      ],
+    },
+    {
+      titulo: "Tus clientes y tu mercado",
+      preguntas: [
+        "¿A quién le quieres llegar? Describe a las personas que más quieres atender: edad, si son hombres o mujeres, a qué se dedican y qué tanto pueden invertir.",
+        "¿En qué zona los quieres atraer? ¿Solo en tu ciudad, en otros municipios, en todo el país o fuera de Colombia?",
+        "¿Qué problemas, molestias o necesidades tienen tus clientes cuando te buscan? ¿Qué es lo que más les preocupa?",
+        "¿Qué dudas o miedos te expresan antes de comprar (precio, tiempo, confianza, forma de pago)?",
+        "¿Por qué te eligen tus clientes a ti? ¿Qué te dicen después de comprar?",
+      ],
+    },
+    {
+      titulo: "Tus productos o servicios y precios",
+      preguntas: [
+        "¿Cuál es tu producto o servicio más económico, cuál le sigue y cuál es el más caro? Escribe el precio aproximado de cada uno y qué tipo de cliente lo compra. ¿Cuál te deja más ganancia?",
+        "¿Qué productos o servicios quieres posicionar primero y por qué?",
+        "¿Qué formas de pago, financiación o descuentos ofreces?",
+        "¿Cuántos clientes nuevos más puedes atender al mes?",
+        "¿Tienes temporadas o fechas fuertes en el año (vacaciones, primas, regreso a clases, fin de año)?",
+      ],
+    },
+    {
+      titulo: "Tu propuesta de valor",
+      preguntas: [
+        "¿Cuál es tu propuesta de valor? Es decir, ¿qué ofreces que te hace diferente y por qué deberían elegirte a ti y no a otro?",
+        "¿Quiénes son tus competidores directos (nombres o cuentas de Instagram) y en qué te diferencias de cada uno?",
+      ],
+    },
+    {
+      titulo: "Mensajes, seguimiento y ventas",
+      preguntas: [
+        "Cuando pagabas publicidad, ¿cuántos mensajes o consultas te llegaban al mes? ¿Y cuántos te llegan ahora, sin publicidad? ¿Por dónde llegan (WhatsApp, Instagram, Facebook, llamadas, referidos, Google)?",
+        "De esos mensajes, ¿cuántos terminan comprando? ¿Cuánto compra en promedio un cliente nuevo?",
+        "¿Quién responde los mensajes, en cuánto tiempo y qué se les dice? Si tienes un mensaje o guion de respuesta, cópialo aquí.",
+        "¿Cómo responden las personas interesadas? ¿Muchas solo preguntan el precio y dejan de contestar? Más o menos, ¿cuántas de cada 10 se quedan sin respuesta? ¿Qué haces cuando alguien pregunta y no vuelve a escribir?",
+        "¿Cada cuánto les haces seguimiento a las personas interesadas que no compraron, y cómo (mensaje de WhatsApp, llamada, audio, promoción, ninguno)?",
+        "¿Cómo llevas el registro de tus clientes y de las personas interesadas (cuaderno, Excel, etiquetas de WhatsApp Business, otro sistema)?",
+      ],
+    },
+    {
+      titulo: "Publicidad",
+      preguntas: [
+        "¿Cuánto puedes invertir al mes en publicidad (aparte del pago a la agencia)? ¿Quién recarga el saldo, con qué medio de pago y cada cuánto?",
+        "En tu experiencia, ¿qué publicidad te ha funcionado y cuál no? ¿Quién manejaba antes tus anuncios?",
+        "¿Tienes cuenta publicitaria y portafolio comercial en Meta? ¿Nos autorizas a agregar a biwov_ como socia para manejar los anuncios sin usar tu sesión personal?",
+      ],
+    },
+    {
+      titulo: "Marca, grabación y agenda",
+      preguntas: [
+        "¿Tienes logo, colores y tipografías oficiales (archivos originales)?",
+        "¿Qué días y en qué horarios de la semana se puede grabar el contenido? ¿Quién aparecerá en los videos?",
+        "¿Qué días y en qué horarios tienes disponibilidad en la semana para nuestras reuniones de seguimiento? Danos dos o tres opciones.",
+        "¿Tienes fotos, videos o testimonios de clientes que podamos usar? ¿Hay clientes contentos a quienes les podamos pedir una reseña?",
+        "¿Hay temas o cosas que NO quieres mostrar en tus redes? ¿Qué temas te gusta explicar y te salen naturales?",
+      ],
+    },
+  ],
+};
+
+/** Documento propio (con análisis a la medida) si el prospecto ya lo tiene. */
+export const documentosPorProspecto = (prospectoId: string) =>
+  DOCUMENTOS_CLIENTES.find((d) => d.prospectoId === prospectoId);

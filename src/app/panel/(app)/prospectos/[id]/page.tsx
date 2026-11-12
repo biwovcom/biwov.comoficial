@@ -26,6 +26,8 @@ import { EditarDatosContacto } from "@/components/panel/EditarDatosContacto";
 import { PaqueteClienteForm } from "@/components/panel/PaqueteClienteForm";
 import { ContratosFirmadosCliente, comprasDelProspecto } from "@/components/panel/ContratosFirmadosCliente";
 import { listarCompras } from "@/lib/compras/guardarCompra";
+import { CuestionarioInicioCliente } from "@/components/panel/CuestionarioInicioCliente";
+import { documentosPorProspecto } from "@/data/documentosClientes";
 import type { RespuestasDiagnosticoLargo } from "@/lib/panel/diagnosticoLargo";
 
 interface FiltroRespuestaFila {
@@ -56,6 +58,17 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
   }
 
   const contratosFirmados = comprasDelProspecto(await listarCompras(supabase), prospecto);
+
+  // Inicio del proyecto: cuestionario del cliente (respuestas guardadas en su Historial)
+  const { data: cuestionarioInicio } = await supabase
+    .from("prospecto_historial")
+    .select("contenido, created_at")
+    .eq("prospecto_id", prospecto.id)
+    .eq("tipo", "Cuestionario de inicio")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle<{ contenido: string; created_at: string }>();
+  const docsPropios = documentosPorProspecto(prospecto.id);
 
   const { data: filtro } = await supabase
     .from("filtro_respuestas")
@@ -240,6 +253,14 @@ export default async function ProspectoPage({ params }: { params: Promise<{ id: 
         </GlassCard>
 
         <ContratosFirmadosCliente compras={contratosFirmados} />
+
+        {(prospecto.categoria === "cliente" || cuestionarioInicio) && (
+          <CuestionarioInicioCliente
+            ruta={docsPropios ? `/documentos/${docsPropios.slug}/cuestionario` : `/inicio/${prospecto.id}`}
+            documentos={docsPropios ? `/documentos/${docsPropios.slug}` : undefined}
+            respuestas={cuestionarioInicio ?? null}
+          />
+        )}
 
         <GlassCard className="p-6">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-text-secondary">
