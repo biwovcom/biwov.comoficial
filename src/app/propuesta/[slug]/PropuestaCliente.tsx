@@ -83,7 +83,9 @@ export function PropuestaCliente({ propuesta: p }: { propuesta: Propuesta }) {
       !datos.telefono.trim() ||
       !datos.fechaInicio
     ) {
-      setError("Completa tu nombre, cédula, correo, teléfono y la fecha de inicio.");
+      setError(
+        "Completa tu nombre, cédula, correo, teléfono y la fecha de inicio.",
+      );
       return;
     }
     if (!aceptaContrato || !aceptaDatos) {
@@ -168,38 +170,22 @@ export function PropuestaCliente({ propuesta: p }: { propuesta: Propuesta }) {
         </p>
 
         <div className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-4">
-          {[
-            {
-              icono: Video,
-              etiqueta: "Contenido",
-              valor: "12 guiones + 3 reels por semana",
-            },
-            {
-              icono: Clock,
-              etiqueta: "Duración",
-              valor: `${p.duracionMeses} meses (mínimo)`,
-            },
-            {
-              icono: Wallet,
-              etiqueta: "Inversión",
-              valor: `${copPropuesta(p.valorMensual)} / mes`,
-            },
-            {
-              icono: Users,
-              etiqueta: "Acompañamiento",
-              valor: "1 reunión virtual por semana",
-            },
-          ].map((d) => (
-            <div key={d.etiqueta} className="card-universo rounded-3xl p-5">
-              <d.icono className="h-5 w-5 text-accent" />
-              <p className="mt-4 text-xs uppercase tracking-[0.16em] text-text-secondary">
-                {d.etiqueta}
-              </p>
-              <p className="mt-1 text-base font-semibold leading-snug md:text-lg">
-                {d.valor}
-              </p>
-            </div>
-          ))}
+          {p.tarjetas
+            .map((t, i) => ({
+              ...t,
+              icono: [Video, Clock, Wallet, Users][i % 4],
+            }))
+            .map((d) => (
+              <div key={d.etiqueta} className="card-universo rounded-3xl p-5">
+                <d.icono className="h-5 w-5 text-accent" />
+                <p className="mt-4 text-xs uppercase tracking-[0.16em] text-text-secondary">
+                  {d.etiqueta}
+                </p>
+                <p className="mt-1 text-base font-semibold leading-snug md:text-lg">
+                  {d.valor}
+                </p>
+              </div>
+            ))}
         </div>
 
         <a href="#firmar" className="mt-10 inline-block">
@@ -316,10 +302,10 @@ export function PropuestaCliente({ propuesta: p }: { propuesta: Propuesta }) {
           </div>
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">
-              Pagas tú, directo al proveedor
+              {p.herramientasSubtitulo}
             </p>
             <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] md:text-4xl">
-              Herramientas
+              {p.herramientasTitulo}
             </h2>
             <div className="mt-6 space-y-3">
               {p.herramientas.map((h) => (
@@ -347,8 +333,8 @@ export function PropuestaCliente({ propuesta: p }: { propuesta: Propuesta }) {
           Inversión
         </p>
         <h2 className="mt-3 text-4xl font-semibold tracking-[-0.04em] md:text-5xl">
-          {copPropuesta(p.valorMensual)}{" "}
-          <span className="text-text-secondary">al mes</span>
+          {p.pago.titulo}{" "}
+          <span className="text-text-secondary">{p.pago.subtitulo}</span>
         </h2>
         <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
           <div className="card-universo rounded-[1.75rem] p-6">
@@ -359,30 +345,21 @@ export function PropuestaCliente({ propuesta: p }: { propuesta: Propuesta }) {
               {copPropuesta(p.pago.totalContrato)}
             </p>
           </div>
-          <div className="card-universo rounded-[1.75rem] p-6">
-            <p className="text-xs uppercase tracking-[0.16em] text-text-secondary">
-              Canje
-            </p>
-            <p className="mt-2 text-3xl font-semibold">
-              {copPropuesta(p.pago.canje.valor)}
-            </p>
-            <p className="mt-2 text-sm text-text-secondary">
-              {p.pago.canje.concepto}
-            </p>
-          </div>
-          <div className="card-universo rounded-[1.75rem] p-6">
-            <p className="text-xs uppercase tracking-[0.16em] text-text-secondary">
-              Saldo en efectivo
-            </p>
-            <p className="mt-2 text-3xl font-semibold">
-              {copPropuesta(p.pago.saldo.valor)}
-            </p>
-            <ul className="mt-2 space-y-1 text-sm text-text-secondary">
-              {p.pago.saldo.condiciones.map((c) => (
-                <li key={c}>{c}</li>
-              ))}
-            </ul>
-          </div>
+          {p.pago.lineas.map((l) => (
+            <div key={l.titulo} className="card-universo rounded-[1.75rem] p-6">
+              <p className="text-xs uppercase tracking-[0.16em] text-text-secondary">
+                {l.titulo}
+              </p>
+              <p className="mt-2 text-3xl font-semibold">
+                {copPropuesta(l.valor)}
+              </p>
+              <ul className="mt-2 space-y-1 text-sm text-text-secondary">
+                {l.detalle.map((c) => (
+                  <li key={c}>{c}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -476,9 +453,7 @@ export function PropuestaCliente({ propuesta: p }: { propuesta: Propuesta }) {
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="p-empresa">
-                    Nombre del consultorio (opcional)
-                  </Label>
+                  <Label htmlFor="p-empresa">{p.etiquetaEmpresa}</Label>
                   <Input
                     id="p-empresa"
                     autoComplete="organization"
@@ -566,7 +541,12 @@ export function PropuestaCliente({ propuesta: p }: { propuesta: Propuesta }) {
       <footer className="border-t border-border-glass">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-8 text-xs text-text-secondary md:flex-row md:justify-between md:px-8">
           <span>biwov_ · Katherine Usma Aristizábal · Manizales, Colombia</span>
-          <a href="/" target="_blank" rel="noopener noreferrer" className="text-accent hover:text-white">
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent hover:text-white"
+          >
             Visita el sitio web de biwov →
           </a>
         </div>

@@ -146,14 +146,7 @@ export function ContratoPropuesta({
         </Clausula>
 
         <Clausula n={sig()} titulo="Objeto">
-          <p>
-            LA CONTRATISTA prestará a LA CONTRATANTE el servicio de dirección y
-            acompañamiento en marketing digital descrito en este contrato (
-            {p.titulo.toLowerCase()}), con campañas publicitarias en Meta,
-            lineamientos para generar comunidad, guiones de contenido,
-            configuración de herramientas e implementación de inteligencia
-            artificial, durante {p.duracionMeses} meses.
-          </p>
+          <p>{p.objeto}</p>
         </Clausula>
 
         <Clausula n={sig()} titulo="Alcance: lo que incluye">
@@ -166,14 +159,7 @@ export function ContratoPropuesta({
         </Clausula>
 
         <Clausula n={sig()} titulo="Plan de trabajo y metodología">
-          <p>
-            Primero se planea y después se ejecuta. Una vez firmado el contrato
-            se inicia el diagnóstico, la revisión de redes sociales y de
-            configuraciones, y se envía a LA CONTRATANTE el plan de trabajo con
-            la planeación, la ejecución y los objetivos. La instalación de
-            herramientas se hace de manera presencial y el acompañamiento
-            continúa con una reunión virtual a la semana.
-          </p>
+          <p>{p.metodologia}</p>
           <Lista
             items={p.plan.map((e) => (
               <>
@@ -188,13 +174,7 @@ export function ContratoPropuesta({
 
         <Clausula n={sig()} titulo="Compromisos de LA CONTRATANTE">
           <Lista items={p.compromisosCliente} />
-          <p>
-            La grabación y la edición de los videos son responsabilidad de LA
-            CONTRATANTE. LA CONTRATISTA la guiará durante todo el proceso y le
-            enseñará marketing digital para que pueda trabajarlo de la mejor
-            manera posible. Los guiones o piezas que no se graben o publiquen en
-            el mes no se acumulan.
-          </p>
+          <p>{p.notaCompromisos}</p>
         </Clausula>
 
         <Clausula n={sig()} titulo="Lo que no incluye">
@@ -225,32 +205,16 @@ export function ContratoPropuesta({
         </Clausula>
 
         <Clausula n={sig()} titulo="Valor y forma de pago">
-          <p>
-            El valor del servicio es de{" "}
-            <strong className="text-[#0f172a]">
-              {copPropuesta(p.valorMensual)} COP mensuales
-            </strong>
-            , para un total de{" "}
-            <strong className="text-[#0f172a]">
-              {copPropuesta(p.pago.totalContrato)} COP
-            </strong>{" "}
-            por los {p.duracionMeses} meses. Se paga así:
-          </p>
+          <p>{p.pago.clausula}</p>
           <Lista
-            items={[
-              <>
-                <strong className="text-[#0f172a]">Canje:</strong>{" "}
-                {p.pago.canje.concepto}, valorado en{" "}
-                {copPropuesta(p.pago.canje.valor)} COP, que se abona al valor de
-                este contrato.
-              </>,
+            items={p.pago.lineas.map((l) => (
               <>
                 <strong className="text-[#0f172a]">
-                  Saldo en efectivo: {copPropuesta(p.pago.saldo.valor)} COP.
+                  {l.titulo}: {copPropuesta(l.valor)} COP.
                 </strong>{" "}
-                {p.pago.saldo.condiciones.join(" ")}
-              </>,
-            ]}
+                {l.detalle.join(" ")}
+              </>
+            ))}
           />
           <p>
             Los valores no incluyen la inversión en pauta ni el costo de
@@ -259,10 +223,7 @@ export function ContratoPropuesta({
         </Clausula>
 
         <Clausula n={sig()} titulo="Herramientas y costos de terceros">
-          <p>
-            LA CONTRATANTE paga directamente las herramientas que necesita. LA
-            CONTRATISTA la asesora y le instala el programa.
-          </p>
+          <p>{p.herramientasIntro}</p>
           <Lista
             items={p.herramientas.map((h) => (
               <>
@@ -283,22 +244,18 @@ export function ContratoPropuesta({
           titulo="Políticas de Meta, plataformas y resultados"
         >
           <p>
-            Las campañas y herramientas dependen de plataformas de terceros
-            (Meta, Instagram, Facebook, WhatsApp, Claude, ChatGPT, entre otras),
-            que pueden cambiar sus políticas, costos y funcionamiento en
-            cualquier momento. LA CONTRATISTA no se hace responsable por
-            rechazos de anuncios, restricciones o bloqueos de cuentas, cambios
-            de políticas o de precios de estas plataformas, ni por el contenido
-            que LA CONTRATANTE grabe, edite o publique.
+            Las campañas y herramientas dependen de plataformas de terceros (
+            {p.plataformas}), que pueden cambiar sus políticas, costos y
+            funcionamiento en cualquier momento. LA CONTRATISTA no se hace
+            responsable por rechazos de anuncios, restricciones o bloqueos de
+            cuentas, cambios de políticas o de precios de estas plataformas, ni
+            por el contenido que LA CONTRATANTE grabe, edite o publique.
           </p>
+          {p.parrafoSector && <p>{p.parrafoSector}</p>}
           <p>
-            Los anuncios de servicios de salud deben cumplir las políticas de
-            publicidad de Meta y las normas colombianas sobre publicidad de
-            servicios de salud; LA CONTRATANTE responde por la veracidad de lo
-            que se anuncia de su consultorio. La obligación de LA CONTRATISTA es
-            de medio y no de resultado: aplica su experiencia y buenas
-            prácticas, pero no garantiza un número específico de seguidores,
-            mensajes, citas o ventas.
+            La obligación de LA CONTRATISTA es de medio y no de resultado:
+            aplica su experiencia y buenas prácticas, pero no garantiza un
+            número específico de seguidores, mensajes, citas o ventas.
           </p>
         </Clausula>
 
@@ -309,7 +266,7 @@ export function ContratoPropuesta({
               "LA CONTRATISTA las usa únicamente para ejecutar el servicio contratado. No las comparte, no las vende y no las divulga a terceros; si un aliado de LA CONTRATISTA necesita un acceso para cumplir el servicio, lo recibe con la misma obligación de reserva.",
               "Siempre que la plataforma lo permita, se trabajará con accesos por rol o invitación (por ejemplo, el administrador comercial de Meta) en lugar de la contraseña principal.",
               "Las claves se guardan de forma segura y no se piden ni se envían por canales públicos o abiertos.",
-              "LA CONTRATISTA no cambia contraseñas, correos de recuperación ni la titularidad de las cuentas sin autorización escrita dLA CONTRATANTE. LA CONTRATANTE sigue siendo el único dueño de sus cuentas.",
+              "LA CONTRATISTA no cambia contraseñas, correos de recuperación ni la titularidad de las cuentas sin autorización escrita de LA CONTRATANTE. LA CONTRATANTE sigue siendo la única dueña de sus cuentas.",
               "Al terminar el contrato, LA CONTRATISTA retira sus accesos y LA CONTRATANTE debe cambiar las contraseñas que haya compartido.",
               "LA CONTRATANTE es responsable de activar la verificación en dos pasos y de la seguridad general de sus cuentas. LA CONTRATISTA no responde por accesos indebidos de terceros ajenos a LA CONTRATISTA.",
               "Esta obligación de confidencialidad sigue vigente después de terminado el contrato.",
@@ -319,12 +276,12 @@ export function ContratoPropuesta({
 
         <Clausula n={sig()} titulo="Confidencialidad y datos personales">
           <p>
-            Las partes guardarán reserva sobre la información del negocio y de
-            los pacientes a la que tengan acceso. LA CONTRATANTE autoriza a LA
-            CONTRATISTA a tratar sus datos personales para ejecutar este
-            contrato, conforme a la Ley 1581 de 2012 y a la política de
-            tratamiento de datos de biwov (biwov.com/politica-datos). LA
-            CONTRATANTE es dueña de su contenido y de sus cuentas.
+            Las partes guardarán reserva sobre {p.reservaSobre} a la que tengan
+            acceso. LA CONTRATANTE autoriza a LA CONTRATISTA a tratar sus datos
+            personales para ejecutar este contrato, conforme a la Ley 1581 de
+            2012 y a la política de tratamiento de datos de biwov
+            (biwov.com/politica-datos). LA CONTRATANTE es dueña de su contenido
+            y de sus cuentas.
           </p>
         </Clausula>
 
