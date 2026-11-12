@@ -24,7 +24,7 @@ export function CuestionarioInicioCliente({
   const [abierto, setAbierto] = useState(false);
   const enlace = documentos ?? ruta;
   const estado = respuestas?.contenido.split("\n")[0] ?? "";
-  const cuerpo = respuestas?.contenido.split("\n").slice(2).join("\n") ?? "";
+  const cuerpo = respuestas?.contenido.split("\n").slice(1).join("\n").trim() ?? "";
 
   const copiar = async () => {
     await navigator.clipboard.writeText(`${window.location.origin}${enlace}`);

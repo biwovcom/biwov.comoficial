@@ -25,17 +25,25 @@ export async function POST(request: Request) {
   // Dos formas de llegar: /documentos/<slug> (cliente con documentos a la medida) o
   // /inicio/<id del prospecto> (cuestionario general para cualquier cliente).
   let prospectoId: string | undefined;
+  let cliente = "";
   let cuestionario = CUESTIONARIO_GENERAL;
   if (body.slug) {
     const d = documentosPorSlug(body.slug);
     if (!d?.prospectoId) return NextResponse.json({ error: "Documento no encontrado" }, { status: 404 });
     prospectoId = d.prospectoId;
+    cliente = d.cliente;
     cuestionario = d.cuestionario;
   } else if (body.prospectoId && /^[0-9a-f-]{36}$/i.test(body.prospectoId)) {
-    const { data: p } = await supabase.from("prospectos").select("id").eq("id", body.prospectoId).maybeSingle();
+    const { data: p } = await supabase
+      .from("prospectos")
+      .select("id, nombre, empresa")
+      .eq("id", body.prospectoId)
+      .maybeSingle<{ id: string; nombre: string; empresa: string | null }>();
     if (!p) return NextResponse.json({ error: "Cliente no encontrado" }, { status: 404 });
     prospectoId = body.prospectoId;
-    cuestionario = documentosPorProspecto(prospectoId)?.cuestionario ?? CUESTIONARIO_GENERAL;
+    const propio = documentosPorProspecto(prospectoId);
+    cliente = propio?.cliente ?? (p.empresa?.trim() ? `${p.empresa.trim()} (${p.nombre.trim()})` : p.nombre.trim());
+    cuestionario = propio?.cuestionario ?? CUESTIONARIO_GENERAL;
   } else {
     return NextResponse.json({ error: "Documento no encontrado" }, { status: 404 });
   }
@@ -63,7 +71,7 @@ export async function POST(request: Request) {
     return `■ ${g.titulo.toUpperCase()}\n\n${qs.join("\n\n")}`;
   });
   const estado = body.enviado ? "✅ ENVIADO por el cliente" : "✏️ En progreso (se guarda solo mientras escribe)";
-  const contenido = `${estado} · ${respondidas} de ${preguntas.length} respondidas · última actualización: ${ahora}\n\n${bloques.join("\n\n")}`;
+  const contenido = `${estado} · ${respondidas} de ${preguntas.length} respondidas · última actualización: ${ahora}\nCliente: ${cliente}\n\n${bloques.join("\n\n")}`;
 
   const { data: existente } = await supabase
     .from("prospecto_historial")
