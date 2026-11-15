@@ -4,23 +4,38 @@ import "./globals.css";
 import { QuoterProvider } from "@/components/quoter/QuoterProvider";
 import { SiteChrome } from "@/components/layout/SiteChrome";
 import { INSTAGRAM_BIWOV, INSTAGRAM_KATHE, TIKTOK_KATHE, WHATSAPP_BIWOV } from "@/lib/contacto";
+import { PLANES_CLIENTES } from "@/data/portafolioClientes";
 
 const organizationJsonLd = {
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@type": "Organization",
+      "@type": ["Organization", "ProfessionalService"],
       "@id": "https://biwov.com/#organizacion",
       name: "biwov",
       alternateName: ["biwov_", "Kathe Digital"],
       url: "https://biwov.com",
       logo: "https://biwov.com/icon.svg",
       description:
-        "Agencia de marketing digital y automatización para negocios en Colombia y Latinoamérica: páginas web, CRM, producción de contenido, campañas en Meta y automatización de WhatsApp con inteligencia artificial conectados en un solo sistema.",
+        "Agencia de ecosistemas digitales con agentes de inteligencia artificial para empresarios en Colombia y Latinoamérica. Integra cuatro capacidades: estrategia de crecimiento empresarial; ecosistemas digitales y embudos de conversión; automatización de procesos comerciales e IA (WhatsApp, CRM, chatbots y agentes); y publicidad digital con análisis de resultados.",
       slogan: "Tu negocio puede vender más y mejor.",
       foundingDate: "2023-08",
       address: { "@type": "PostalAddress", addressLocality: "Manizales", addressRegion: "Caldas", addressCountry: "CO" },
       areaServed: ["Manizales", "Caldas", "Colombia", "Latinoamérica"],
+      telephone: WHATSAPP_BIWOV,
+      priceRange: "$$",
+      hasOfferCatalog: {
+        "@type": "OfferCatalog",
+        name: "Planes biwov para empresarios",
+        url: "https://biwov.com/planes",
+        itemListElement: PLANES_CLIENTES.map((p) => ({
+          "@type": "Offer",
+          url: `https://biwov.com/planes/${p.slug}`,
+          price: p.precio,
+          priceCurrency: "COP",
+          itemOffered: { "@type": "Service", name: p.nombre, description: p.gancho },
+        })),
+      },
       knowsLanguage: "es",
       knowsAbout: [
         "Marketing digital",
@@ -30,7 +45,11 @@ const organizationJsonLd = {
         "Automatización con inteligencia artificial",
         "Landing pages y sitios web",
         "Producción de contenido para redes sociales",
-        "SEO y GEO",
+        "SEO, GEO y AEO (posicionamiento en buscadores y en respuestas de inteligencia artificial)",
+        "Meta Advantage+ y Andromeda",
+        "Google Ads y Performance Max",
+        "Agentes de IA para marketing",
+        "Estrategia de crecimiento empresarial",
       ],
       sameAs: [INSTAGRAM_BIWOV],
       contactPoint: {

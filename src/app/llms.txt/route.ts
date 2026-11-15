@@ -1,3 +1,4 @@
+import { PLANES_CLIENTES, MESES_MINIMOS } from "@/data/portafolioClientes";
 import { PLANES, DURACION_MINIMA_MESES } from "@/data/planes";
 import { LINEAS } from "@/data/lineas";
 import { EXTRAS_COTIZABLES, CATEGORIAS_POR_LINEA } from "@/data/extrasCotizables";
@@ -75,9 +76,17 @@ ${articulos}
 - WhatsApp: +57 313 312 5157
 - Instagram: https://www.instagram.com/biwov_/
 
+## Planes estándar para empresarios
+
+${PLANES_CLIENTES.map((p) => `- **${p.nombre}**: ${cop(p.precio)} ${p.unidad}${p.adicional ? ` + ${p.adicional.label} ${cop(p.adicional.precio)}` : ""}. ${p.gancho} (https://biwov.com/planes/${p.slug})`).join("\n")}
+
+Permanencia mínima de ${MESES_MINIMOS} meses en los planes mensuales. Pago mes a mes sin descuento; por adelantado 10% (4 meses) o 20% (anual). Los costos de plataformas (pauta, mensajes de WhatsApp API, tokens de IA y herramientas externas) los paga el cliente directamente.
+
 ## Páginas principales
 
 - https://biwov.com — inicio: servicios, casos de éxito y preguntas frecuentes
+- https://biwov.com/planes — planes estándar para empresarios, en escalera de valor (capacitación, asesoría, agencia completa, campañas, automatización y agentes de IA)
+- https://biwov.com/agencia-ia — biwov Agentes: agencia de marketing con agentes de IA y la memoria de cada marca
 - https://biwov.com/tienda — planes y servicios con precios
 - https://biwov.com/blog — blog de marketing digital
 - https://biwov.com/kathe — perfil de la fundadora
