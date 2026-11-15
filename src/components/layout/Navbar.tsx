@@ -1,5 +1,6 @@
 "use client";
 
+import { PORTAL_CLIENTES } from "@/data/hotmart";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
@@ -73,6 +74,9 @@ export function Navbar() {
           >
             Diagnóstico gratis
           </button>
+          <a href={PORTAL_CLIENTES} className="text-[15px] font-medium whitespace-nowrap text-white/85 transition-colors hover:text-accent">
+            Iniciar sesión
+          </a>
           <a
             href={linkWhatsApp(WHATSAPP_BIWOV, MENSAJE_WHATSAPP_BIWOV)}
             target="_blank"
@@ -113,6 +117,9 @@ export function Navbar() {
                   {link.label}
                 </a>
               ))}
+              <a href={PORTAL_CLIENTES} className="rounded-xl px-3 py-3 text-base text-text-secondary transition-colors hover:bg-white/[0.05] hover:text-white">
+                Iniciar sesión (clientes)
+              </a>
               <Button size="md" variant="secondary" className="mt-2 w-full" onClick={cerrarYDiagnostico}>
                 Diagnóstico gratis
               </Button>

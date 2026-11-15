@@ -14,6 +14,8 @@ import { FooterClaro, HeaderClaro, waBiwov } from "@/components/claro/ChromeClar
 import { formatCopEnMoneda, type Moneda } from "@/lib/moneda";
 import { useTRM } from "@/hooks/useTRM";
 import { cn } from "@/lib/utils";
+import { DemoAgencia } from "./DemoAgencia";
+import { PORTAL_CLIENTES, checkoutDe } from "@/data/hotmart";
 
 const MSG = "Hola, quiero mi agencia de agentes de IA de biwov.";
 /** Paleta biwov: navy + cian de la marca y un lima eléctrico como color vivo. */
@@ -77,16 +79,6 @@ const CEREBRO = [
   { doc: "Cliente ideal y su forma de hablar", tag: "3 perfiles", i: Users },
   { doc: "Servicios, precios y ofertas", tag: "Catálogo", i: ClipboardCheck },
   { doc: "Objetivos y plan del mes", tag: "En curso", i: Target },
-];
-
-/** Ejemplos de entregables (marcas ficticias, marcados como ejemplo). */
-const EJEMPLOS = [
-  { tipo: "Guion de reel", marca: "Café Andino", fondo: "bg-[#eef9fd]", titulo: "Tu café no se enfría por la mañana. Se enfría por la falta de rito.", pie: "Gancho · 3 escenas · caption" },
-  { tipo: "Carrusel", marca: "Clínica Sonríe", fondo: "bg-[#f3fbdc]", titulo: "5 señales de que tu sonrisa pide una valoración", pie: "7 láminas · texto y diseño" },
-  { tipo: "Anuncio", marca: "Hotel Mirador", fondo: "bg-[#e8eef6]", titulo: "Un fin de semana entre montañas, a 30 minutos de la ciudad", pie: "3 variantes para probar" },
-  { tipo: "Manual de marca", marca: "Taller Ruana", fondo: "bg-[#eef9fd]", titulo: "Logo, paleta y tipografías con la historia de la marca", pie: "Hecho por Scher" },
-  { tipo: "Plan de contenido", marca: "Moda Kaldas", fondo: "bg-[#f3fbdc]", titulo: "12 publicaciones del mes con su objetivo y su guion", pie: "Calendario mensual" },
-  { tipo: "Radar semanal", marca: "biwov", fondo: "bg-[#eef3f8]", titulo: "Lo que cambió en Meta, TikTok e IA esta semana", pie: "Hecho por Toffler" },
 ];
 
 const POR_QUE = [
@@ -208,7 +200,7 @@ export function AgenciaIA() {
               Empezar ahora <ArrowRight className="h-5 w-5" />
             </a>
             <a href="#ejemplos" className="rounded-full border border-white/25 px-8 py-4 font-bold text-white transition-colors hover:border-[#00c2e8] hover:text-[#00c2e8]">
-              Ver ejemplos
+              Ver cómo funciona
             </a>
           </motion.div>
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }} className="mt-8 flex flex-wrap justify-center gap-x-7 gap-y-2 text-sm font-semibold text-white/75">
@@ -366,30 +358,18 @@ export function AgenciaIA() {
         </div>
       </section>
 
-      {/* ───────── EJEMPLOS (en movimiento) ───────── */}
-      <section id="ejemplos" className="scroll-mt-20 bg-[#f6f8fa] py-20">
+      {/* ───────── CÓMO FUNCIONA (video demo) ───────── */}
+      <section id="ejemplos" className="scroll-mt-20 bg-[#eef9fd] py-20">
         <motion.div {...aparecer} className="mx-auto max-w-4xl px-5 text-center">
-          <h2 className="font-heading text-4xl font-extrabold md:text-6xl">Así se ven las entregas de tu equipo</h2>
-          <p className="mt-4 text-[#0a2642]/60">Ejemplos con marcas ficticias para que veas el tipo de trabajo. Los de tu marca salen con tu información.</p>
+          <Pill>Mira cómo funciona</Pill>
+          <h2 className="mt-5 font-heading text-4xl font-extrabold md:text-6xl">
+            De tu idea a <Marca>piezas aprobadas</Marca>
+          </h2>
+          <p className="mt-4 text-[#0a2642]/60">Así trabaja tu equipo de agentes, paso a paso. Las piezas del ejemplo son de una marca ficticia.</p>
         </motion.div>
-        <div className="relative mt-12 overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_8%,black_92%,transparent)]">
-          <motion.div className="flex w-max gap-5 px-5" animate={{ x: ["0%", "-50%"] }} transition={{ duration: 45, repeat: Infinity, ease: "linear" }}>
-            {[...EJEMPLOS, ...EJEMPLOS].map((e, k) => (
-              <div key={k} className={cn("relative flex h-[340px] w-[280px] flex-none flex-col rounded-2xl p-6 shadow-lg", e.fondo)}>
-                <span className="absolute right-4 top-4 rounded-full bg-white/80 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#0a2642]/60">Ejemplo</span>
-                <span className="text-xs font-bold uppercase tracking-[0.2em]" style={{ color: CIAN_TXT }}>
-                  {e.tipo}
-                </span>
-                <span className="mt-1 text-sm font-semibold text-[#0a2642]/50">{e.marca}</span>
-                <p className="mt-6 font-heading text-2xl font-extrabold leading-tight">{e.titulo}</p>
-                <div className="mt-auto flex items-center justify-between">
-                  <span className="text-xs font-semibold text-[#0a2642]/50">{e.pie}</span>
-                  <span className="h-1.5 w-12 rounded-full bg-[#00c2e8]" />
-                </div>
-              </div>
-            ))}
-          </motion.div>
-        </div>
+        <motion.div {...aparecer} className="mx-auto mt-12 max-w-6xl px-5 md:px-8">
+          <DemoAgencia />
+        </motion.div>
       </section>
 
       {/* ───────── EQUIPO ───────── */}
@@ -579,11 +559,15 @@ export function AgenciaIA() {
                   </li>
                 ))}
               </ul>
-              <a href={waBiwov(p.mensajeWhatsApp)} target="_blank" rel="noopener noreferrer" className="mt-8 rounded-full px-6 py-4 text-center font-bold uppercase tracking-wide text-[#0a2642] transition-transform hover:-translate-y-0.5" style={{ background: LIMA }}>
+              <a href={checkoutDe(p.slug) || waBiwov(p.mensajeWhatsApp)} target="_blank" rel="noopener noreferrer" className="mt-8 rounded-full px-6 py-4 text-center font-bold uppercase tracking-wide text-[#0a2642] transition-transform hover:-translate-y-0.5" style={{ background: LIMA }}>
                 Activar {p.nombre.replace("biwov Agentes · ", "")}
               </a>
               <p className="mt-3 text-center text-xs text-[#0a2642]/50">
                 {anual ? "Pago anual por adelantado." : `Mensual. Permanencia mínima de ${MESES_MINIMOS} meses.`} {p.costosTerceros[0]}
+              </p>
+              <p className="mt-2 text-center text-xs text-[#0a2642]/60">
+                {checkoutDe(p.slug) ? "Pago seguro con Hotmart. Al pagar, tu oficina se activa sola y te llega el acceso." : "Te activamos tu oficina por WhatsApp."}{" "}
+                ¿Ya eres cliente? <a href={PORTAL_CLIENTES} className="font-bold text-[#0089b3] underline underline-offset-2">Inicia sesión</a>
               </p>
             </motion.div>
           ))}

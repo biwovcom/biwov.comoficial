@@ -1,5 +1,6 @@
 "use client";
 
+import { PORTAL_CLIENTES } from "@/data/hotmart";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { LogoMark } from "@/components/layout/LogoMark";
@@ -46,6 +47,13 @@ export function HeaderClaro({ cta = "Hablemos", mensaje = "Hola, quiero conocer 
             </Link>
           ))}
         </nav>
+        <div className="flex items-center gap-2">
+        <a
+          href={PORTAL_CLIENTES}
+          className="hidden rounded-full border border-[#0a2642]/15 px-4 py-2.5 text-sm font-semibold text-[#0a2642] transition-colors hover:border-[#00c2e8] sm:inline-flex"
+        >
+          Iniciar sesión
+        </a>
         <a
           href={waBiwov(mensaje)}
           target="_blank"
@@ -55,6 +63,7 @@ export function HeaderClaro({ cta = "Hablemos", mensaje = "Hola, quiero conocer 
           <WhatsAppIcon className="h-4 w-4" />
           {cta}
         </a>
+        </div>
       </div>
     </header>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import { checkoutDe } from "@/data/hotmart";
 import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
@@ -73,7 +74,7 @@ export function DetallePlan({ slug }: { slug: string }) {
               ))}
             </div>
             <a
-              href={waBiwov(plan.mensajeWhatsApp)}
+              href={checkoutDe(plan.slug) || waBiwov(plan.mensajeWhatsApp)}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-6 flex items-center justify-center gap-2 rounded-full bg-[#0a2642] px-6 py-4 font-bold text-white shadow-lg shadow-[#0a2642]/25 transition-transform hover:-translate-y-0.5"
