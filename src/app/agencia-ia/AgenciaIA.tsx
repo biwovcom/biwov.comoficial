@@ -16,9 +16,17 @@ import { useTRM } from "@/hooks/useTRM";
 import { cn } from "@/lib/utils";
 
 const MSG = "Hola, quiero mi agencia de agentes de IA de biwov.";
-const CORAL = "#ff7a59";
-const MENTA = "#9be8c8";
-const AMARILLO = "#ffd96a";
+/** Paleta biwov: navy + cian de la marca y un lima eléctrico como color vivo. */
+const NAVY = "#0a2642";
+const NAVY_2 = "#12355a";
+const CIAN = "#00c2e8";
+const CIAN_TXT = "#0089b3"; // cian legible sobre blanco
+const LIMA = "#c6f432";
+
+/** Resaltado tipo marcador lima (firma visual de biwov Agentes). */
+function Marca({ children }: { children: React.ReactNode }) {
+  return <span className="bg-[linear-gradient(transparent_60%,#c6f432_60%)] px-1">{children}</span>;
+}
 
 const aparecer = {
   initial: { opacity: 0, y: 28 },
@@ -51,17 +59,17 @@ const Avatar = ({ id, size = 64, className }: { id: string; size?: number; class
 function Pill({ children }: { children: React.ReactNode }) {
   return (
     <span className="inline-flex items-center gap-2 rounded-full border border-[#0a2642]/10 bg-white px-4 py-1.5 text-sm font-semibold shadow-sm">
-      <Sparkles className="h-4 w-4" style={{ color: CORAL }} />
+      <Sparkles className="h-4 w-4" style={{ color: CIAN_TXT }} />
       {children}
     </span>
   );
 }
 
 const BENTO: { t: string; p: string; i: LucideIcon; bg: string; dark?: boolean }[] = [
-  { t: "Cerebro de tu marca", p: "Los documentos clave de tu negocio para que cada entrega salga 100% personalizada.", i: Brain, bg: CORAL, dark: true },
-  { t: "Flujos de trabajo", p: "Del caos al orden: campañas, guiones y planes listos en minutos, no en días.", i: Workflow, bg: MENTA },
-  { t: "Piezas y diseños", p: "Carruseles, anuncios y manuales de marca hechos con criterio de diseñador.", i: Images, bg: AMARILLO },
-  { t: "Tareas listas", p: "Pide en una frase lo que antes te tomaba horas. Tú solo apruebas.", i: ListChecks, bg: "#0a2642", dark: true },
+  { t: "Cerebro de tu marca", p: "Los documentos clave de tu negocio para que cada entrega salga 100% personalizada.", i: Brain, bg: NAVY_2, dark: true },
+  { t: "Flujos de trabajo", p: "Del caos al orden: campañas, guiones y planes listos en minutos, no en días.", i: Workflow, bg: CIAN },
+  { t: "Piezas y diseños", p: "Carruseles, anuncios y manuales de marca hechos con criterio de diseñador.", i: Images, bg: LIMA },
+  { t: "Tareas listas", p: "Pide en una frase lo que antes te tomaba horas. Tú solo apruebas.", i: ListChecks, bg: "#ffffff" },
 ];
 
 const CEREBRO = [
@@ -73,11 +81,11 @@ const CEREBRO = [
 
 /** Ejemplos de entregables (marcas ficticias, marcados como ejemplo). */
 const EJEMPLOS = [
-  { tipo: "Guion de reel", marca: "Café Andino", fondo: "bg-[#fff4ec]", titulo: "Tu café no se enfría por la mañana. Se enfría por la falta de rito.", pie: "Gancho · 3 escenas · caption" },
-  { tipo: "Carrusel", marca: "Clínica Sonríe", fondo: "bg-[#eaf8fd]", titulo: "5 señales de que tu sonrisa pide una valoración", pie: "7 láminas · texto y diseño" },
-  { tipo: "Anuncio", marca: "Hotel Mirador", fondo: "bg-[#fff8dc]", titulo: "Un fin de semana entre montañas, a 30 minutos de la ciudad", pie: "3 variantes para probar" },
-  { tipo: "Manual de marca", marca: "Taller Ruana", fondo: "bg-[#eefaf3]", titulo: "Logo, paleta y tipografías con la historia de la marca", pie: "Hecho por Scher" },
-  { tipo: "Plan de contenido", marca: "Moda Kaldas", fondo: "bg-[#f3efff]", titulo: "12 publicaciones del mes con su objetivo y su guion", pie: "Calendario mensual" },
+  { tipo: "Guion de reel", marca: "Café Andino", fondo: "bg-[#eef9fd]", titulo: "Tu café no se enfría por la mañana. Se enfría por la falta de rito.", pie: "Gancho · 3 escenas · caption" },
+  { tipo: "Carrusel", marca: "Clínica Sonríe", fondo: "bg-[#f3fbdc]", titulo: "5 señales de que tu sonrisa pide una valoración", pie: "7 láminas · texto y diseño" },
+  { tipo: "Anuncio", marca: "Hotel Mirador", fondo: "bg-[#e8eef6]", titulo: "Un fin de semana entre montañas, a 30 minutos de la ciudad", pie: "3 variantes para probar" },
+  { tipo: "Manual de marca", marca: "Taller Ruana", fondo: "bg-[#eef9fd]", titulo: "Logo, paleta y tipografías con la historia de la marca", pie: "Hecho por Scher" },
+  { tipo: "Plan de contenido", marca: "Moda Kaldas", fondo: "bg-[#f3fbdc]", titulo: "12 publicaciones del mes con su objetivo y su guion", pie: "Calendario mensual" },
   { tipo: "Radar semanal", marca: "biwov", fondo: "bg-[#eef3f8]", titulo: "Lo que cambió en Meta, TikTok e IA esta semana", pie: "Hecho por Toffler" },
 ];
 
@@ -98,7 +106,7 @@ function Pregunta({ q, a }: { q: string; a: string }) {
     <div className="rounded-2xl border border-[#0a2642]/10 bg-white">
       <button type="button" onClick={() => setAbierta((v) => !v)} className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left font-heading text-lg font-bold">
         {q}
-        <ChevronDown className={cn("h-5 w-5 flex-none transition-transform", abierta && "rotate-180")} style={{ color: CORAL }} />
+        <ChevronDown className={cn("h-5 w-5 flex-none transition-transform", abierta && "rotate-180")} style={{ color: CIAN_TXT }} />
       </button>
       <AnimatePresence initial={false}>
         {abierta && (
@@ -115,7 +123,7 @@ function Pregunta({ q, a }: { q: string; a: string }) {
 function Oficina() {
   const puestos = AGENTES.slice(0, 8);
   return (
-    <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-b from-[#e9f7fc] to-[#d4eef7] p-6 md:p-10">
+    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-[#e9f7fc] to-[#d4eef7] p-6 md:p-10">
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-[repeating-linear-gradient(90deg,#c6e6f1_0,#c6e6f1_2px,transparent_2px,transparent_80px)] opacity-60" />
       <div className="relative grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-4">
         {puestos.map((a, k) => (
@@ -163,8 +171,9 @@ export function AgenciaIA() {
       <HeaderClaro cta="Empezar ahora" mensaje={MSG} />
 
       {/* ───────── HERO ───────── */}
-      <section className="relative">
-        <div className="pointer-events-none absolute left-1/2 top-0 h-[600px] w-[1000px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,#00c2e826_0,transparent_62%)]" />
+      <section className="relative overflow-hidden bg-[#0a2642] text-white">
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(#ffffff0d_1px,transparent_1px),linear-gradient(90deg,#ffffff0d_1px,transparent_1px)] bg-[size:56px_56px] [mask-image:radial-gradient(ellipse_at_top,black_30%,transparent_75%)]" />
+        <div className="pointer-events-none absolute left-1/2 top-0 h-[600px] w-[1000px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,#00c2e840_0,transparent_62%)]" />
         {[
           { id: "ogilvy", c: "left-[6%] top-24" },
           { id: "scher", c: "right-[7%] top-32" },
@@ -178,40 +187,40 @@ export function AgenciaIA() {
             animate={{ opacity: 1, scale: 1, y: [0, -14, 0] }}
             transition={{ opacity: { delay: 0.4 + k * 0.1 }, scale: { delay: 0.4 + k * 0.1 }, y: { duration: 4 + k, repeat: Infinity, ease: "easeInOut" } }}
           >
-            <Avatar id={f.id} size={84} className="shadow-xl ring-4 ring-white" />
+            <Avatar id={f.id} size={84} className="bg-white shadow-xl ring-4 ring-[#00c2e8]/40" />
           </motion.div>
         ))}
         <div className="relative mx-auto max-w-5xl px-5 pb-10 pt-16 text-center md:px-8 md:pt-24">
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-            <span className="inline-flex items-center gap-2 rounded-full border border-[#0a2642]/10 bg-white px-2 py-1.5 pr-4 text-sm font-semibold shadow-sm">
-              <span className="rounded-full bg-[#0a2642] px-3 py-0.5 text-xs font-bold text-white">Nuevo</span>
-              <Sparkles className="h-4 w-4" style={{ color: CORAL }} /> Tu agencia de marketing con IA
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-2 py-1.5 pr-4 text-sm font-semibold backdrop-blur">
+              <span className="rounded-full px-3 py-0.5 text-xs font-bold text-[#0a2642]" style={{ background: LIMA }}>Nuevo</span>
+              <Sparkles className="h-4 w-4" style={{ color: CIAN }} /> biwov Agentes · tu agencia de marketing con IA
             </span>
           </motion.div>
           <motion.h1 initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08, duration: 0.7 }} className="mt-6 font-heading text-5xl font-extrabold leading-[1.02] tracking-tight md:text-[84px]">
-            Tu agencia de marketing <span style={{ color: CORAL }}>con agentes de IA</span>
+            Tu agencia de marketing <span style={{ color: CIAN }}>con agentes de IA</span><motion.span animate={{ opacity: [1, 0, 1] }} transition={{ duration: 1.1, repeat: Infinity }} style={{ color: LIMA }}>_</motion.span>
           </motion.h1>
-          <motion.p initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.16 }} className="mx-auto mt-6 max-w-2xl text-lg text-[#0a2642]/65 md:text-xl">
+          <motion.p initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.16 }} className="mx-auto mt-6 max-w-2xl text-lg text-white/70 md:text-xl">
             Un equipo de {AGENTES.length} agentes que piensa, crea y prepara tu marketing con la memoria de tu marca, para que te enfoques en hacer crecer tu negocio.
           </motion.p>
           <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.24 }} className="mt-9 flex flex-wrap justify-center gap-3">
-            <a href="#planes" className="inline-flex items-center gap-2 rounded-full px-8 py-4 font-bold text-white shadow-xl transition-transform hover:-translate-y-0.5" style={{ background: CORAL, boxShadow: `0 18px 40px -12px ${CORAL}88` }}>
+            <a href="#planes" className="inline-flex items-center gap-2 rounded-full px-8 py-4 font-bold text-[#0a2642] shadow-xl transition-transform hover:-translate-y-0.5" style={{ background: LIMA, boxShadow: `0 18px 40px -12px ${LIMA}99` }}>
               Empezar ahora <ArrowRight className="h-5 w-5" />
             </a>
-            <a href="#ejemplos" className="rounded-full border border-[#0a2642]/15 bg-white px-8 py-4 font-bold transition-colors hover:border-[#0a2642]/40">
+            <a href="#ejemplos" className="rounded-full border border-white/25 px-8 py-4 font-bold text-white transition-colors hover:border-[#00c2e8] hover:text-[#00c2e8]">
               Ver ejemplos
             </a>
           </motion.div>
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }} className="mt-8 flex flex-wrap justify-center gap-x-7 gap-y-2 text-sm font-semibold text-[#0a2642]/70">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }} className="mt-8 flex flex-wrap justify-center gap-x-7 gap-y-2 text-sm font-semibold text-white/75">
             {[`${AGENTES.length} agentes especialistas`, "Cerebro de tu marca", "Método biwov", "Tú apruebas todo"].map((t) => (
               <span key={t} className="flex items-center gap-2">
-                <Check className="h-4 w-4 rounded-full p-0.5 text-white" style={{ background: CORAL }} /> {t}
+                <Check className="h-4 w-4 rounded-full p-0.5 text-[#0a2642]" style={{ background: CIAN }} /> {t}
               </span>
             ))}
           </motion.div>
         </div>
 
-        <div className="mx-auto grid max-w-6xl gap-4 px-5 pb-20 sm:grid-cols-2 md:px-8 lg:grid-cols-4">
+        <div className="relative mx-auto grid max-w-6xl gap-4 px-5 pb-20 sm:grid-cols-2 md:px-8 lg:grid-cols-4">
           {BENTO.map((b, k) => {
             const I = b.i;
             return (
@@ -221,10 +230,10 @@ export function AgenciaIA() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.35 + k * 0.08, duration: 0.6 }}
                 whileHover={{ y: -8, rotate: k % 2 ? 0.6 : -0.6 }}
-                className="rounded-[28px] p-7 shadow-lg"
+                className="rounded-2xl border border-white/10 p-7 shadow-lg"
                 style={{ background: b.bg, color: b.dark ? "#fff" : "#0a2642" }}
               >
-                <span className={cn("flex h-14 w-14 items-center justify-center rounded-2xl", b.dark ? "bg-white/20" : "bg-white")}>
+                <span className={cn("flex h-14 w-14 items-center justify-center rounded-2xl", b.dark ? "bg-white/10" : b.bg === "#ffffff" ? "bg-[#00c2e8]/15" : "bg-white/70")}>
                   <I className="h-7 w-7" style={{ color: b.dark ? "#fff" : "#0a2642" }} />
                 </span>
                 <h3 className="mt-6 font-heading text-2xl font-extrabold leading-tight">{b.t}</h3>
@@ -240,21 +249,21 @@ export function AgenciaIA() {
         <motion.div {...aparecer} className="mx-auto max-w-3xl px-5 text-center">
           <Pill>Todo en un solo lugar</Pill>
           <h2 className="mt-5 font-heading text-4xl font-extrabold md:text-6xl">
-            Todo empieza en <span style={{ color: CORAL }}>el cerebro</span>
+            Todo empieza en <Marca>el cerebro</Marca>
           </h2>
           <p className="mt-4 text-lg text-[#0a2642]/65">Los documentos clave de tu negocio hacen que cada tarea salga como si la hubiera hecho alguien de tu equipo.</p>
         </motion.div>
-        <motion.div {...aparecer} className="mx-auto mt-12 grid max-w-6xl overflow-hidden rounded-[32px] border border-[#0a2642]/8 bg-white shadow-xl shadow-[#0a2642]/5 md:grid-cols-2">
+        <motion.div {...aparecer} className="mx-auto mt-12 grid max-w-6xl overflow-hidden rounded-3xl border border-[#0a2642]/8 bg-white shadow-xl shadow-[#0a2642]/5 md:grid-cols-2">
           <div className="p-8 md:p-12">
-            <span className="flex h-14 w-14 items-center justify-center rounded-2xl" style={{ background: `${CORAL}22` }}>
-              <Brain className="h-7 w-7" style={{ color: CORAL }} />
+            <span className="flex h-14 w-14 items-center justify-center rounded-2xl" style={{ background: `${CIAN}1f` }}>
+              <Brain className="h-7 w-7" style={{ color: CIAN_TXT }} />
             </span>
             <h3 className="mt-6 font-heading text-3xl font-extrabold">El cerebro que trabaja como tú</h3>
             <p className="mt-3 text-lg text-[#0a2642]/65">Aprende tu marca, tu tono y tus objetivos. Entre más lo usas, mejor te conoce.</p>
             <ul className="mt-6 space-y-3">
               {["Tu marca, tono y propuesta de valor", "Cliente ideal y objetivos de negocio", "Servicios, ofertas y precios", "Lo que ya funcionó en tus campañas"].map((t) => (
                 <li key={t} className="flex items-center gap-3 font-medium">
-                  <Check className="h-5 w-5 rounded-full border-2 p-0.5" style={{ color: CORAL, borderColor: CORAL }} /> {t}
+                  <Check className="h-5 w-5 rounded-full border-2 p-0.5" style={{ color: CIAN_TXT, borderColor: CIAN }} /> {t}
                 </li>
               ))}
             </ul>
@@ -273,8 +282,8 @@ export function AgenciaIA() {
                   className="flex items-center justify-between rounded-2xl border border-[#0a2642]/8 bg-white px-5 py-4 shadow-sm"
                 >
                   <span className="flex items-center gap-4">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-xl" style={{ background: `${CORAL}1f` }}>
-                      <I className="h-5 w-5" style={{ color: CORAL }} />
+                    <span className="flex h-11 w-11 items-center justify-center rounded-xl" style={{ background: `${CIAN}1f` }}>
+                      <I className="h-5 w-5" style={{ color: CIAN_TXT }} />
                     </span>
                     <span>
                       <span className="block font-bold">{c.doc}</span>
@@ -293,7 +302,7 @@ export function AgenciaIA() {
       <section className="mx-auto max-w-6xl px-5 py-24 md:px-8">
         <motion.div {...aparecer} className="mx-auto max-w-3xl text-center">
           <h2 className="font-heading text-4xl font-extrabold md:text-6xl">
-            De una idea a piezas <span style={{ color: CORAL }}>listas, desde el chat</span>
+            De una idea a piezas <Marca>listas, desde el chat</Marca>
           </h2>
           <p className="mt-4 text-lg text-[#0a2642]/65">Describe lo que necesitas y tu equipo prepara guiones, campañas y diseños alineados con tu marca.</p>
         </motion.div>
@@ -308,23 +317,23 @@ export function AgenciaIA() {
                 { t: "Logo y manual de marca (sin IA de imágenes)", i: Sparkles },
               ].map(({ t, i: I }) => (
                 <li key={t} className="flex items-center gap-4 text-lg font-medium">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-xl" style={{ background: `${CORAL}1f` }}>
-                    <I className="h-5 w-5" style={{ color: CORAL }} />
+                  <span className="flex h-11 w-11 items-center justify-center rounded-xl" style={{ background: `${CIAN}1f` }}>
+                    <I className="h-5 w-5" style={{ color: CIAN_TXT }} />
                   </span>
                   {t}
                 </li>
               ))}
             </ul>
           </motion.div>
-          <motion.div {...aparecer} className="overflow-hidden rounded-[28px] border border-[#0a2642]/10 bg-white shadow-2xl shadow-[#0a2642]/10">
+          <motion.div {...aparecer} className="overflow-hidden rounded-2xl border border-[#0a2642]/10 bg-white shadow-2xl shadow-[#0a2642]/10">
             <div className="flex items-center gap-2 border-b border-[#0a2642]/8 px-5 py-3">
-              <span className="h-3 w-3 rounded-full" style={{ background: CORAL }} />
-              <span className="h-3 w-3 rounded-full bg-[#ffd96a]" />
+              <span className="h-3 w-3 rounded-full" style={{ background: CIAN }} />
+              <span className="h-3 w-3 rounded-full" style={{ background: LIMA }} />
               <span className="h-3 w-3 rounded-full bg-[#d6dde4]" />
               <span className="ml-2 text-sm font-semibold text-[#0a2642]/50">biwov Agentes · Chat</span>
             </div>
             <div className="space-y-4 p-6">
-              <div className="ml-auto max-w-[85%] rounded-2xl rounded-br-sm px-4 py-3 text-[15px] font-medium text-white" style={{ background: CORAL }}>
+              <div className="ml-auto max-w-[85%] rounded-2xl rounded-br-sm px-4 py-3 text-[15px] font-medium text-white" style={{ background: NAVY }}>
                 Créame una campaña de lanzamiento: un carrusel, un anuncio y 3 guiones.
               </div>
               <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.5 }} className="flex gap-3">
@@ -333,9 +342,9 @@ export function AgenciaIA() {
                   <p className="text-[15px]">¡Listo! Ogilvy, Bárbara y Scher prepararon estas piezas con tu marca. Quedan esperando tu aprobación:</p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {[
-                      { t: "Carrusel", bg: AMARILLO, r: -3 },
-                      { t: "Anuncio", bg: CORAL, r: 2, w: true },
-                      { t: "3 guiones", bg: MENTA, r: -1 },
+                      { t: "Carrusel", bg: LIMA, r: -3 },
+                      { t: "Anuncio", bg: NAVY, r: 2, w: true },
+                      { t: "3 guiones", bg: CIAN, r: -1 },
                     ].map((c, k) => (
                       <motion.span
                         key={c.t}
@@ -366,9 +375,9 @@ export function AgenciaIA() {
         <div className="relative mt-12 overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_8%,black_92%,transparent)]">
           <motion.div className="flex w-max gap-5 px-5" animate={{ x: ["0%", "-50%"] }} transition={{ duration: 45, repeat: Infinity, ease: "linear" }}>
             {[...EJEMPLOS, ...EJEMPLOS].map((e, k) => (
-              <div key={k} className={cn("relative flex h-[340px] w-[280px] flex-none flex-col rounded-[28px] p-6 shadow-lg", e.fondo)}>
+              <div key={k} className={cn("relative flex h-[340px] w-[280px] flex-none flex-col rounded-2xl p-6 shadow-lg", e.fondo)}>
                 <span className="absolute right-4 top-4 rounded-full bg-white/80 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#0a2642]/60">Ejemplo</span>
-                <span className="text-xs font-bold uppercase tracking-[0.2em]" style={{ color: CORAL }}>
+                <span className="text-xs font-bold uppercase tracking-[0.2em]" style={{ color: CIAN_TXT }}>
                   {e.tipo}
                 </span>
                 <span className="mt-1 text-sm font-semibold text-[#0a2642]/50">{e.marca}</span>
@@ -400,8 +409,8 @@ export function AgenciaIA() {
               whileHover={{ y: -8 }}
               className={cn("relative flex flex-col items-center rounded-3xl border px-4 py-7 text-center transition-shadow hover:shadow-xl", a.lider ? "border-transparent bg-[#0a2642] text-white" : "border-[#0a2642]/8 bg-white")}
             >
-              {a.nuevo && <span className="absolute -top-3 rounded-full bg-[#0a2642] px-3 py-0.5 text-[11px] font-bold text-white">NUEVO</span>}
-              <Avatar id={a.id} size={88} className={cn("ring-4", a.lider ? "ring-[#ff7a59]/60" : "ring-[#f1f4f7]")} />
+              {a.nuevo && <span className="absolute -top-3 rounded-full px-3 py-0.5 text-[11px] font-bold text-[#0a2642]" style={{ background: LIMA }}>NUEVO</span>}
+              <Avatar id={a.id} size={88} className={cn("ring-4", a.lider ? "ring-[#c6f432]/70" : "ring-[#f1f4f7]")} />
               <p className="mt-4 font-heading text-lg font-extrabold">{a.nombre}</p>
               <p className={cn("mt-1 text-sm", a.lider ? "text-white/70" : "text-[#0a2642]/55")}>{a.rol}</p>
             </motion.div>
@@ -425,32 +434,32 @@ export function AgenciaIA() {
 
       {/* ───────── BENTO EQUIPO ───────── */}
       <section className="mx-auto max-w-6xl px-5 pb-24 md:px-8">
-        <motion.div {...aparecer} className="relative overflow-hidden rounded-[32px] p-8 text-white md:p-12" style={{ background: CORAL }}>
+        <motion.div {...aparecer} className="relative overflow-hidden rounded-3xl bg-[linear-gradient(120deg,#0a2642_0%,#12355a_55%,#0089b3_100%)] p-8 text-white md:p-12">
           <div className="flex flex-wrap items-center justify-between gap-6">
             <div className="max-w-xl">
-              <Users className="h-10 w-10 rounded-2xl bg-white/20 p-2" />
+              <Users className="h-10 w-10 rounded-2xl p-2 text-[#0a2642]" style={{ background: LIMA }} />
               <h3 className="mt-5 font-heading text-4xl font-extrabold">{AGENTES.length} agentes de IA</h3>
               <p className="mt-3 text-lg text-white/90">Tu equipo completo, listo cuando lo necesites y sin nómina. Entrenados con los métodos de biwov.</p>
             </div>
             <div className="flex -space-x-4">
               {AGENTES.slice(0, 5).map((a) => (
-                <Avatar key={a.id} id={a.id} size={68} className="ring-4 ring-[#ff7a59]" />
+                <Avatar key={a.id} id={a.id} size={68} className="ring-4 ring-[#12355a]" />
               ))}
-              <span className="flex h-[68px] w-[68px] items-center justify-center rounded-full bg-white font-heading text-lg font-extrabold text-[#0a2642] ring-4 ring-[#ff7a59]">+{AGENTES.length - 5}</span>
+              <span className="flex h-[68px] w-[68px] items-center justify-center rounded-full bg-white font-heading text-lg font-extrabold text-[#0a2642] ring-4 ring-[#12355a]">+{AGENTES.length - 5}</span>
             </div>
           </div>
         </motion.div>
         <div className="mt-4 grid gap-4 md:grid-cols-3">
           {[
-            { t: "Tareas en una frase", p: "Haz en minutos lo que antes tomaba horas.", bg: AMARILLO, i: ListChecks },
-            { t: "Flujos inteligentes", p: "El coordinador reparte el trabajo entre especialistas.", bg: "#0a2642", dark: true, i: Workflow },
-            { t: "Memoria que aprende", p: "Recuerda tu marca y mejora con cada aprobación.", bg: MENTA, i: Brain },
+            { t: "Tareas en una frase", p: "Haz en minutos lo que antes tomaba horas.", bg: LIMA, i: ListChecks },
+            { t: "Flujos inteligentes", p: "El coordinador reparte el trabajo entre especialistas.", bg: NAVY, dark: true, i: Workflow },
+            { t: "Memoria que aprende", p: "Recuerda tu marca y mejora con cada aprobación.", bg: CIAN, i: Brain },
           ].map((b, k) => {
             const I = b.i;
             return (
-              <motion.div key={b.t} {...aparecer} transition={{ ...aparecer.transition, delay: k * 0.08 }} whileHover={{ y: -6 }} className="rounded-[28px] p-8" style={{ background: b.bg, color: b.dark ? "#fff" : "#0a2642" }}>
+              <motion.div key={b.t} {...aparecer} transition={{ ...aparecer.transition, delay: k * 0.08 }} whileHover={{ y: -6 }} className="rounded-2xl p-8" style={{ background: b.bg, color: b.dark ? "#fff" : "#0a2642" }}>
                 <span className={cn("flex h-12 w-12 items-center justify-center rounded-2xl", b.dark ? "bg-white/15" : "bg-white/60")}>
-                  <I className="h-6 w-6" style={{ color: b.dark ? CORAL : "#0a2642" }} />
+                  <I className="h-6 w-6" style={{ color: b.dark ? LIMA : "#0a2642" }} />
                 </span>
                 <h3 className="mt-5 font-heading text-2xl font-extrabold">{b.t}</h3>
                 <p className={cn("mt-2", b.dark ? "text-white/75" : "text-[#0a2642]/75")}>{b.p}</p>
@@ -470,9 +479,9 @@ export function AgenciaIA() {
           {POR_QUE.map((d, k) => {
             const I = d.i;
             return (
-              <motion.div key={d.t} {...aparecer} transition={{ ...aparecer.transition, delay: (k % 3) * 0.08 }} whileHover={{ y: -6 }} className="rounded-[28px] border border-[#0a2642]/8 bg-white p-8 shadow-sm">
-                <span className="flex h-14 w-14 items-center justify-center rounded-2xl" style={{ background: `${CORAL}1f` }}>
-                  <I className="h-6 w-6" style={{ color: CORAL }} />
+              <motion.div key={d.t} {...aparecer} transition={{ ...aparecer.transition, delay: (k % 3) * 0.08 }} whileHover={{ y: -6 }} className="rounded-2xl border border-[#0a2642]/8 bg-white p-8 shadow-sm">
+                <span className="flex h-14 w-14 items-center justify-center rounded-2xl" style={{ background: `${CIAN}1f` }}>
+                  <I className="h-6 w-6" style={{ color: CIAN_TXT }} />
                 </span>
                 <h3 className="mt-6 font-heading text-xl font-extrabold">{d.t}</h3>
                 <p className="mt-2 text-[15px] leading-relaxed text-[#0a2642]/65">{d.p}</p>
@@ -483,12 +492,12 @@ export function AgenciaIA() {
       </section>
 
       {/* ───────── BANDA OSCURA ───────── */}
-      <section className="relative overflow-hidden bg-[#0b1320] py-24 text-center text-white">
+      <section className="relative overflow-hidden bg-[#061a2e] py-24 text-center text-white">
         <div className="mx-auto flex max-w-md justify-center gap-3">
           {[
-            { t: "Carrusel", bg: AMARILLO, r: -6, c: "#0a2642" },
-            { t: "Anuncio", bg: CORAL, r: 0, c: "#fff" },
-            { t: "Guion", bg: MENTA, r: 6, c: "#0a2642" },
+            { t: "Carrusel", bg: LIMA, r: -6, c: "#0a2642" },
+            { t: "Anuncio", bg: "#ffffff", r: 0, c: "#0a2642" },
+            { t: "Guion", bg: CIAN, r: 6, c: "#0a2642" },
           ].map((c, k) => (
             <motion.span key={c.t} animate={{ y: [0, -10, 0] }} transition={{ duration: 3, repeat: Infinity, delay: k * 0.4 }} className="rounded-2xl px-6 py-3 font-bold shadow-xl" style={{ background: c.bg, color: c.c, rotate: c.r }}>
               {c.t}
@@ -496,30 +505,30 @@ export function AgenciaIA() {
           ))}
         </div>
         <motion.h2 {...aparecer} className="mx-auto mt-10 max-w-3xl px-5 font-heading text-4xl font-extrabold md:text-6xl">
-          Recupera tu tiempo <span style={{ color: CORAL }}>cada semana</span>
+          Recupera tu tiempo <span style={{ color: CIAN }}>cada semana</span><span style={{ color: LIMA }}>_</span>
         </motion.h2>
         <p className="mx-auto mt-5 max-w-xl px-5 text-lg text-white/70">Tu equipo de agentes prepara el trabajo; tú te enfocas en lo que solo tú puedes hacer: hacer crecer tu negocio.</p>
-        <a href="#planes" className="mt-9 inline-flex items-center gap-2 rounded-full px-8 py-4 font-bold text-white transition-transform hover:-translate-y-0.5" style={{ background: CORAL }}>
+        <a href="#planes" className="mt-9 inline-flex items-center gap-2 rounded-full px-8 py-4 font-bold text-[#0a2642] transition-transform hover:-translate-y-0.5" style={{ background: LIMA }}>
           Empezar ahora <ArrowRight className="h-5 w-5" />
         </a>
       </section>
 
       {/* ───────── PLANES ───────── */}
-      <section id="planes" className="scroll-mt-20 bg-[#fff6f2] py-24">
+      <section id="planes" className="scroll-mt-20 bg-[#eef9fd] py-24">
         <motion.div {...aparecer} className="mx-auto max-w-3xl px-5 text-center">
           <Pill>Planes de precio</Pill>
           <h2 className="mt-5 font-heading text-4xl font-extrabold md:text-6xl">
-            Elige el plan que mejor <span style={{ color: CORAL }}>se adapte a ti</span>
+            Elige el plan que mejor <Marca>se adapte a ti</Marca>
           </h2>
           <p className="mt-4 text-lg text-[#0a2642]/65">Ambos te dan tu equipo de agentes. Solo uno incluye diseñadora de marca, radar y acompañamiento mensual.</p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
             <div className="inline-flex items-center gap-3 rounded-full bg-white px-4 py-2 font-semibold shadow-sm">
               <span className={anual ? "text-[#0a2642]/40" : "text-[#0a2642]"}>Mensual</span>
-              <button type="button" aria-label="Cambiar entre mensual y anual" onClick={() => setAnual((v) => !v)} className="relative h-7 w-12 rounded-full transition-colors" style={{ background: anual ? CORAL : "#0a264226" }}>
+              <button type="button" aria-label="Cambiar entre mensual y anual" onClick={() => setAnual((v) => !v)} className="relative h-7 w-12 rounded-full transition-colors" style={{ background: anual ? CIAN : "#0a264226" }}>
                 <motion.span layout className={cn("absolute top-1 h-5 w-5 rounded-full bg-white shadow", anual ? "right-1" : "left-1")} />
               </button>
               <span className={anual ? "text-[#0a2642]" : "text-[#0a2642]/40"}>Anual</span>
-              <span className="rounded-full px-2 py-0.5 text-xs font-bold text-white" style={{ background: CORAL }}>
+              <span className="rounded-full px-2 py-0.5 text-xs font-bold text-[#0a2642]" style={{ background: LIMA }}>
                 -{Math.round(dtoAnual * 100)}%
               </span>
             </div>
@@ -538,11 +547,11 @@ export function AgenciaIA() {
               key={p.slug}
               {...aparecer}
               transition={{ ...aparecer.transition, delay: k * 0.1 }}
-              className={cn("relative flex flex-col rounded-[32px] bg-white p-9", p.destacado ? "border-2 shadow-xl" : "shadow-sm")}
-              style={p.destacado ? { borderColor: CORAL } : undefined}
+              className={cn("relative flex flex-col rounded-3xl bg-white p-9", p.destacado ? "border-2 shadow-xl" : "shadow-sm")}
+              style={p.destacado ? { borderColor: CIAN } : undefined}
             >
               {p.destacado && (
-                <span className="absolute left-9 top-0 -translate-y-1/2 rounded-full px-4 py-1 text-xs font-bold text-white" style={{ background: CORAL }}>
+                <span className="absolute left-9 top-0 -translate-y-1/2 rounded-full px-4 py-1 text-xs font-bold text-[#0a2642]" style={{ background: LIMA }}>
                   ★ RECOMENDADO
                 </span>
               )}
@@ -553,7 +562,7 @@ export function AgenciaIA() {
                 <span className="text-lg font-semibold text-[#0a2642]/45">{anual ? " /año" : " /mes"}</span>
               </p>
               {anual && (
-                <p className="mt-1 text-sm font-semibold" style={{ color: CORAL }}>
+                <p className="mt-1 text-sm font-semibold" style={{ color: CIAN_TXT }}>
                   Ahorras el {Math.round(dtoAnual * 100)}% pagando el año
                 </p>
               )}
@@ -566,11 +575,11 @@ export function AgenciaIA() {
               <ul className="flex-1 space-y-3">
                 {p.incluye.flatMap((g) => g.items).map((it) => (
                   <li key={it} className="flex gap-3 text-[15px]">
-                    <Check className="mt-0.5 h-5 w-5 flex-none rounded-full border-2 p-0.5" style={{ color: CORAL, borderColor: CORAL }} /> {it}
+                    <Check className="mt-0.5 h-5 w-5 flex-none rounded-full border-2 p-0.5" style={{ color: CIAN_TXT, borderColor: CIAN }} /> {it}
                   </li>
                 ))}
               </ul>
-              <a href={waBiwov(p.mensajeWhatsApp)} target="_blank" rel="noopener noreferrer" className="mt-8 rounded-full px-6 py-4 text-center font-bold uppercase tracking-wide text-white transition-transform hover:-translate-y-0.5" style={{ background: CORAL }}>
+              <a href={waBiwov(p.mensajeWhatsApp)} target="_blank" rel="noopener noreferrer" className="mt-8 rounded-full px-6 py-4 text-center font-bold uppercase tracking-wide text-[#0a2642] transition-transform hover:-translate-y-0.5" style={{ background: LIMA }}>
                 Activar {p.nombre.replace("biwov Agentes · ", "")}
               </a>
               <p className="mt-3 text-center text-xs text-[#0a2642]/50">
@@ -580,13 +589,13 @@ export function AgenciaIA() {
           ))}
         </div>
 
-        <motion.div {...aparecer} className="mx-auto mt-10 max-w-5xl overflow-hidden rounded-[28px] bg-white shadow-sm">
+        <motion.div {...aparecer} className="mx-auto mt-10 max-w-5xl overflow-hidden rounded-2xl bg-white shadow-sm">
           <table className="w-full text-left text-[15px]">
             <thead>
               <tr className="border-b border-[#0a2642]/8">
                 <th className="px-6 py-5 font-heading text-lg font-extrabold">Comparar planes</th>
                 <th className="px-4 py-5 text-center font-heading font-extrabold">Esencial</th>
-                <th className="bg-[#fff6f2] px-4 py-5 text-center font-heading font-extrabold" style={{ color: CORAL }}>
+                <th className="bg-[#eef9fd] px-4 py-5 text-center font-heading font-extrabold" style={{ color: CIAN_TXT }}>
                   Pro
                 </th>
               </tr>
@@ -606,8 +615,8 @@ export function AgenciaIA() {
                 <tr key={f} className="border-b border-[#0a2642]/6 last:border-0">
                   <td className="px-6 py-4">{f}</td>
                   {[e, p].map((v, i) => (
-                    <td key={i} className={cn("px-4 py-4 text-center", i === 1 && "bg-[#fff6f2]")}>
-                      {typeof v === "string" ? <span className="font-semibold">{v}</span> : v ? <Check className="mx-auto h-5 w-5" style={{ color: CORAL }} /> : <X className="mx-auto h-5 w-5 text-[#0a2642]/25" />}
+                    <td key={i} className={cn("px-4 py-4 text-center", i === 1 && "bg-[#eef9fd]")}>
+                      {typeof v === "string" ? <span className="font-semibold">{v}</span> : v ? <Check className="mx-auto h-5 w-5" style={{ color: CIAN_TXT }} /> : <X className="mx-auto h-5 w-5 text-[#0a2642]/25" />}
                     </td>
                   ))}
                 </tr>
@@ -629,7 +638,7 @@ export function AgenciaIA() {
           <h2 className="font-heading text-4xl font-extrabold md:text-5xl">Trabajos reales de biwov</h2>
           <p className="mt-4 text-[#0a2642]/65">Proyectos que ya hicimos para nuestros clientes. Los testimonios de biwov Agentes los publicaremos con la autorización de cada cliente.</p>
         </motion.div>
-        <motion.div {...aparecer} className="mt-12 grid items-center gap-8 overflow-hidden rounded-[32px] bg-[#0a2642] p-6 text-white md:grid-cols-2 md:p-10">
+        <motion.div {...aparecer} className="mt-12 grid items-center gap-8 overflow-hidden rounded-3xl bg-[#0a2642] p-6 text-white md:grid-cols-2 md:p-10">
           <div>
             <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#8fdff0]">Caso real</span>
             <h3 className="mt-4 font-heading text-3xl font-extrabold">Fashion Lash</h3>
@@ -668,7 +677,7 @@ export function AgenciaIA() {
           Empieza a ejecutar tu marketing hoy
         </motion.h2>
         <p className="mx-auto mt-5 max-w-xl px-5 text-lg text-[#0a2642]/65">Tu equipo de agentes, con la memoria de tu marca, listo para trabajar contigo.</p>
-        <a href={waBiwov(MSG)} target="_blank" rel="noopener noreferrer" className="mt-9 inline-flex items-center gap-2 rounded-full px-9 py-4 font-bold text-white shadow-xl transition-transform hover:-translate-y-0.5" style={{ background: CORAL }}>
+        <a href={waBiwov(MSG)} target="_blank" rel="noopener noreferrer" className="mt-9 inline-flex items-center gap-2 rounded-full px-9 py-4 font-bold text-[#0a2642] shadow-xl transition-transform hover:-translate-y-0.5" style={{ background: LIMA }}>
           Quiero mi agencia de agentes <ArrowRight className="h-5 w-5" />
         </a>
       </section>
