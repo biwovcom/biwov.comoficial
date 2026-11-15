@@ -2,11 +2,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import {
+import {
+
   Calculator,
   Clock,
-  CreditCard,
-  Menu,
+  CreditCard,
+  FileText,
+
+  Menu,
+
   Users2,
   UserPlus,
   X,
@@ -16,6 +20,7 @@ import { LogoutButton } from "./LogoutButton";
 const LINKS = [
   { href: "/panel/prospectos", label: "Prospectos", icon: Users2 },
   { href: "/panel/prospectos/nuevo", label: "Nuevo prospecto", icon: UserPlus },
+  { href: "/panel/propuestas", label: "Propuestas", icon: FileText },
   { href: "/panel/cotizaciones", label: "Cotizaciones", icon: Calculator },
   { href: "/panel/compras", label: "Compras de planes", icon: CreditCard },
   { href: "/panel/tiempos", label: "Tiempos", icon: Clock },
