@@ -413,9 +413,129 @@ const CONTENIDO_REDES: PropuestaCliente = {
   ],
 };
 
+const TRES_CUENTAS: PropuestaCliente = {
+  slug: "turismo-marca-portafolio-bw28",
+  version: "propuesta-tres-cuentas-2026-11-15-v1",
+  titulo: "Plan para tres cuentas: turismo, marca personal y portafolio",
+  subtitulo:
+    "Contenido mensual para la agencia de turismo, asesoría para la marca personal y un portafolio en Instagram listo para mostrar.",
+  sector: "Propuesta a la medida",
+  duracionMeses: 4,
+  tarjetas: [
+    { etiqueta: "Agencia de turismo", valor: "$1.650.000 / mes" },
+    { etiqueta: "Marca personal", valor: "$650.000 / mes" },
+    { etiqueta: "Portafolio en Instagram", valor: "$790.000 (pago único)" },
+    { etiqueta: "Duración", valor: "4 meses (mínimo)" },
+  ],
+  objeto:
+    "LA CONTRATISTA prestará a LA CONTRATANTE, durante 4 meses, los servicios descritos en este contrato para tres cuentas: (1) creación de contenido, planeación y estrategia mensual para la cuenta de la agencia de turismo, (2) ideas, asesoría y lineamientos para la cuenta de marca personal y (3) la creación, por una sola vez, de un portafolio base en Instagram para la tercera cuenta.",
+  metodologia:
+    "Primero se planea y después se ejecuta. Cada mes LA CONTRATANTE recibe la estrategia, el calendario, los guiones y los diseños para aprobar antes de publicar. La cuenta de turismo y la de marca personal se apoyan entre sí con contenido en colaboración. El portafolio se entrega en las primeras 3 semanas y no tiene mantenimiento posterior.",
+  notaCompromisos:
+    "La edición se hace con el material (videos y fotos) que LA CONTRATANTE entregue. Si se requiere grabación, cada sesión de hasta 2 horas tiene un costo adicional de $120.000 COP, que se paga aparte y se agenda con al menos 48 horas de anticipación. Las piezas que no se produzcan en el mes por falta de material no se acumulan para el mes siguiente.",
+  plataformas: "Meta, Instagram, Facebook, TikTok, Canva, entre otras",
+  reservaSobre: "la información de las tres cuentas, de la empresa y de sus clientes",
+  etiquetaEmpresa: "Nombre de la agencia de turismo (opcional)",
+  herramientasTitulo: "Grabación y pauta",
+  herramientasSubtitulo: "Se pagan aparte",
+  herramientasIntro:
+    "El valor del plan es la mano de obra. La grabación, si se requiere, se paga aparte por sesión. La pauta publicitaria, si se decide hacer, se paga directamente a Meta.",
+  incluye: [
+    {
+      titulo: "1 · Agencia de turismo (mensual)",
+      items: [
+        "Análisis de la cuenta y estrategia de contenido para vender planes y destinos.",
+        "Planeación mensual y calendario de publicaciones.",
+        "Guiones para los videos y copys (textos) para cada publicación.",
+        "Estrategia de historias: qué publicar cada día.",
+        "Edición de 8 videos al mes con el material que entregue la empresa.",
+        "Diseño de 8 piezas gráficas al mes (publicaciones o carruseles).",
+        "Contenido en colaboración con la cuenta de marca personal.",
+        "Revisión de resultados e informe mensual.",
+        "No incluye grabación (ver costo aparte).",
+      ],
+    },
+    {
+      titulo: "2 · Marca personal (asesoría mensual)",
+      items: [
+        "Ideas de contenido: banco de 12 ideas al mes, alineadas con la agencia de turismo.",
+        "Guiones base para que la persona grabe sus videos.",
+        "Lineamientos de perfil, tono, historias y frecuencia de publicación.",
+        "2 sesiones de asesoría al mes, de 1 hora cada una (virtuales).",
+        "Ideas de colaboraciones con la cuenta de turismo.",
+      ],
+    },
+    {
+      titulo: "3 · Portafolio en Instagram (pago único)",
+      items: [
+        "Optimización del perfil: nombre, biografía y foto.",
+        "9 publicaciones base diseñadas (una cuadrícula de 3 × 3) para mostrar el portafolio.",
+        "4 portadas para historias destacadas.",
+        "Plantillas editables en Canva para que la cuenta se pueda actualizar sin ayuda.",
+        "Entrega única en las primeras 3 semanas. No incluye mantenimiento.",
+      ],
+    },
+  ],
+  plan: [
+    {
+      cuando: "Semanas 1 a 3",
+      titulo: "Arranque de las tres cuentas",
+      detalle: [
+        "Análisis de las cuentas, estrategia y planeación del primer mes.",
+        "Diseño y entrega del portafolio en Instagram.",
+        "Primeras ediciones y diseños para la agencia de turismo.",
+      ],
+    },
+    {
+      cuando: "Meses 1 a 4",
+      titulo: "Contenido y asesoría cada mes",
+      detalle: [
+        "Turismo: 8 videos editados y 8 diseños al mes, con su estrategia.",
+        "Marca personal: 12 ideas, guiones base y 2 sesiones de asesoría al mes.",
+        "Contenidos en colaboración entre las dos cuentas.",
+      ],
+    },
+    {
+      cuando: "Al cumplir el cuarto mes",
+      titulo: "Evaluación y continuidad",
+      detalle: ["Revisamos los resultados de los 4 meses.", "Decidimos juntos cómo continuar."],
+    },
+  ],
+  compromisosCliente: [
+    "Entregar a tiempo el material de video y fotos para editar cada mes.",
+    "Entregar la información de los planes, destinos, precios y promociones.",
+    "Dar acceso a las cuentas de Instagram (y Facebook si aplica).",
+    "Aprobar la planeación y los diseños antes de publicar.",
+    "Asistir a las sesiones de asesoría de la marca personal.",
+  ],
+  herramientas: [
+    { nombre: "Grabación (opcional)", uso: "Si se requiere grabar videos para la agencia de turismo", costoAprox: "$120.000 COP por sesión de hasta 2 horas." },
+    { nombre: "Pauta en Meta (opcional)", uso: "Si se decide promocionar planes o destinos", costoAprox: "Se paga directo a Meta; recomendado desde $20.000 COP diarios." },
+  ],
+  pago: {
+    totalContrato: 9_990_000,
+    titulo: "$3.090.000",
+    subtitulo: "el primer mes · $2.300.000 del segundo al cuarto",
+    clausula:
+      "El valor del servicio es de $1.650.000 COP mensuales por la cuenta de la agencia de turismo y $650.000 COP mensuales por la asesoría de la marca personal, durante 4 meses, más $790.000 COP por una sola vez por el portafolio en Instagram, para un total de $9.990.000 COP. Cada mes se paga por anticipado, dentro de los primeros 5 días del mes de servicio; el portafolio se paga con el primer mes. Si LA CONTRATANTE paga por adelantado los 4 meses, tiene un 10% de descuento sobre las mensualidades. La grabación, cuando se requiera, se paga aparte ($120.000 COP por sesión de hasta 2 horas). Se paga así:",
+    lineas: [
+      { titulo: "Mes 1", valor: 3_090_000, detalle: ["Turismo $1.650.000 + marca personal $650.000 + portafolio $790.000 (pago único)."] },
+      { titulo: "Meses 2, 3 y 4 · cada mes", valor: 2_300_000, detalle: ["Turismo $1.650.000 + marca personal $650.000.", "Total de los meses 2 a 4: $6.900.000."] },
+    ],
+  },
+  noIncluye: [
+    "Grabación de videos ($120.000 COP por sesión de hasta 2 horas, aparte).",
+    "Mantenimiento del portafolio después de entregado.",
+    "Publicación y manejo diario de la cuenta de marca personal (es asesoría).",
+    "Pauta publicitaria (se paga directo a Meta).",
+    "Respuesta de mensajes comerciales ni atención a clientes.",
+  ],
+};
+
 export const PROPUESTAS_CLIENTES: PropuestaCliente[] = [
   ORTODONCIA,
   CONTENIDO_REDES,
+  TRES_CUENTAS,
 ];
 
 export function propuestaPorSlug(slug: string): PropuestaCliente | undefined {
