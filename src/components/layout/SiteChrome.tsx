@@ -26,7 +26,9 @@ export function SiteChrome({ children }: { children: ReactNode }) {
     pathname?.startsWith("/propuesta") ||
     pathname?.startsWith("/documentos") ||
     pathname?.startsWith("/inicio") ||
-    pathname?.startsWith("/contrato-firmado");
+    pathname?.startsWith("/contrato-firmado") ||
+    pathname?.startsWith("/planes") ||
+    pathname?.startsWith("/agencia-ia");
 
   // Permite compartir un link directo (ej: biwov.com/?diagnostico=1) que
   // abre de una vez el formulario del diagnóstico gratis, sin que el
