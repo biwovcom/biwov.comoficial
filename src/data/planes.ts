@@ -42,7 +42,7 @@ export interface Plan {
 }
 
 /** Compromiso mínimo de los planes mensuales. */
-export const DURACION_MINIMA_MESES = 3;
+export const DURACION_MINIMA_MESES = 4;
 
 const SIN_MONTAJE: PrecioDual = { cop: 0, usd: 0 };
 

@@ -90,7 +90,7 @@ const FAQ = [
   },
   {
     q: "¿Puedo cancelar?",
-    a: "El compromiso mínimo es de 3 meses; después es mes a mes. Si cancelas, conservas lo que se creó, y se detienen las actualizaciones, el mantenimiento de la memoria y el soporte.",
+    a: "El compromiso mínimo es de 4 meses; después es mes a mes. Si cancelas, conservas lo que se creó, y se detienen las actualizaciones, el mantenimiento de la memoria y el soporte.",
   },
 ];
 

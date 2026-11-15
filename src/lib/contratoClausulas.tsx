@@ -770,7 +770,7 @@ export function seccionesCampanaMeta(): SeccionContrato[] {
             <strong>
               por anticipado dentro de los primeros 5 días de cada mes
             </strong>{" "}
-            y tiene una permanencia mínima de <strong>3 meses</strong>. Para
+            y tiene una permanencia mínima de <strong>4 meses</strong>. Para
             iniciar, el Cliente debe entregar un mínimo de 6 piezas creativas
             (videos o imágenes). El incumplimiento en el pago de dos (2)
             mensualidades consecutivas faculta a biwov para suspender el
@@ -797,7 +797,7 @@ export function seccionesCampanaMeta(): SeccionContrato[] {
       contenido: (
         <>
           <p>
-            Cumplida la permanencia mínima de 3 meses, cualquiera de las partes
+            Cumplida la permanencia mínima de 4 meses, cualquiera de las partes
             puede terminar el contrato con treinta (30) días de aviso previo por
             escrito. Los servicios ya ejecutados se facturan en proporción al
             avance realizado.

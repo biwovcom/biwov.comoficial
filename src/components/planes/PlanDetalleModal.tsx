@@ -313,6 +313,18 @@ function PlanDetalleTarjeta({
               {formatCopEnMoneda(totalGeneralCop, moneda, trm)}
             </p>
           </div>
+          <div className="mt-3 grid gap-1 rounded-xl bg-white/5 p-3 text-xs text-white/70">
+            <p className="font-semibold text-white/85">Formas de pago</p>
+            <p>Mes a mes: sin descuento.</p>
+            <p>
+              Los {DURACION_MINIMA_MESES} meses por adelantado (10% de descuento en la mensualidad):{" "}
+              <strong className="text-white">{formatCopEnMoneda(Math.round(mensualidadTotalCop * DURACION_MINIMA_MESES * 0.9), moneda, trm)}</strong>
+            </p>
+            <p>
+              Anual por adelantado (20% de descuento en la mensualidad):{" "}
+              <strong className="text-white">{formatCopEnMoneda(Math.round(mensualidadTotalCop * 12 * 0.8), moneda, trm)}</strong>
+            </p>
+          </div>
         </div>
 
         <button

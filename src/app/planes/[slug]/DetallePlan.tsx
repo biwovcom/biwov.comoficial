@@ -8,6 +8,7 @@ import { ESCALONES, PLANES_CLIENTES, TICKET_LABEL, planClientePorSlug } from "@/
 import { FooterClaro, HeaderClaro, waBiwov } from "@/components/claro/ChromeClaro";
 import { FONDO_ESCALON, ICONOS_PLAN, precioPlan } from "@/components/claro/iconosPlan";
 import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
+import { CostosTerceros, DemoChat, DescargarPdf, FormasPago } from "@/components/claro/BloquesPlan";
 import { useTRM } from "@/hooks/useTRM";
 import type { Moneda } from "@/lib/moneda";
 import { cn } from "@/lib/utils";
@@ -40,6 +41,9 @@ export function DetallePlan({ slug }: { slug: string }) {
             </p>
             <h1 className="mt-3 font-heading text-4xl font-extrabold leading-[1.05] tracking-tight md:text-6xl">{plan.nombre}</h1>
             <p className={cn("mt-5 max-w-xl text-lg", claro ? "text-[#0a2642]/75" : "text-white/80")}>{plan.gancho}</p>
+            <div className="mt-7">
+              <DescargarPdf slug={plan.slug} claro={claro} />
+            </div>
           </motion.div>
 
           {/* Tarjeta de precio */}
@@ -57,7 +61,8 @@ export function DetallePlan({ slug }: { slug: string }) {
             <p className="text-sm font-semibold text-[#00a3c4]">{plan.unidad}</p>
             {plan.adicional && (
               <p className="mt-3 rounded-2xl bg-[#f3f8fb] px-4 py-3 text-sm">
-                <span className="font-semibold">{plan.adicional.label}:</span> {precioPlan({ precio: plan.adicional.precio }, moneda, trm)}
+                <span className="font-semibold">{plan.adicional.label}:</span> {precioPlan(plan.adicional, moneda, trm)}
+                {plan.adicional.mensual ? " /mes" : ""}
               </p>
             )}
             <div className="mt-3 flex gap-1 text-xs font-semibold">
@@ -79,6 +84,12 @@ export function DetallePlan({ slug }: { slug: string }) {
           </motion.aside>
         </div>
       </section>
+
+      {plan.demo && (
+        <section className="mx-auto max-w-6xl px-5 pt-16 md:px-8">
+          <DemoChat tipo={plan.demo} />
+        </section>
+      )}
 
       {/* Para quién */}
       <section className="mx-auto max-w-6xl px-5 py-16 md:px-8">
@@ -130,6 +141,12 @@ export function DetallePlan({ slug }: { slug: string }) {
             </div>
           )}
         </div>
+      </section>
+
+      {/* Pago y costos de plataformas */}
+      <section className="mx-auto grid max-w-6xl gap-5 px-5 pt-16 md:px-8">
+        <FormasPago plan={plan} moneda={moneda} trm={trm} />
+        <CostosTerceros plan={plan} />
       </section>
 
       {/* Cómo funciona */}

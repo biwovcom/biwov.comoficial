@@ -21,7 +21,7 @@ export const FAQ: PreguntaFrecuente[] = [
   },
   {
     pregunta: "¿Cuánto tiempo debo quedarme?",
-    respuesta: "Mínimo 3 meses, porque es el tiempo que toma aprender qué funciona.",
+    respuesta: "Mínimo 4 meses, porque es el tiempo que toma aprender qué funciona y ver resultados estables.",
   },
   {
     pregunta: "¿Atienden fuera de Colombia?",

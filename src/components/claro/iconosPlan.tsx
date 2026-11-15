@@ -1,5 +1,5 @@
 import {
-  Bot, Brain, Compass, Crown, GraduationCap, MapIcon, Megaphone, Mail, Rocket, Send, Sparkles, Users,
+  Bot, Brain, Compass, MessageSquareMore, Crown, GraduationCap, MapIcon, Megaphone, Mail, Rocket, Send, Sparkles, Users,
   type LucideIcon,
 } from "lucide-react";
 import type { PlanCliente } from "@/data/portafolioClientes";
@@ -18,10 +18,11 @@ export const ICONOS_PLAN: Record<PlanCliente["icono"], LucideIcon> = {
   mail: Mail,
   sparkles: Sparkles,
   brain: Brain,
+  message: MessageSquareMore,
 };
 
 /** Precio del plan en la moneda elegida (respeta el USD fijo si el plan lo tiene). */
-export function precioPlan(plan: Pick<PlanCliente, "precio" | "usd">, moneda: Moneda, trm: number) {
+export function precioPlan(plan: { precio: number; usd?: number }, moneda: Moneda, trm: number) {
   if (moneda === "USD" && plan.usd) return `US$${plan.usd}`;
   return formatCopEnMoneda(plan.precio, moneda, trm);
 }

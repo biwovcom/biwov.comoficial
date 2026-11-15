@@ -49,7 +49,7 @@ function TarjetaPlan({
         </p>
         {plan.adicional && (
           <p className="mt-1 text-xs text-white/60">
-            + {plan.adicional.label}: {precioPlan({ precio: plan.adicional.precio }, moneda, trm)}
+            + {plan.adicional.label}: {precioPlan(plan.adicional, moneda, trm)}{plan.adicional.mensual ? " /mes" : ""}
           </p>
         )}
         <p className="mt-4 flex-1 text-[15px] leading-relaxed text-white/80">{plan.gancho}</p>
@@ -276,7 +276,7 @@ export function PlanesCliente() {
                 <h3 className="mt-2 font-heading text-xl font-extrabold">{e.nombre}</h3>
                 <p className="mt-2 text-sm text-[#0a2642]/65">{e.lema}</p>
                 <p className="mt-4 text-xs font-semibold text-[#0a2642]/50">
-                  {delEscalon.length} {delEscalon.length === 1 ? "plan" : "planes"} · desde {precioPlan({ precio: desde, usd: e.id === "aprende" ? 19 : undefined }, moneda, trm)}
+                  {delEscalon.length} {delEscalon.length === 1 ? "plan" : "planes"} · desde {precioPlan({ precio: desde }, moneda, trm)}
                 </p>
                 <span className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-[#0a2642] group-hover:text-[#00a3c4]">
                   Ver planes <ArrowRight className="h-4 w-4" />
