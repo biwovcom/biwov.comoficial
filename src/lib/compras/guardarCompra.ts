@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { avisarKathe } from "@/lib/avisoTelegram";
 
 export interface FilaCompra {
   tipo: "plan" | "item" | "combo";
@@ -50,7 +51,34 @@ export interface CompraNormalizada {
  * (tipo, item_id, item_nombre), la guarda con las columnas básicas y deja esos
  * datos dentro de "snapshot", para que la firma nunca falle por eso.
  */
+/** Guarda la compra y le avisa a Kathe por Telegram (nuevo contrato o compra en el sitio). */
 export async function insertarCompra(
+  supabase: SupabaseClient,
+  fila: FilaCompra,
+): Promise<string | null> {
+  const id = await insertarCompraSinAviso(supabase, fila);
+  if (id) {
+    const que = fila.item_nombre || fila.plan_id || fila.tipo;
+    const monto = `${fila.moneda === "USD" ? "US$" : "$"}${fila.monto.toLocaleString("es-CO")} ${fila.moneda}`;
+    await avisarKathe(
+      `📝 ${fila.acepta_contrato ? "Contrato aceptado y firmado" : "Compra nueva"} en biwov.com
+
+` +
+        `Cliente: ${fila.nombre}${fila.empresa ? ` (${fila.empresa})` : ""}
+` +
+        `Qué: ${que}
+Monto: ${monto}
+` +
+        `Contacto: ${[fila.whatsapp, fila.email].filter(Boolean).join(" · ") || "—"}
+
+` +
+        `Míralo en el panel → Compras de planes.`,
+    );
+  }
+  return id;
+}
+
+async function insertarCompraSinAviso(
   supabase: SupabaseClient,
   fila: FilaCompra,
 ): Promise<string | null> {
