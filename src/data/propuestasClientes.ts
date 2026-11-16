@@ -422,7 +422,7 @@ const TRES_CUENTAS: PropuestaCliente = {
   sector: "Propuesta a la medida",
   duracionMeses: 4,
   tarjetas: [
-    { etiqueta: "Agencia de turismo", valor: "$1.650.000 / mes" },
+    { etiqueta: "Agencia de turismo", valor: "$949.000 / mes" },
     { etiqueta: "Marca personal", valor: "$650.000 / mes" },
     { etiqueta: "Portafolio en Instagram", valor: "$790.000 (pago único)" },
     { etiqueta: "Duración", valor: "4 meses (mínimo)" },
@@ -513,14 +513,14 @@ const TRES_CUENTAS: PropuestaCliente = {
     { nombre: "Pauta en Meta (opcional)", uso: "Si se decide promocionar planes o destinos", costoAprox: "Se paga directo a Meta; recomendado desde $20.000 COP diarios." },
   ],
   pago: {
-    totalContrato: 9_990_000,
-    titulo: "$3.090.000",
-    subtitulo: "el primer mes · $2.300.000 del segundo al cuarto",
+    totalContrato: 7_186_000,
+    titulo: "$2.389.000",
+    subtitulo: "el primer mes · $1.599.000 del segundo al cuarto",
     clausula:
-      "El valor del servicio es de $1.650.000 COP mensuales por la cuenta de la agencia de turismo y $650.000 COP mensuales por la asesoría de la marca personal, durante 4 meses, más $790.000 COP por una sola vez por el portafolio en Instagram, para un total de $9.990.000 COP. Cada mes se paga por anticipado, dentro de los primeros 5 días del mes de servicio; el portafolio se paga con el primer mes. Si LA CONTRATANTE paga por adelantado los 4 meses, tiene un 10% de descuento sobre las mensualidades. La grabación, cuando se requiera, se paga aparte ($120.000 COP por sesión de hasta 2 horas). Se paga así:",
+      "El valor del servicio es de $949.000 COP mensuales por la cuenta de la agencia de turismo y $650.000 COP mensuales por la asesoría de la marca personal, durante 4 meses, más $790.000 COP por una sola vez por el portafolio en Instagram, para un total de $7.186.000 COP. Cada mes se paga por anticipado, dentro de los primeros 5 días del mes de servicio; el portafolio se paga con el primer mes. Si LA CONTRATANTE paga por adelantado los 4 meses, tiene un 10% de descuento sobre las mensualidades. La grabación, cuando se requiera, se paga aparte ($120.000 COP por sesión de hasta 2 horas). Se paga así:",
     lineas: [
-      { titulo: "Mes 1", valor: 3_090_000, detalle: ["Turismo $1.650.000 + marca personal $650.000 + portafolio $790.000 (pago único)."] },
-      { titulo: "Meses 2, 3 y 4 · cada mes", valor: 2_300_000, detalle: ["Turismo $1.650.000 + marca personal $650.000.", "Total de los meses 2 a 4: $6.900.000."] },
+      { titulo: "Mes 1", valor: 2_389_000, detalle: ["Turismo $949.000 + marca personal $650.000 + portafolio $790.000 (pago único)."] },
+      { titulo: "Meses 2, 3 y 4 · cada mes", valor: 1_599_000, detalle: ["Turismo $949.000 + marca personal $650.000.", "Total de los meses 2 a 4: $4.797.000."] },
     ],
   },
   noIncluye: [

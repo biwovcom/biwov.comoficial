@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/Badge";
 import { PLANES } from "@/data/planes";
 import { FileSignature } from "lucide-react";
 import { listarCompras, type CompraNormalizada } from "@/lib/compras/guardarCompra";
+import { BotonEliminar } from "./BotonEliminar";
 
 type PlanCompra = CompraNormalizada;
 
@@ -56,11 +57,12 @@ export default async function ComprasPage() {
             <Th>Contrato</Th>
             <Th>Datos</Th>
             <Th>Contrato firmado</Th>
+            <Th>Acciones</Th>
           </TableHead>
           <TableBody>
             {compras.length === 0 && (
               <Tr>
-                <Td colSpan={10} className="py-8 text-center text-text-secondary">
+                <Td colSpan={11} className="py-8 text-center text-text-secondary">
                   Todavía no hay compras registradas.
                 </Td>
               </Tr>
@@ -106,6 +108,9 @@ export default async function ComprasPage() {
                   ) : (
                     "—"
                   )}
+                </Td>
+                <Td>
+                  <BotonEliminar id={c.id} nombre={c.nombre ?? "sin nombre"} />
                 </Td>
               </Tr>
             ))}
