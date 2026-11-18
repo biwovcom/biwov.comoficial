@@ -932,7 +932,7 @@ export function PlanCliente({ slug, nombre, negocio, plan }: { slug: string; nom
       </div>
 
       <div className="mt-8 grid grid-cols-3 gap-2 md:gap-3">
-        {[["🎬", reels.length, `guiones (${Math.round(reels.length / Math.max(1, semanas.length))} por semana)`], ["📱", historias.length, "días de historias"], ["✅", tareas.length, "tareas para ti"]].map(([e, n, l]) => (
+        {[["🎬", reels.length, reels.some((r) => r.opcion) ? `guiones (${Math.round(reels.length / Math.max(1, semanas.length))} por semana)` : "reels del mes"], ["📱", historias.length, "días de historias"], ["✅", tareas.length, "tareas para ti"]].map(([e, n, l]) => (
           <div key={String(l)} className="rounded-2xl border border-white/10 bg-white/[0.04] p-3 md:p-4">
             <p className="text-2xl font-semibold md:text-3xl">{e} {n}</p>
             <p className="text-xs text-white/55 md:text-sm">{l}</p>
@@ -972,15 +972,24 @@ export function PlanCliente({ slug, nombre, negocio, plan }: { slug: string; nom
                 </button>
               ))}
             </div>
-            <p className="mt-4 text-sm text-white/65">Esta semana hay <b>{reels.filter((r) => r.semana === semana).length} guiones</b>. Publica <b>3</b>: los ⭐ ya están en el calendario; si alguno no te convence, cámbialo por una de las opciones 🔁. Graba varios el mismo día.</p>
-            <h3 className="mt-5 text-sm font-bold uppercase tracking-[0.18em] text-[#c6f432]">⭐ Recomendados (en el calendario)</h3>
-            <div className="mt-3 space-y-4">
-              {reels.filter((r) => r.semana === semana && !r.opcion).map((r) => <ReelCard key={r.id} it={r} marcas={marcas} marcar={marcar} />)}
-            </div>
-            <h3 className="mt-8 text-sm font-bold uppercase tracking-[0.18em] text-[#8fdff0]">🔁 Opciones para cambiar o grabar de más</h3>
-            <div className="mt-3 space-y-4">
-              {reels.filter((r) => r.semana === semana && r.opcion).map((r) => <ReelCard key={r.id} it={r} marcas={marcas} marcar={marcar} />)}
-            </div>
+            {(() => {
+              const sem = reels.filter((r) => r.semana === semana).sort((a, b) => (a.fecha || "9").localeCompare(b.fecha || "9"));
+              const opciones = sem.filter((r) => r.opcion);
+              return opciones.length ? (
+                <>
+                  <p className="mt-4 text-sm text-white/65">Esta semana hay <b>{sem.length} guiones</b>. Publica los ⭐ del calendario; si alguno no te convence, cámbialo por una de las opciones 🔁.</p>
+                  <h3 className="mt-5 text-sm font-bold uppercase tracking-[0.18em] text-[#c6f432]">⭐ Recomendados (en el calendario)</h3>
+                  <div className="mt-3 space-y-4">{sem.filter((r) => !r.opcion).map((r) => <ReelCard key={r.id} it={r} marcas={marcas} marcar={marcar} />)}</div>
+                  <h3 className="mt-8 text-sm font-bold uppercase tracking-[0.18em] text-[#8fdff0]">🔁 Opciones para cambiar o grabar de más</h3>
+                  <div className="mt-3 space-y-4">{opciones.map((r) => <ReelCard key={r.id} it={r} marcas={marcas} marcar={marcar} />)}</div>
+                </>
+              ) : (
+                <>
+                  <p className="mt-4 text-sm text-white/65">Esta semana: <b>{sem.length} {sem.length === 1 ? "reel" : "reels"}</b>, cada uno con su fecha de publicación. Puedes grabar varios el mismo día.</p>
+                  <div className="mt-4 space-y-4">{sem.map((r) => <ReelCard key={r.id} it={r} marcas={marcas} marcar={marcar} />)}</div>
+                </>
+              );
+            })()}
             <PorQue>
               <p>Cada guion tiene un <b>gancho de 3 segundos</b> (lo que se ve, lo que se lee y lo primero que dices), porque en ese tiempo la gente decide si sigue viendo o pasa al siguiente video.</p>
               <p>Lo que más premian hoy Instagram y TikTok es que <b>vean el video completo</b> y que lo <b>envíen a otra persona</b>. Por eso los videos son cortos (25 a 35 s), numerados (“1, 2, 3”) y cierran con algo como “envíaselo a…”.</p>
