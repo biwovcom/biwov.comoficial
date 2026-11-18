@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  BarChart3, CalendarDays, TrendingUp, Check, ChevronDown, Clapperboard, Copy, Lightbulb, ListChecks, Smartphone, Target,
+  BarChart3, CalendarDays, TrendingUp, UserRound, Check, ChevronDown, Clapperboard, Copy, Lightbulb, ListChecks, Smartphone, Target,
 } from "lucide-react";
 import type { DocumentosCliente } from "@/data/documentosClientes";
 import { cn } from "@/lib/utils";
@@ -57,8 +57,10 @@ async function leerPlan(slug: string) {
   }
   let calculadora: Calc | null = null;
   try { calculadora = f.calculadora?.stringValue ? JSON.parse(f.calculadora.stringValue) : null; } catch { /* sin calculadora */ }
+  let perfil: PerfilData | null = null;
+  try { perfil = f.perfil?.stringValue ? JSON.parse(f.perfil.stringValue) : null; } catch { /* sin perfil */ }
   const txt = (k: string) => (f[k]?.stringValue as string) || "";
-  return { items, marcas, ideas, reportes, calculadora, cliente: txt("cliente"), desde: txt("desde"), hasta: txt("hasta") };
+  return { items, marcas, ideas, reportes, calculadora, perfil, cliente: txt("cliente"), desde: txt("desde"), hasta: txt("hasta") };
 }
 async function guardarCampo(slug: string, mapa: "marcas" | "ideasCliente" | "reportes", clave: string, valor: { booleanValue: boolean } | { stringValue: string }) {
   const r = await fetch(`${BASE}/${slug}?updateMask.fieldPaths=${mapa}.${clave}&currentDocument.exists=true`, {
@@ -567,11 +569,185 @@ function Resultados({ reportes, guardar }: { reportes: Record<string, Reporte>; 
   );
 }
 
+// ---------- Tu perfil (cómo debe verse cada red, con el porqué) ----------
+type DestacadaP = { nombre: string; icono: string; contenido: string; porque: string };
+type CampoP = { etiqueta: string; valor: string; nota?: string };
+type PerfilData = {
+  intro: string; comoSeMueven: string[];
+  instagram: {
+    usuario: string; antes: { nombre: string; bio: string[]; enlace: string; destacadas: string };
+    foto: { indicaciones: string[]; porque: string }; nombre: string; nombrePorque: string; categoria: string;
+    bio: { texto: string; que: string }[]; bioPorque: string; enlace: string; enlaceTexto: string; enlacePorque: string;
+    destacadas: DestacadaP[]; destacadasPorque: string; fijados: string[]; fijadosPorque: string;
+  };
+  facebook: { pagina: string; campos: CampoP[]; tareasExtra: string[]; porque: string };
+  tiktok: { campos: CampoP[]; porque: string };
+};
+
+function Copiar({ texto, label = "Copiar" }: { texto: string; label?: string }) {
+  const [ok, setOk] = useState(false);
+  return (
+    <button type="button" onClick={() => { navigator.clipboard?.writeText(texto); setOk(true); setTimeout(() => setOk(false), 1500); }}
+      className="inline-flex flex-none items-center gap-1 rounded-full bg-[#c6f432] px-3 py-1.5 text-xs font-bold text-[#03101b]">
+      <Copy className="h-3.5 w-3.5" />{ok ? "¡Copiado!" : label}
+    </button>
+  );
+}
+const Num = ({ n }: { n: number }) => (
+  <span className="grid h-6 w-6 flex-none place-items-center rounded-full bg-[#ff9f43] text-xs font-extrabold text-[#03101b] shadow">{n}</span>
+);
+
+function Perfil({ p }: { p: PerfilData }) {
+  const [red, setRed] = useState<"instagram" | "facebook" | "tiktok">("instagram");
+  const ig = p.instagram;
+  const bioTxt = ig.bio.map((b) => b.texto).join("\n");
+  return (
+    <div className="space-y-8">
+      <p className="max-w-3xl text-lg text-white/75">{p.intro}</p>
+      <div className="flex flex-wrap gap-2">
+        {([["instagram", "📸 Instagram"], ["facebook", "👍 Facebook"], ["tiktok", "🎵 TikTok"]] as const).map(([k, l]) => (
+          <button key={k} type="button" onClick={() => setRed(k)} className={cn("rounded-full px-4 py-2 text-sm font-bold", red === k ? "bg-white text-[#03101b]" : "bg-white/10")}>{l}</button>
+        ))}
+      </div>
+
+      {red === "instagram" && (
+        <>
+          <div className="grid items-start gap-8 lg:grid-cols-[340px_1fr]">
+            {/* Celular con el perfil ideal */}
+            <div className="mx-auto w-full max-w-[340px] rounded-[2.4rem] border-[6px] border-white/15 bg-white p-4 text-[#111] shadow-2xl">
+              <div className="mx-auto mb-3 h-1.5 w-20 rounded-full bg-black/15" />
+              <p className="text-center text-sm font-bold">{ig.usuario}</p>
+              <div className="mt-3 flex items-center gap-4">
+                <div className="relative">
+                  <div className="grid h-20 w-20 place-items-center rounded-full bg-gradient-to-br from-[#00c2e8] to-[#0a6b7a] p-[3px]">
+                    <div className="grid h-full w-full place-items-center rounded-full bg-[#7fd6cf] text-3xl">👩‍⚕️</div>
+                  </div>
+                  <span className="absolute -left-2 -top-2"><Num n={1} /></span>
+                </div>
+                <div className="flex flex-1 justify-around text-center text-xs">
+                  <div><b className="block text-sm">157</b>publicaciones</div><div><b className="block text-sm">339</b>seguidores</div><div><b className="block text-sm">138</b>seguidos</div>
+                </div>
+              </div>
+              <div className="mt-3 space-y-0.5 text-[12.5px] leading-snug">
+                <p className="flex items-center gap-1.5 font-bold"><Num n={2} /> {ig.nombre}</p>
+                <p className="pl-7 text-black/50">{ig.categoria}</p>
+                {ig.bio.map((b, k) => <p key={k} className="flex items-center gap-1.5"><Num n={3 + k} /> {b.texto}</p>)}
+                <p className="flex items-center gap-1.5 font-semibold text-[#00376b]"><Num n={3 + ig.bio.length} /> 🔗 {ig.enlaceTexto}</p>
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-1.5 text-center text-xs font-semibold">
+                <span className="rounded-lg bg-black/5 py-1.5">Seguir</span><span className="rounded-lg bg-black/5 py-1.5">Mensaje</span>
+              </div>
+              <div className="relative mt-4 flex gap-2.5 overflow-x-auto pb-1">
+                <span className="absolute -top-1 left-0 z-10"><Num n={4 + ig.bio.length} /></span>
+                {ig.destacadas.map((d) => (
+                  <div key={d.nombre} className="flex w-14 flex-none flex-col items-center">
+                    <div className="grid h-14 w-14 place-items-center rounded-full border-2 border-black/10 bg-[#0a6b7a] text-xl">{d.icono}</div>
+                    <span className="mt-1 w-full truncate text-center text-[10px]">{d.nombre}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="relative mt-3 grid grid-cols-3 gap-0.5">
+                <span className="absolute -left-2 -top-2 z-10"><Num n={5 + ig.bio.length} /></span>
+                {[0, 1, 2, 3, 4, 5].map((k) => (
+                  <div key={k} className={cn("relative aspect-[3/4] rounded-sm", k < 3 ? "bg-[#0a6b7a]" : "bg-black/10")}>
+                    {k < 3 && <span className="absolute right-1 top-1 text-[10px]">📌</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Explicación numerada */}
+            <ol className="min-w-0 space-y-3">
+              <li className="flex gap-3 rounded-2xl bg-white/[0.04] p-4 [&>div]:min-w-0 [&>div]:flex-1"><Num n={1} /><div><p className="font-semibold">Foto de perfil</p>
+                <ul className="mt-1 list-disc pl-5 text-sm text-white/75">{ig.foto.indicaciones.map((x) => <li key={x}>{x}</li>)}</ul>
+                <p className="mt-1 text-sm text-[#8fdff0]">💡 {ig.foto.porque}</p></div></li>
+              <li className="flex gap-3 rounded-2xl bg-white/[0.04] p-4 [&>div]:min-w-0 [&>div]:flex-1"><Num n={2} /><div className="flex-1"><p className="font-semibold">Nombre (se busca) y categoría “{ig.categoria}”</p>
+                <div className="mt-2 flex flex-wrap items-center gap-2"><code className="break-words rounded-lg bg-black/30 px-2 py-1 text-sm">{ig.nombre}</code><Copiar texto={ig.nombre} /></div>
+                <p className="mt-1 text-sm text-[#8fdff0]">💡 {ig.nombrePorque}</p></div></li>
+              {ig.bio.map((b, k) => (
+                <li key={k} className="flex gap-3 rounded-2xl bg-white/[0.04] p-4 [&>div]:min-w-0 [&>div]:flex-1"><Num n={3 + k} /><div><p className="font-semibold">Biografía, línea {k + 1}: {b.que}</p><p className="text-sm text-white/75">{b.texto}</p></div></li>
+              ))}
+              <li className="flex gap-3 rounded-2xl bg-white/[0.04] p-4 [&>div]:min-w-0 [&>div]:flex-1"><Num n={3 + ig.bio.length} /><div className="flex-1"><p className="font-semibold">Enlace de WhatsApp con mensaje ya escrito</p>
+                <div className="mt-2 flex flex-wrap items-center gap-2"><code className="block max-w-full truncate rounded-lg bg-black/30 px-2 py-1 text-xs">{ig.enlace}</code><Copiar texto={ig.enlace} label="Copiar enlace" /></div>
+                <p className="mt-1 text-sm text-[#8fdff0]">💡 {ig.enlacePorque}</p></div></li>
+              <li className="flex gap-3 rounded-2xl bg-white/[0.04] p-4 [&>div]:min-w-0 [&>div]:flex-1"><Num n={4 + ig.bio.length} /><div><p className="font-semibold">Historias destacadas (en este orden)</p><p className="mt-1 text-sm text-[#8fdff0]">💡 {ig.destacadasPorque}</p></div></li>
+              <li className="flex gap-3 rounded-2xl bg-white/[0.04] p-4 [&>div]:min-w-0 [&>div]:flex-1"><Num n={5 + ig.bio.length} /><div><p className="font-semibold">3 publicaciones fijadas 📌</p>
+                <ul className="mt-1 list-disc pl-5 text-sm text-white/75">{ig.fijados.map((x) => <li key={x}>{x}</li>)}</ul>
+                <p className="mt-1 text-sm text-[#8fdff0]">💡 {ig.fijadosPorque}</p></div></li>
+            </ol>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
+              <p className="text-xs font-bold uppercase tracking-wider text-[#ff9f43]">❌ Antes</p>
+              <p className="mt-2 text-sm font-semibold">{ig.antes.nombre}</p>
+              {ig.antes.bio.map((x) => <p key={x} className="text-sm text-white/70">{x}</p>)}
+              <p className="mt-1 text-xs text-white/50">{ig.antes.enlace} · {ig.antes.destacadas}</p>
+            </div>
+            <div className="rounded-3xl border border-[#c6f432]/40 bg-[#c6f432]/[0.06] p-5">
+              <div className="flex items-center justify-between gap-2"><p className="text-xs font-bold uppercase tracking-wider text-[#c6f432]">✅ Nueva biografía (copiar y pegar)</p><Copiar texto={bioTxt} /></div>
+              <pre className="mt-2 whitespace-pre-wrap font-sans text-sm">{bioTxt}</pre>
+              <p className="mt-2 text-xs text-white/55">💡 {ig.bioPorque}</p>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-xl font-semibold">Las {ig.destacadas.length} destacadas</h3>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {ig.destacadas.map((d, k) => (
+                <div key={d.nombre} className="rounded-3xl border border-white/10 bg-white/[0.04] p-4">
+                  <div className="flex items-center gap-3">
+                    <span className="grid h-12 w-12 place-items-center rounded-full bg-[#0a6b7a] text-xl">{d.icono}</span>
+                    <div><p className="text-xs text-white/50">Destacada {k + 1}</p><p className="font-semibold">{d.nombre}</p></div>
+                    <span className="ml-auto"><Copiar texto={d.nombre} label="Nombre" /></span>
+                  </div>
+                  <p className="mt-3 text-sm text-white/80"><b>Qué poner:</b> {d.contenido}</p>
+                  <p className="mt-1 text-sm text-[#8fdff0]">💡 {d.porque}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
+      {(red === "facebook" || red === "tiktok") && (() => {
+        const r = red === "facebook" ? p.facebook : p.tiktok;
+        return (
+          <div className="space-y-4">
+            {red === "facebook" && <p className="text-sm text-white/60">Página que se trabaja: <b className="text-white">{p.facebook.pagina}</b></p>}
+            <div className="space-y-2">
+              {r.campos.map((c) => (
+                <div key={c.etiqueta} className="flex flex-wrap items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                  <div className="min-w-[180px] text-xs font-bold uppercase tracking-wider text-[#8fdff0]">{c.etiqueta}</div>
+                  <div className="flex-1 text-sm">{c.valor}{c.nota && <span className="mt-1 block text-xs text-[#ffd2a6]">⚠️ {c.nota}</span>}</div>
+                  <Copiar texto={c.valor} />
+                </div>
+              ))}
+            </div>
+            {red === "facebook" && p.facebook.tareasExtra.length > 0 && (
+              <ul className="list-disc space-y-1 pl-5 text-sm text-white/75">{p.facebook.tareasExtra.map((x) => <li key={x}>{x}</li>)}</ul>
+            )}
+            <p className="rounded-2xl bg-[#00c2e8]/[0.08] p-4 text-sm text-[#8fdff0]">💡 {r.porque}</p>
+          </div>
+        );
+      })()}
+
+      <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
+        <h3 className="text-xl font-semibold">¿Cómo se mueven las redes hoy?</h3>
+        <ul className="mt-3 space-y-2">
+          {p.comoSeMueven.map((x, k) => <li key={k} className="flex gap-3 text-sm text-white/80"><span className="font-bold text-[#c6f432]">{k + 1}.</span>{x}</li>)}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
 // ---------- Página ----------
 const TABS = [
   { id: "calendario", label: "Calendario", icon: CalendarDays },
   { id: "guiones", label: "Guiones", icon: Clapperboard },
   { id: "tareas", label: "Tus tareas", icon: ListChecks },
+  { id: "perfil", label: "Tu perfil", icon: UserRound },
   { id: "estrategia", label: "Estrategia", icon: Target },
   { id: "resultados", label: "Resultados", icon: TrendingUp },
   { id: "calculadora", label: "Calculadora", icon: BarChart3 },
@@ -589,11 +765,20 @@ export function PlanCliente({ slug, nombre, negocio, plan }: { slug: string; nom
   const [idea, setIdea] = useState({ texto: "", link: "" });
   const [reportes, setReportes] = useState<Record<string, Reporte>>({});
   const [calcPub, setCalcPub] = useState<Calc | null>(null);
+  const [perfil, setPerfil] = useState<PerfilData | null>(null);
   const [info, setInfo] = useState({ cliente: "", desde: "", hasta: "" });
+
+  // Abrir una pestaña directo desde el enlace: …/plan#perfil, #resultados, #guiones…
+  useEffect(() => {
+    const h = window.location.hash.replace("#", "");
+    // Solo al cargar: el hash no existe en el servidor, por eso se lee aquí
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (TABS.some((t) => t.id === h)) setTab(h as (typeof TABS)[number]["id"]);
+  }, []);
 
   useEffect(() => {
     leerPlan(slug).then((r) => {
-      setItems(r.items); setMarcas(r.marcas); setIdeas(r.ideas); setReportes(r.reportes); setCalcPub(r.calculadora);
+      setItems(r.items); setMarcas(r.marcas); setIdeas(r.ideas); setReportes(r.reportes); setCalcPub(r.calculadora); setPerfil(r.perfil);
       setInfo({ cliente: r.cliente, desde: r.desde, hasta: r.hasta }); setEstado("ok");
     }).catch(() => setEstado("error"));
   }, [slug]);
@@ -674,7 +859,7 @@ export function PlanCliente({ slug, nombre, negocio, plan }: { slug: string; nom
 
       <nav className="sticky top-0 z-10 -mx-4 mt-8 flex gap-1 overflow-x-auto border-b border-white/10 bg-bg-deep/95 px-4 backdrop-blur md:mx-0 md:px-0">
         {TABS.map((t) => (
-          <button key={t.id} type="button" onClick={() => setTab(t.id)}
+          <button key={t.id} type="button" onClick={() => { setTab(t.id); history.replaceState(null, "", `#${t.id}`); }}
             className={cn("flex items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-3 text-sm font-bold transition-colors", tab === t.id ? "border-[#c6f432] text-white" : "border-transparent text-white/55 hover:text-white")}>
             <t.icon className="h-4 w-4 text-[#00c2e8]" /> {t.label}
           </button>
@@ -781,6 +966,18 @@ export function PlanCliente({ slug, nombre, negocio, plan }: { slug: string; nom
               </PorQue>
             </div>
           </div>
+        )}
+
+        {estado === "ok" && tab === "perfil" && (
+          perfil ? (
+            <>
+              <Perfil p={perfil} />
+              <div className="mt-6 space-y-2">
+                <h3 className="text-lg font-semibold">Tareas para dejar tu perfil listo</h3>
+                {tareas.filter((t) => (t as Item & { grupo?: string }).grupo === "perfil").map((t) => <TareaFila key={t.id} it={t} marcas={marcas} marcar={marcar} />)}
+              </div>
+            </>
+          ) : <p className="text-white/60">Pronto verás aquí cómo debe quedar tu perfil.</p>
         )}
 
         {estado === "ok" && tab === "resultados" && (
