@@ -10,19 +10,20 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false, googleBot: { index: false, follow: false } },
 };
 
+// Cualquier cliente con plan publicado desde la oficina (planesPublicos/<slug>) tiene esta página.
 export function generateStaticParams() {
   return DOCUMENTOS_CLIENTES.filter((d) => d.plan).map((d) => ({ slug: d.slug }));
 }
-export const dynamicParams = false;
+export const dynamicParams = true;
 
 export default async function PlanPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  if (!/^[a-z0-9-]{3,80}$/.test(slug)) notFound();
   const d = documentosPorSlug(slug);
-  if (!d || !d.plan) notFound();
   return (
     <div className="min-h-screen overflow-x-clip bg-bg-deep text-white">
-      <DocHeader volver={{ href: `/documentos/${d.slug}`, texto: "Documentos" }} />
-      <PlanCliente slug={d.slug} nombre={d.nombrePila} negocio={d.negocio} plan={d.plan} />
+      <DocHeader volver={d ? { href: `/documentos/${d.slug}`, texto: "Documentos" } : undefined} />
+      <PlanCliente slug={slug} nombre={d?.nombrePila} negocio={d?.negocio} plan={d?.plan} />
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  BarChart3, CalendarDays, Check, ChevronDown, Clapperboard, Copy, Lightbulb, ListChecks, Smartphone, Target,
+  BarChart3, CalendarDays, TrendingUp, Check, ChevronDown, Clapperboard, Copy, Lightbulb, ListChecks, Smartphone, Target,
 } from "lucide-react";
 import type { DocumentosCliente } from "@/data/documentosClientes";
 import { cn } from "@/lib/utils";
@@ -51,9 +51,16 @@ async function leerPlan(slug: string) {
   for (const [k, v] of Object.entries(f.ideasCliente?.mapValue?.fields || {})) {
     try { ideas[k] = JSON.parse((v as { stringValue: string }).stringValue); } catch { /* idea mal formada */ }
   }
-  return { items, marcas, ideas };
+  const reportes: Record<string, Reporte> = {};
+  for (const [k, v] of Object.entries(f.reportes?.mapValue?.fields || {})) {
+    try { reportes[k.replace(/^s(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3")] = JSON.parse((v as { stringValue: string }).stringValue); } catch { /* reporte mal formado */ }
+  }
+  let calculadora: Calc | null = null;
+  try { calculadora = f.calculadora?.stringValue ? JSON.parse(f.calculadora.stringValue) : null; } catch { /* sin calculadora */ }
+  const txt = (k: string) => (f[k]?.stringValue as string) || "";
+  return { items, marcas, ideas, reportes, calculadora, cliente: txt("cliente"), desde: txt("desde"), hasta: txt("hasta") };
 }
-async function guardarCampo(slug: string, mapa: "marcas" | "ideasCliente", clave: string, valor: { booleanValue: boolean } | { stringValue: string }) {
+async function guardarCampo(slug: string, mapa: "marcas" | "ideasCliente" | "reportes", clave: string, valor: { booleanValue: boolean } | { stringValue: string }) {
   const r = await fetch(`${BASE}/${slug}?updateMask.fieldPaths=${mapa}.${clave}&currentDocument.exists=true`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
@@ -198,6 +205,11 @@ function TareaFila({ it, marcas, marcar }: { it: Item; marcas: Record<string, bo
   );
 }
 
+function fechaLarga(iso: string) {
+  if (!iso) return "";
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString("es-CO", { day: "numeric", month: "long" });
+}
 function fechaCorta(iso: string) {
   if (!iso) return "";
   const [y, m, d] = iso.split("-").map(Number);
@@ -438,17 +450,135 @@ function Calculadora({ c }: { c: Calc }) {
   );
 }
 
+// ---------- Resultados (el cliente reporta cada semana) ----------
+type Reporte = { escribieron: number; agendaron: number; asistieron: number; iniciaron: number; inversion: number; ventas: number; comentario: string; fecha: string };
+const CAMPOS_REPORTE: [keyof Reporte, string, string][] = [
+  ["escribieron", "Personas que escribieron", "WhatsApp, Instagram o llamadas nuevas"],
+  ["agendaron", "Agendaron cita", "Valoración, cita o cotización"],
+  ["asistieron", "Asistieron", "Llegaron a la cita"],
+  ["iniciaron", "Empezaron o compraron", "Iniciaron tratamiento o pagaron"],
+  ["inversion", "Invertido en pauta esa semana ($)", "Lo que se cargó en Meta (opcional)"],
+  ["ventas", "Valor vendido ($)", "Lo que pagaron los nuevos (opcional)"],
+];
+const lunesDe = (d = new Date()) => { const x = new Date(d); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x.toISOString().slice(0, 10); };
+const pct = (a: number, b: number) => (b > 0 ? Math.round((a / b) * 100) : 0);
+
+export function totalesReportes(reportes: Record<string, Reporte>) {
+  const t = { escribieron: 0, agendaron: 0, asistieron: 0, iniciaron: 0, inversion: 0, ventas: 0 };
+  for (const r of Object.values(reportes)) for (const k of Object.keys(t) as (keyof typeof t)[]) t[k] += Number(r[k]) || 0;
+  return t;
+}
+
+function Resultados({ reportes, guardar }: { reportes: Record<string, Reporte>; guardar: (semana: string, r: Reporte) => Promise<void> }) {
+  const [semana, setSemana] = useState(lunesDe());
+  const vacio: Reporte = { escribieron: 0, agendaron: 0, asistieron: 0, iniciaron: 0, inversion: 0, ventas: 0, comentario: "", fecha: "" };
+  const [f, setF] = useState<Reporte>(reportes[lunesDe()] || vacio);
+  const [guardando, setGuardando] = useState(false);
+  const semanas = Object.keys(reportes).sort();
+  const t = totalesReportes(reportes);
+  const maxEsc = Math.max(1, ...semanas.map((s) => reportes[s].escribieron || 0));
+  const elegir = (s: string) => { setSemana(s); setF(reportes[s] || vacio); };
+
+  const lectura: string[] = [];
+  if (t.escribieron >= 10) {
+    const ag = pct(t.agendaron, t.escribieron), as = pct(t.asistieron, t.agendaron), ini = pct(t.iniciaron, t.asistieron);
+    if (ag < 15) lectura.push(`De cada 100 que escriben, agendan ${ag}. El punto a mejorar es la respuesta y el seguimiento: contestar en menos de 5 minutos, enviar el mensaje con la oferta y hacer seguimiento a los 2 y 7 días.`);
+    else lectura.push(`¡Bien! Agendan ${ag} de cada 100 que escriben.`);
+    if (t.agendaron >= 5 && as < 70) lectura.push(`Asiste el ${as} % de los que agendan. Confirmar la cita un día antes por WhatsApp suele subir la asistencia.`);
+    if (t.asistieron >= 5 && ini < 60) lectura.push(`Empieza el ${ini} % de los que asisten. Revisemos cómo se presenta el plan y las formas de pago en la cita.`);
+    if (t.inversion > 0 && t.escribieron > 0) lectura.push(`Cada conversación costó ${cop(t.inversion / t.escribieron)}${t.iniciaron ? ` y cada cliente nuevo ${cop(t.inversion / t.iniciaron)}` : ""}.`);
+    if (t.inversion > 0 && t.ventas > 0) lectura.push(`Por cada $1 invertido en pauta se vendieron ${cop(t.ventas / t.inversion)}.`);
+  }
+
+  const enviar = async () => { setGuardando(true); await guardar(semana, { ...f, fecha: new Date().toISOString() }); setGuardando(false); };
+
+  return (
+    <div className="space-y-8">
+      <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr]">
+        <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
+          <h2 className="text-xl font-semibold">Tu reporte de la semana</h2>
+          <p className="mt-1 text-sm text-white/60">Llénalo cada lunes con lo de la semana anterior. Toma 1 minuto.</p>
+          <label className="mt-4 block text-sm text-white/70">Semana que empieza el
+            <input type="date" value={semana} onChange={(e) => elegir(lunesDe(new Date(e.target.value + "T12:00:00")))} className="mt-1 w-full rounded-2xl border border-white/15 bg-transparent p-2.5 text-sm text-white [color-scheme:dark]" />
+          </label>
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            {CAMPOS_REPORTE.map(([k, l, h]) => (
+              <label key={k} className="block">
+                <span className="text-xs font-bold text-white/80">{l}</span>
+                <input type="number" min={0} inputMode="numeric" value={Number(f[k]) || ""} placeholder="0" onChange={(e) => setF({ ...f, [k]: Number(e.target.value) || 0 })}
+                  className="mt-1 w-full rounded-2xl border border-white/15 bg-transparent p-2.5 text-lg font-semibold outline-none focus:border-[#c6f432]" />
+                <span className="text-[11px] text-white/40">{h}</span>
+              </label>
+            ))}
+          </div>
+          <textarea value={f.comentario} onChange={(e) => setF({ ...f, comentario: e.target.value.slice(0, 800) })} rows={3} placeholder="¿Qué preguntaron más? ¿Qué pasó esta semana?"
+            className="mt-3 w-full rounded-2xl border border-white/15 bg-transparent p-3 text-sm outline-none focus:border-[#c6f432]" />
+          <button type="button" disabled={guardando} onClick={enviar} className="mt-3 rounded-full bg-[#c6f432] px-6 py-3 text-sm font-bold text-[#03101b] disabled:opacity-60">
+            {guardando ? "Guardando…" : reportes[semana] ? "Actualizar reporte" : "Enviar reporte"}
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          <div className="rounded-3xl bg-white p-6 text-[#03101b]">
+            <p className="text-sm font-semibold text-[#0a2642]/60">Acumulado de {semanas.length} {semanas.length === 1 ? "semana" : "semanas"}</p>
+            <div className="mt-4 space-y-2">
+              {([["Escribieron", t.escribieron], ["Agendaron", t.agendaron], ["Asistieron", t.asistieron], ["Empezaron", t.iniciaron]] as [string, number][]).map(([l, v], k, arr) => (
+                <div key={l} className="flex items-center gap-3">
+                  <div className="h-8 rounded-lg" style={{ width: `${Math.max(8, pct(v, Math.max(1, arr[0][1])))}%`, background: k === 3 ? "#c6f432" : `rgba(0,194,232,${0.9 - k * 0.2})` }} />
+                  <span className="whitespace-nowrap text-sm"><b className="text-lg">{v}</b> {l.toLowerCase()}{k > 0 && arr[k - 1][1] > 0 ? <span className="text-[#0a2642]/50"> · {pct(v, arr[k - 1][1])} %</span> : null}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-3xl border border-[#00c2e8]/25 bg-[#00c2e8]/[0.06] p-5 text-sm leading-relaxed">
+            <p className="font-bold text-[#8fdff0]">🔎 ¿Está funcionando? Lo que dicen tus números</p>
+            {lectura.length ? <ul className="mt-2 list-disc space-y-1.5 pl-5 text-white/80">{lectura.map((x) => <li key={x}>{x}</li>)}</ul>
+              : <p className="mt-2 text-white/70">Cuando tengas al menos 10 personas que escribieron, aquí verás qué está funcionando y qué mejorar.</p>}
+          </div>
+        </div>
+      </div>
+
+      {semanas.length > 0 && (
+        <div>
+          <h3 className="text-lg font-semibold">Semana a semana</h3>
+          <div className="mt-3 overflow-x-auto rounded-3xl border border-white/10">
+            <table className="w-full min-w-[620px] text-sm">
+              <thead className="bg-white/[0.06] text-left text-xs uppercase tracking-wider text-white/55">
+                <tr><th className="p-3">Semana</th><th className="p-3">Escribieron</th><th className="p-3">Agendaron</th><th className="p-3">Asistieron</th><th className="p-3">Empezaron</th><th className="p-3">Inversión</th><th className="p-3">Vendido</th></tr>
+              </thead>
+              <tbody>
+                {semanas.slice().reverse().map((s) => {
+                  const r = reportes[s];
+                  return (
+                    <tr key={s} onClick={() => elegir(s)} className="cursor-pointer border-t border-white/5 hover:bg-white/[0.04]">
+                      <td className="p-3 font-semibold">{fechaCorta(s)}</td>
+                      <td className="p-3"><div className="flex items-center gap-2"><div className="h-2 rounded bg-[#00c2e8]" style={{ width: `${(r.escribieron / maxEsc) * 60}px` }} />{r.escribieron}</div></td>
+                      <td className="p-3">{r.agendaron}</td><td className="p-3">{r.asistieron}</td><td className="p-3 font-bold text-[#c6f432]">{r.iniciaron}</td>
+                      <td className="p-3">{r.inversion ? cop(r.inversion) : "—"}</td><td className="p-3">{r.ventas ? cop(r.ventas) : "—"}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ---------- Página ----------
 const TABS = [
   { id: "calendario", label: "Calendario", icon: CalendarDays },
   { id: "guiones", label: "Guiones", icon: Clapperboard },
   { id: "tareas", label: "Tus tareas", icon: ListChecks },
   { id: "estrategia", label: "Estrategia", icon: Target },
+  { id: "resultados", label: "Resultados", icon: TrendingUp },
   { id: "calculadora", label: "Calculadora", icon: BarChart3 },
   { id: "ideas", label: "Ideas", icon: Lightbulb },
 ] as const;
 
-export function PlanCliente({ slug, nombre, negocio, plan }: { slug: string; nombre: string; negocio: string; plan: NonNullable<DocumentosCliente["plan"]> }) {
+export function PlanCliente({ slug, nombre, negocio, plan }: { slug: string; nombre?: string; negocio?: string; plan?: DocumentosCliente["plan"] }) {
   const [items, setItems] = useState<Item[]>([]);
   const [marcas, setMarcas] = useState<Record<string, boolean>>({});
   const [ideas, setIdeas] = useState<Record<string, Idea>>({});
@@ -457,9 +587,15 @@ export function PlanCliente({ slug, nombre, negocio, plan }: { slug: string; nom
   const [aviso, setAviso] = useState("");
   const [semana, setSemana] = useState(1);
   const [idea, setIdea] = useState({ texto: "", link: "" });
+  const [reportes, setReportes] = useState<Record<string, Reporte>>({});
+  const [calcPub, setCalcPub] = useState<Calc | null>(null);
+  const [info, setInfo] = useState({ cliente: "", desde: "", hasta: "" });
 
   useEffect(() => {
-    leerPlan(slug).then((r) => { setItems(r.items); setMarcas(r.marcas); setIdeas(r.ideas); setEstado("ok"); }).catch(() => setEstado("error"));
+    leerPlan(slug).then((r) => {
+      setItems(r.items); setMarcas(r.marcas); setIdeas(r.ideas); setReportes(r.reportes); setCalcPub(r.calculadora);
+      setInfo({ cliente: r.cliente, desde: r.desde, hasta: r.hasta }); setEstado("ok");
+    }).catch(() => setEstado("error"));
   }, [slug]);
 
   const avisar = (t: string) => { setAviso(t); setTimeout(() => setAviso(""), 2500); };
@@ -477,6 +613,23 @@ export function PlanCliente({ slug, nombre, negocio, plan }: { slug: string; nom
     catch { avisar("No se pudo enviar la idea. Intenta de nuevo."); }
   };
 
+  const guardarReporte = async (semana: string, r: Reporte) => {
+    try {
+      await guardarCampo(slug, "reportes", "s" + semana.replaceAll("-", ""), { stringValue: JSON.stringify(r) });
+      setReportes((x) => ({ ...x, [semana]: r })); avisar("¡Reporte guardado! Tu equipo ya lo puede ver 📊");
+    } catch { avisar("No se pudo guardar el reporte. Intenta de nuevo."); }
+  };
+  // Calculadora: la de la oficina o la del documento; si ya hay reportes suficientes, usa los porcentajes REALES
+  const calcBase = calcPub || plan?.calculadora || null;
+  const tr = totalesReportes(reportes);
+  const calc: Calc | null = calcBase && tr.escribieron >= 20 ? {
+    ...calcBase,
+    pctAgenda: Math.max(1, pct(tr.agendaron, tr.escribieron)),
+    ...(tr.agendaron >= 5 ? { pctAsiste: Math.max(10, pct(tr.asistieron, tr.agendaron)), pctAsisteMedido: true } : {}),
+    ...(tr.asistieron >= 5 ? { pctInicia: Math.max(10, pct(tr.iniciaron, tr.asistieron)) } : {}),
+    fuente: calcBase.fuente + ` Actualizado con tus reportes: ${tr.escribieron} conversaciones, ${tr.agendaron} citas, ${tr.asistieron} asistieron, ${tr.iniciaron} empezaron.`,
+  } : calcBase;
+  const desde = plan?.desde || fechaLarga(info.desde), hasta = plan?.hasta || fechaLarga(info.hasta);
   const reels = items.filter((i) => i.tipo === "reel");
   const principales = reels.filter((r) => !r.opcion);
   const historias = items.filter((i) => i.tipo === "historia");
@@ -486,22 +639,22 @@ export function PlanCliente({ slug, nombre, negocio, plan }: { slug: string; nom
   const total = principales.length * 2 + historias.length + tareas.length;
   const hechosReels = Math.min(principales.length * 2, reels.reduce((a, r) => a + (marcas[`${r.id}_grabado`] ? 1 : 0) + (marcas[`${r.id}_publicado`] ? 1 : 0), 0));
   const hechos = hechosReels + historias.filter((h) => marcas[h.id]).length + tareas.filter((t) => marcas[t.id]).length;
-  const pct = total ? Math.round((hechos / total) * 100) : 0;
+  const avance = total ? Math.round((hechos / total) * 100) : 0;
   const semanas = [...new Set(reels.map((r) => r.semana))].sort();
 
   return (
     <section className="mx-auto max-w-5xl px-4 pb-24 pt-10 md:px-8 md:pt-14">
-      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">{negocio}</p>
+      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">{negocio || info.cliente}</p>
       <div className="mt-3 flex flex-wrap items-end justify-between gap-6">
         <div>
           <h1 className="text-4xl font-semibold leading-[1.02] tracking-[-0.04em] md:text-6xl">Tu plan de trabajo</h1>
-          <p className="mt-3 max-w-xl text-lg text-text-secondary">{nombre}, aquí está todo lo del {plan.desde} al {plan.hasta}: qué publicar cada día, tus guiones y por qué lo hacemos. Ve marcando lo que haces ✅</p>
+          <p className="mt-3 max-w-xl text-lg text-text-secondary">{nombre ? `${nombre}, a` : "A"}quí está todo lo del {desde} al {hasta}: qué publicar cada día, tus guiones y por qué lo hacemos. Ve marcando lo que haces ✅</p>
         </div>
         <div className="flex items-center gap-4 rounded-3xl border border-white/10 bg-white/[0.04] p-4">
           <svg viewBox="0 0 120 120" className="h-20 w-20">
             <circle cx="60" cy="60" r="50" stroke="#ffffff1a" strokeWidth="12" fill="none" />
-            <circle cx="60" cy="60" r="50" stroke="#c6f432" strokeWidth="12" fill="none" strokeLinecap="round" strokeDasharray={`${pct * 3.14} 314`} transform="rotate(-90 60 60)" />
-            <text x="60" y="68" textAnchor="middle" fill="#fff" fontSize="26" fontWeight="700">{pct}%</text>
+            <circle cx="60" cy="60" r="50" stroke="#c6f432" strokeWidth="12" fill="none" strokeLinecap="round" strokeDasharray={`${avance * 3.14} 314`} transform="rotate(-90 60 60)" />
+            <text x="60" y="68" textAnchor="middle" fill="#fff" fontSize="26" fontWeight="700">{avance}%</text>
           </svg>
           <div className="text-sm">
             <p className="font-bold">Tu avance del mes</p>
@@ -630,11 +783,21 @@ export function PlanCliente({ slug, nombre, negocio, plan }: { slug: string; nom
           </div>
         )}
 
+        {estado === "ok" && tab === "resultados" && (
+          <>
+            <Resultados reportes={reportes} guardar={guardarReporte} />
+            <PorQue>
+              <p>La publicidad trae conversaciones, pero lo que importa son los clientes. Con tu reporte de cada semana sabemos en qué paso se están quedando las personas (no escriben, no agendan, no llegan o no empiezan) y ahí enfocamos la mejora.</p>
+              <p>Tus números también actualizan la calculadora: deja de usar supuestos y usa tus resultados reales.</p>
+            </PorQue>
+          </>
+        )}
+
         {estado === "ok" && tab === "calculadora" && (
           <>
             <h2 className="text-2xl font-semibold">¿Cuánto invertir para lograr tu meta?</h2>
             <p className="mt-2 max-w-2xl text-white/65">Mueve las barras. Partimos de tus números reales de pauta y de lo que nos contaste en el cuestionario.</p>
-            <div className="mt-6"><Calculadora c={plan.calculadora} /></div>
+            {calc ? <div className="mt-6"><Calculadora c={calc} /></div> : <p className="mt-6 text-white/60">La calculadora se activa cuando cargamos los datos de tus anuncios.</p>}
             <PorQue>
               <p>La publicidad compra <b>conversaciones</b>, no pacientes. El resultado final depende de cuántas de esas conversaciones agendan y de cuántas citas terminan en tratamiento.</p>
               <p>Por eso trabajamos dos cosas a la vez: que cada conversación cueste poco (buenos anuncios) y que más personas agenden (respuesta rápida, seguimiento y oferta clara).</p>
