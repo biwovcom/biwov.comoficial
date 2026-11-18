@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  BarChart3, CalendarDays, TrendingUp, UserRound, Check, ChevronDown, Clapperboard, Copy, Lightbulb, ListChecks, Smartphone, Target,
+  BarChart3, CalendarDays, TrendingUp, UserRound, Video, Check, ChevronDown, Clapperboard, Copy, Lightbulb, ListChecks, Smartphone, Target,
 } from "lucide-react";
 import type { DocumentosCliente } from "@/data/documentosClientes";
 import { cn } from "@/lib/utils";
@@ -59,8 +59,10 @@ async function leerPlan(slug: string) {
   try { calculadora = f.calculadora?.stringValue ? JSON.parse(f.calculadora.stringValue) : null; } catch { /* sin calculadora */ }
   let perfil: PerfilData | null = null;
   try { perfil = f.perfil?.stringValue ? JSON.parse(f.perfil.stringValue) : null; } catch { /* sin perfil */ }
+  let reuniones: ReunionP[] = [];
+  try { reuniones = f.reuniones?.stringValue ? JSON.parse(f.reuniones.stringValue) : []; } catch { /* sin reuniones */ }
   const txt = (k: string) => (f[k]?.stringValue as string) || "";
-  return { items, marcas, ideas, reportes, calculadora, perfil, cliente: txt("cliente"), desde: txt("desde"), hasta: txt("hasta") };
+  return { items, marcas, ideas, reportes, calculadora, perfil, reuniones, cliente: txt("cliente"), desde: txt("desde"), hasta: txt("hasta") };
 }
 async function guardarCampo(slug: string, mapa: "marcas" | "ideasCliente" | "reportes", clave: string, valor: { booleanValue: boolean } | { stringValue: string }) {
   const r = await fetch(`${BASE}/${slug}?updateMask.fieldPaths=${mapa}.${clave}&currentDocument.exists=true`, {
@@ -742,12 +744,92 @@ function Perfil({ p }: { p: PerfilData }) {
   );
 }
 
+// ---------- Reuniones (asesoría semanal de 60 min) ----------
+type ReunionP = { id: string; fecha: string; hora: string; duracion: number; modalidad: string; estado: string; tema: string; enlace: string; notas: string; acuerdos: string[] };
+
+function ReunionesCliente({ reuniones, marcas, marcar }: { reuniones: ReunionP[]; marcas: Record<string, boolean>; marcar: (k: string) => void }) {
+  const lista = [...reuniones].filter((r) => r.estado !== "cancelada").sort((a, b) => (a.fecha + a.hora).localeCompare(b.fecha + b.hora));
+  const hoy = new Date().toISOString().slice(0, 10);
+  const proxima = lista.find((r) => r.fecha >= hoy && r.estado !== "realizada");
+  const pasadas = lista.filter((r) => r.estado === "realizada" || r.fecha < hoy).reverse();
+  const futuras = lista.filter((r) => r !== proxima && r.fecha >= hoy && r.estado !== "realizada");
+  const larga = (f: string) => new Date(f + "T12:00:00").toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long" });
+  const hora12 = (h: string) => { const [hh, mm] = h.split(":").map(Number); return `${((hh + 11) % 12) + 1}:${String(mm).padStart(2, "0")} ${hh < 12 ? "a. m." : "p. m."}`; };
+  const gcal = (r: ReunionP) => {
+    const ini = new Date(`${r.fecha}T${r.hora}:00-05:00`), fin = new Date(ini.getTime() + (r.duracion || 60) * 60000);
+    const z = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent("Asesoría de marketing con biwov")}&dates=${z(ini)}/${z(fin)}&details=${encodeURIComponent(r.tema + (r.enlace ? "\nEnlace: " + r.enlace : ""))}`;
+  };
+  return (
+    <div className="space-y-8">
+      {proxima ? (
+        <div className="rounded-3xl bg-white p-6 text-[#03101b] md:p-8">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#0a2642]/55">Próxima asesoría · {proxima.duracion || 60} min · {proxima.modalidad || "virtual"}</p>
+          <p className="mt-2 text-3xl font-semibold capitalize tracking-tight md:text-4xl">{larga(proxima.fecha)}</p>
+          <p className="text-xl text-[#0a2642]/70">{hora12(proxima.hora)}{proxima.estado === "por confirmar" ? " · por confirmar" : ""}</p>
+          <p className="mt-3 text-[#0a2642]/80">{proxima.tema}</p>
+          <div className="mt-5 flex flex-wrap gap-2">
+            {proxima.enlace
+              ? <a href={proxima.enlace} target="_blank" rel="noopener noreferrer" className="rounded-full bg-[#03101b] px-5 py-2.5 text-sm font-bold text-white">🎥 Entrar a la reunión</a>
+              : <span className="rounded-full bg-[#03101b]/10 px-5 py-2.5 text-sm font-semibold">El enlace te llega antes de la reunión</span>}
+            <a href={gcal(proxima)} target="_blank" rel="noopener noreferrer" className="rounded-full bg-[#c6f432] px-5 py-2.5 text-sm font-bold">📅 Agregar a mi calendario</a>
+          </div>
+        </div>
+      ) : <p className="text-white/60">Pronto programamos la próxima asesoría.</p>}
+
+      {futuras.length > 0 && (
+        <div>
+          <h3 className="text-lg font-semibold">Próximas fechas</h3>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            {futuras.map((r) => (
+              <div key={r.id} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                <p className="font-semibold capitalize">{larga(r.fecha)} · {hora12(r.hora)}</p>
+                <p className="text-sm text-white/60">{r.tema}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {pasadas.length > 0 && (
+        <div>
+          <h3 className="text-lg font-semibold">Lo que hemos hablado</h3>
+          <div className="mt-3 space-y-3">
+            {pasadas.map((r) => (
+              <div key={r.id} className="rounded-3xl border border-white/10 bg-white/[0.04] p-5">
+                <p className="text-sm font-bold capitalize text-[#8fdff0]">{larga(r.fecha)}</p>
+                <p className="mt-1 font-semibold">{r.tema}</p>
+                {r.notas && <p className="mt-2 whitespace-pre-wrap text-sm text-white/75">{r.notas}</p>}
+                {r.acuerdos?.length > 0 && (
+                  <div className="mt-3 space-y-1.5">
+                    <p className="text-xs font-bold uppercase tracking-wider text-white/45">Acuerdos</p>
+                    {r.acuerdos.map((a, i) => {
+                      const k = `${r.id}_${i}`, on = !!marcas[k];
+                      return (
+                        <button key={k} type="button" onClick={() => marcar(k)} className="flex w-full items-center gap-3 rounded-xl bg-white/[0.04] p-2.5 text-left text-sm">
+                          <span className={cn("grid h-5 w-5 flex-none place-items-center rounded-full border-2", on ? "border-[#c6f432] bg-[#c6f432] text-[#03101b]" : "border-white/30")}>{on && <Check className="h-3 w-3" />}</span>
+                          <span className={cn(on && "text-white/50 line-through")}>{a}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ---------- Página ----------
 const TABS = [
   { id: "calendario", label: "Calendario", icon: CalendarDays },
   { id: "guiones", label: "Guiones", icon: Clapperboard },
   { id: "tareas", label: "Tus tareas", icon: ListChecks },
   { id: "perfil", label: "Tu perfil", icon: UserRound },
+  { id: "reuniones", label: "Reuniones", icon: Video },
   { id: "estrategia", label: "Estrategia", icon: Target },
   { id: "resultados", label: "Resultados", icon: TrendingUp },
   { id: "calculadora", label: "Calculadora", icon: BarChart3 },
@@ -766,6 +848,7 @@ export function PlanCliente({ slug, nombre, negocio, plan }: { slug: string; nom
   const [reportes, setReportes] = useState<Record<string, Reporte>>({});
   const [calcPub, setCalcPub] = useState<Calc | null>(null);
   const [perfil, setPerfil] = useState<PerfilData | null>(null);
+  const [reuniones, setReuniones] = useState<ReunionP[]>([]);
   const [info, setInfo] = useState({ cliente: "", desde: "", hasta: "" });
 
   // Abrir una pestaña directo desde el enlace: …/plan#perfil, #resultados, #guiones…
@@ -778,7 +861,7 @@ export function PlanCliente({ slug, nombre, negocio, plan }: { slug: string; nom
 
   useEffect(() => {
     leerPlan(slug).then((r) => {
-      setItems(r.items); setMarcas(r.marcas); setIdeas(r.ideas); setReportes(r.reportes); setCalcPub(r.calculadora); setPerfil(r.perfil);
+      setItems(r.items); setMarcas(r.marcas); setIdeas(r.ideas); setReportes(r.reportes); setCalcPub(r.calculadora); setPerfil(r.perfil); setReuniones(r.reuniones);
       setInfo({ cliente: r.cliente, desde: r.desde, hasta: r.hasta }); setEstado("ok");
     }).catch(() => setEstado("error"));
   }, [slug]);
@@ -966,6 +1049,15 @@ export function PlanCliente({ slug, nombre, negocio, plan }: { slug: string; nom
               </PorQue>
             </div>
           </div>
+        )}
+
+        {estado === "ok" && tab === "reuniones" && (
+          <>
+            <ReunionesCliente reuniones={reuniones} marcas={marcas} marcar={marcar} />
+            <PorQue>
+              <p>Cada semana nos reunimos 60 minutos por videollamada para revisar tus números, ver qué contenido funcionó y decidir qué hacer la semana siguiente. Aquí quedan las notas y los acuerdos, para que nada se pierda.</p>
+            </PorQue>
+          </>
         )}
 
         {estado === "ok" && tab === "perfil" && (
