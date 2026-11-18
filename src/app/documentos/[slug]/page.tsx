@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowRight, ClipboardList, FileSignature, LineChart } from "lucide-react";
+import { ArrowRight, CalendarDays, ClipboardList, FileSignature, LineChart } from "lucide-react";
 import { DocHeader } from "@/components/documentos/DocHeader";
 import { DOCUMENTOS_CLIENTES, documentosPorSlug } from "@/data/documentosClientes";
 
@@ -37,6 +37,17 @@ export default async function DocumentosPage({ params }: { params: Promise<{ slu
       titulo: "Análisis inicial",
       texto: "Lo que encontramos en tus redes y en tu publicidad: lo que funciona y las oportunidades.",
     },
+    ...(d.plan
+      ? [
+          {
+            href: `/documentos/${d.slug}/plan`,
+            icono: CalendarDays,
+            etiqueta: "Nuevo · Tu día a día",
+            titulo: "Plan de trabajo",
+            texto: "Tu calendario de contenido, los guiones, tus tareas para marcar y la calculadora de pacientes.",
+          },
+        ]
+      : []),
     ...(d.propuestaSlug
       ? [
           {
@@ -63,7 +74,7 @@ export default async function DocumentosPage({ params }: { params: Promise<{ slu
           cuestionario: será la base para definir la estrategia, las campañas y el contenido.
         </p>
 
-        <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           {docs.map((doc) => (
             <Link
               key={doc.href}

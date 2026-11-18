@@ -1,0 +1,607 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  BarChart3, CalendarDays, Check, ChevronDown, Clapperboard, Copy, Lightbulb, ListChecks, Smartphone, Target,
+} from "lucide-react";
+import type { DocumentosCliente } from "@/data/documentosClientes";
+import { cn } from "@/lib/utils";
+
+/**
+ * Plan de trabajo que ve el cliente. Los datos viven en la oficina de biwov (proyecto del cliente →
+ * contenido) y se publican en Firestore planesPublicos/<slug>. El cliente marca lo que va haciendo
+ * (marcas) y deja ideas (ideasCliente); Kathe y los agentes lo ven en la oficina.
+ */
+
+const BASE = "https://firestore.googleapis.com/v1/projects/biwov-oficina/databases/(default)/documents/planesPublicos";
+
+type Escena = { seg: string; dice: string; pantalla: string; plano: string };
+type Item = {
+  id: string; tipo: "reel" | "historia" | "tarea" | "idea"; fecha: string; semana: number;
+  pilar: string; embudo: string; titulo: string; objetivo?: string; formato?: string;
+  ganchoVisual?: string; ganchoTexto?: string; ganchoVerbal?: string; escenas?: Escena[];
+  cta?: string; caption?: string; palabraClave?: string; duracion?: string; retencion?: string;
+  metrica?: string; notas?: string; frames?: string[]; tema?: string; numero?: number;
+};
+type Idea = { texto: string; link?: string; fecha: string };
+
+const PILAR: Record<string, { nombre: string; color: string; texto: string; que: string }> = {
+  conexion: { nombre: "Conexión", color: "#00c2e8", texto: "#03101b", que: "Que te conozcan como persona: tu historia, tu consultorio, tu forma de atender." },
+  valor: { nombre: "Valor", color: "#c6f432", texto: "#03101b", que: "Enseñar algo útil: resolver dudas, quitar miedos y mitos. Genera confianza y guardados." },
+  oferta: { nombre: "Oferta", color: "#ff9f43", texto: "#03101b", que: "Invitar a dar el paso: valoración, higiene oral, cupos. Lleva a WhatsApp." },
+};
+const EMBUDO: Record<string, { nombre: string; que: string }> = {
+  TOFU: { nombre: "Te descubren", que: "Gente que todavía no te conoce" },
+  MOFU: { nombre: "Te conocen y confían", que: "Gente que ya te vio y está evaluando" },
+  BOFU: { nombre: "Te escriben", que: "Gente lista para agendar" },
+};
+const DIAS = ["L", "M", "M", "J", "V", "S", "D"];
+const cop = (n: number) => `$${Math.round(n).toLocaleString("es-CO")}`;
+
+// ---------- Firestore REST (sin sesión, como el cuestionario) ----------
+async function leerPlan(slug: string) {
+  const r = await fetch(`${BASE}/${slug}`, { cache: "no-store" });
+  if (!r.ok) throw new Error(String(r.status));
+  const f = (await r.json()).fields || {};
+  const items: Item[] = JSON.parse(f.datos?.stringValue || "[]");
+  const marcas: Record<string, boolean> = {};
+  for (const [k, v] of Object.entries(f.marcas?.mapValue?.fields || {})) marcas[k] = !!(v as { booleanValue?: boolean }).booleanValue;
+  const ideas: Record<string, Idea> = {};
+  for (const [k, v] of Object.entries(f.ideasCliente?.mapValue?.fields || {})) {
+    try { ideas[k] = JSON.parse((v as { stringValue: string }).stringValue); } catch { /* idea mal formada */ }
+  }
+  return { items, marcas, ideas };
+}
+async function guardarCampo(slug: string, mapa: "marcas" | "ideasCliente", clave: string, valor: { booleanValue: boolean } | { stringValue: string }) {
+  const r = await fetch(`${BASE}/${slug}?updateMask.fieldPaths=${mapa}.${clave}&currentDocument.exists=true`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ fields: { [mapa]: { mapValue: { fields: { [clave]: valor } } } } }),
+  });
+  if (!r.ok) throw new Error(String(r.status));
+}
+
+const Badge = ({ pilar }: { pilar: string }) =>
+  PILAR[pilar] ? (
+    <span className="rounded-full px-2.5 py-0.5 text-[11px] font-bold" style={{ background: PILAR[pilar].color, color: PILAR[pilar].texto }}>
+      {PILAR[pilar].nombre}
+    </span>
+  ) : null;
+const BadgeEmbudo = ({ e }: { e: string }) =>
+  EMBUDO[e] ? <span className="rounded-full border border-white/20 px-2.5 py-0.5 text-[11px] font-semibold text-white/75">{EMBUDO[e].nombre}</span> : null;
+
+function Check2({ on, onClick, label }: { on: boolean; onClick: () => void; label: string }) {
+  return (
+    <button type="button" onClick={onClick} aria-pressed={on}
+      className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold transition-colors",
+        on ? "border-[#c6f432] bg-[#c6f432] text-[#03101b]" : "border-white/20 text-white/80 hover:border-[#c6f432]")}>
+      <span className={cn("grid h-4 w-4 place-items-center rounded-full border", on ? "border-[#03101b]" : "border-white/40")}>
+        {on && <Check className="h-3 w-3" />}
+      </span>
+      {label}
+    </button>
+  );
+}
+
+function PorQue({ children }: { children: React.ReactNode }) {
+  const [a, setA] = useState(false);
+  return (
+    <div className="mt-4 rounded-2xl border border-[#00c2e8]/25 bg-[#00c2e8]/[0.06]">
+      <button type="button" onClick={() => setA(!a)} className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-semibold text-[#8fdff0]">
+        💡 ¿Por qué hacemos esto?
+        <ChevronDown className={cn("h-4 w-4 transition-transform", a && "rotate-180")} />
+      </button>
+      {a && <div className="space-y-2 px-4 pb-4 text-sm leading-relaxed text-white/80">{children}</div>}
+    </div>
+  );
+}
+
+// ---------- Tarjetas ----------
+function ReelCard({ it, marcas, marcar, abierto }: { it: Item; marcas: Record<string, boolean>; marcar: (k: string) => void; abierto?: boolean }) {
+  const [a, setA] = useState(!!abierto);
+  const [copiado, setCopiado] = useState(false);
+  return (
+    <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04]">
+      <div className="h-1.5" style={{ background: PILAR[it.pilar]?.color }} />
+      <div className="p-5">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="rounded-full bg-white px-2.5 py-0.5 text-[11px] font-extrabold text-[#03101b]">🎬 Reel {it.numero ?? ""}</span>
+          <Badge pilar={it.pilar} /> <BadgeEmbudo e={it.embudo} />
+          <span className="text-xs text-white/50">{fechaCorta(it.fecha)} · {it.duracion}</span>
+        </div>
+        <h3 className="mt-3 text-xl font-semibold leading-tight">{it.titulo}</h3>
+        <p className="mt-1 text-sm text-white/65">{it.objetivo}</p>
+        <div className="mt-4 grid gap-2 sm:grid-cols-3">
+          <div className="rounded-2xl bg-white/[0.06] p-3"><p className="text-[10px] font-bold uppercase tracking-wider text-[#8fdff0]">Gancho visual</p><p className="mt-1 text-sm">{it.ganchoVisual}</p></div>
+          <div className="rounded-2xl bg-white/[0.06] p-3"><p className="text-[10px] font-bold uppercase tracking-wider text-[#8fdff0]">Texto en pantalla</p><p className="mt-1 text-sm font-semibold">{it.ganchoTexto}</p></div>
+          <div className="rounded-2xl bg-white/[0.06] p-3"><p className="text-[10px] font-bold uppercase tracking-wider text-[#8fdff0]">Lo primero que dices</p><p className="mt-1 text-sm">“{it.ganchoVerbal}”</p></div>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Check2 on={!!marcas[`${it.id}_grabado`]} onClick={() => marcar(`${it.id}_grabado`)} label="Grabado" />
+          <Check2 on={!!marcas[`${it.id}_publicado`]} onClick={() => marcar(`${it.id}_publicado`)} label="Publicado" />
+          <button type="button" onClick={() => setA(!a)} className="ml-auto inline-flex items-center gap-1 rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold hover:bg-white/15">
+            {a ? "Ocultar guion" : "Ver guion completo"} <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", a && "rotate-180")} />
+          </button>
+        </div>
+        <AnimatePresence initial={false}>
+          {a && (
+            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+              <div className="mt-5 space-y-2">
+                {it.escenas?.map((e, k) => (
+                  <div key={k} className="grid gap-2 rounded-2xl bg-white/[0.05] p-3 sm:grid-cols-[70px_1fr_1fr]">
+                    <span className="text-xs font-extrabold text-[#c6f432]">{e.seg}</span>
+                    <p className="text-sm">🗣️ {e.dice}</p>
+                    <div className="text-xs text-white/65"><p>📝 {e.pantalla}</p><p className="mt-1">🎥 {e.plano}</p></div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+                <p><b className="text-[#8fdff0]">Llamado a la acción:</b> {it.cta}</p>
+                <p><b className="text-[#8fdff0]">Formato (inspiración):</b> {it.formato}</p>
+                <p><b className="text-[#8fdff0]">Para que lo vean completo:</b> {it.retencion}</p>
+                <p><b className="text-[#8fdff0]">Qué medimos:</b> {it.metrica}</p>
+                <p><b className="text-[#8fdff0]">Palabra clave (búsquedas):</b> {it.palabraClave}</p>
+              </div>
+              {it.notas && <p className="mt-3 rounded-2xl bg-[#ff9f43]/15 p-3 text-sm text-[#ffd2a6]">⚠️ {it.notas}</p>}
+              <div className="mt-4 rounded-2xl border border-white/10 p-3">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-white/50">Texto para la publicación</p>
+                  <button type="button" onClick={() => { navigator.clipboard?.writeText(it.caption || ""); setCopiado(true); setTimeout(() => setCopiado(false), 1500); }}
+                    className="inline-flex items-center gap-1 text-xs font-bold text-[#c6f432]"><Copy className="h-3.5 w-3.5" />{copiado ? "¡Copiado!" : "Copiar"}</button>
+                </div>
+                <p className="mt-1 text-sm text-white/80">{it.caption}</p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
+
+function HistoriaCard({ it, marcas, marcar }: { it: Item; marcas: Record<string, boolean>; marcar: (k: string) => void }) {
+  return (
+    <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-5">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-[11px] font-extrabold">📱 Historias</span>
+        <Badge pilar={it.pilar} /> <BadgeEmbudo e={it.embudo} />
+      </div>
+      <h3 className="mt-2 font-semibold">{it.titulo}</h3>
+      <p className="text-sm text-white/60">{it.objetivo}</p>
+      <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+        {it.frames?.map((fr, k) => (
+          <div key={k} className="relative flex h-40 w-24 flex-none flex-col rounded-2xl p-2.5 text-[11px] leading-snug"
+            style={{ background: `linear-gradient(160deg, ${PILAR[it.pilar]?.color ?? "#00c2e8"}33, #0a2642)` }}>
+            <div className="mb-1.5 flex gap-0.5">{it.frames!.map((_, j) => <span key={j} className={cn("h-0.5 flex-1 rounded", j <= k ? "bg-white" : "bg-white/30")} />)}</div>
+            <span className="text-[10px] font-bold text-white/60">{k + 1}</span>
+            <p className="mt-1">{fr}</p>
+          </div>
+        ))}
+      </div>
+      <div className="mt-3"><Check2 on={!!marcas[it.id]} onClick={() => marcar(it.id)} label="Publicadas" /></div>
+    </div>
+  );
+}
+
+function TareaFila({ it, marcas, marcar }: { it: Item; marcas: Record<string, boolean>; marcar: (k: string) => void }) {
+  const on = !!marcas[it.id];
+  return (
+    <button type="button" onClick={() => marcar(it.id)} className={cn("flex w-full items-start gap-3 rounded-2xl border p-4 text-left transition-colors", on ? "border-[#c6f432]/40 bg-[#c6f432]/10" : "border-white/10 bg-white/[0.04] hover:border-white/25")}>
+      <span className={cn("mt-0.5 grid h-6 w-6 flex-none place-items-center rounded-full border-2", on ? "border-[#c6f432] bg-[#c6f432] text-[#03101b]" : "border-white/30")}>{on && <Check className="h-4 w-4" />}</span>
+      <span>
+        <span className={cn("block font-semibold", on && "text-white/60 line-through")}>{it.titulo}</span>
+        {it.notas && <span className="mt-0.5 block text-sm text-white/55">{it.notas}</span>}
+        <span className="mt-1 block text-xs text-white/40">{fechaCorta(it.fecha)}</span>
+      </span>
+    </button>
+  );
+}
+
+function fechaCorta(iso: string) {
+  if (!iso) return "";
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString("es-CO", { weekday: "short", day: "numeric", month: "short" });
+}
+
+// ---------- Calendario ----------
+function Calendario({ items, marcas, marcar }: { items: Item[]; marcas: Record<string, boolean>; marcar: (k: string) => void }) {
+  const meses = useMemo(() => [...new Set(items.filter((i) => i.fecha).map((i) => i.fecha.slice(0, 7)))].sort(), [items]);
+  const [mes, setMes] = useState(meses[0] || "2026-11");
+  const [dia, setDia] = useState<string>(() => {
+    const hoy = new Date().toISOString().slice(0, 10);
+    return items.some((i) => i.fecha === hoy) ? hoy : items.find((i) => i.fecha)?.fecha || "";
+  });
+  const [y, m] = mes.split("-").map(Number);
+  const primero = new Date(y, m - 1, 1);
+  const offset = (primero.getDay() + 6) % 7;
+  const nDias = new Date(y, m, 0).getDate();
+  const todas: (string | null)[] = [...Array(offset).fill(null), ...Array.from({ length: nDias }, (_, k) => `${mes}-${String(k + 1).padStart(2, "0")}`)];
+  while (todas.length % 7) todas.push(null);
+  // Solo las semanas que tienen algo del plan (sin filas vacías)
+  const celdas = Array.from({ length: todas.length / 7 }, (_, w) => todas.slice(w * 7, w * 7 + 7))
+    .filter((fila) => fila.some((c) => c && items.some((i) => i.fecha === c))).flat();
+  const delDia = items.filter((i) => i.fecha === dia);
+  const hoy = new Date().toISOString().slice(0, 10);
+  return (
+    <div>
+      <div className="flex flex-wrap items-center gap-2">
+        {meses.map((mm) => {
+          const [yy, mo] = mm.split("-").map(Number);
+          return (
+            <button key={mm} type="button" onClick={() => setMes(mm)} className={cn("rounded-full px-4 py-2 text-sm font-bold capitalize", mm === mes ? "bg-white text-[#03101b]" : "bg-white/10 text-white/70")}>
+              {new Date(yy, mo - 1, 1).toLocaleDateString("es-CO", { month: "long" })}
+            </button>
+          );
+        })}
+        <div className="ml-auto flex flex-wrap gap-3 text-xs text-white/60">
+          <span>🎬 Reel</span><span>📱 Historias</span><span>✓ Tarea</span>
+        </div>
+      </div>
+      <div className="mt-4 grid grid-cols-7 gap-1.5">
+        {DIAS.map((dd, k) => <div key={k} className="pb-1 text-center text-xs font-bold text-white/40">{dd}</div>)}
+        {celdas.map((c, k) => {
+          if (!c) return <div key={k} />;
+          const its = items.filter((i) => i.fecha === c);
+          const reel = its.find((i) => i.tipo === "reel");
+          const hechos = its.filter((i) => (i.tipo === "reel" ? marcas[`${i.id}_publicado`] : marcas[i.id])).length;
+          const completo = its.length > 0 && hechos === its.length;
+          return (
+            <button key={c} type="button" onClick={() => its.length && setDia(c)} disabled={!its.length}
+              className={cn("relative flex min-h-[64px] flex-col rounded-xl border p-1.5 text-left transition-all md:min-h-[92px] md:p-2",
+                its.length ? "border-white/10 bg-white/[0.05] hover:border-white/30" : "border-transparent bg-transparent opacity-35",
+                dia === c && "border-[#c6f432] ring-2 ring-[#c6f432]/40", c === hoy && "outline outline-1 outline-[#00c2e8]")}>
+              <span className="flex items-center justify-between text-xs font-bold">
+                {Number(c.slice(8))}
+                {completo && <Check className="h-3.5 w-3.5 text-[#c6f432]" />}
+              </span>
+              {reel && (
+                <span className="mt-1 hidden truncate rounded-md px-1.5 py-0.5 text-[10px] font-bold md:block" style={{ background: PILAR[reel.pilar]?.color, color: "#03101b" }}>
+                  🎬 {reel.titulo}
+                </span>
+              )}
+              <span className="mt-auto flex gap-0.5 pt-1 text-[11px]">
+                {reel && <span className="md:hidden">🎬</span>}
+                {its.some((i) => i.tipo === "historia") && <span>📱</span>}
+                {its.some((i) => i.tipo === "tarea") && <span>✓</span>}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {dia && (
+        <div className="mt-6">
+          <h3 className="text-sm font-bold uppercase tracking-[0.18em] text-[#8fdff0] first-letter:uppercase">{fechaCorta(dia)}</h3>
+          <div className="mt-3 space-y-3">
+            {delDia.filter((i) => i.tipo === "tarea").map((i) => <TareaFila key={i.id} it={i} marcas={marcas} marcar={marcar} />)}
+            {delDia.filter((i) => i.tipo === "reel").map((i) => <ReelCard key={i.id} it={i} marcas={marcas} marcar={marcar} />)}
+            {delDia.filter((i) => i.tipo === "historia").map((i) => <HistoriaCard key={i.id} it={i} marcas={marcas} marcar={marcar} />)}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------- Calculadora ----------
+function Campo({ label, valor, set, min, max, step, fmt }: { label: string; valor: number; set: (n: number) => void; min: number; max: number; step: number; fmt: (n: number) => string }) {
+  return (
+    <label className="block">
+      <span className="flex justify-between text-sm"><span className="text-white/70">{label}</span><b>{fmt(valor)}</b></span>
+      <input type="range" min={min} max={max} step={step} value={valor} onChange={(e) => set(Number(e.target.value))} className="mt-2 w-full accent-[#c6f432]" />
+    </label>
+  );
+}
+
+function Calculadora({ c }: { c: NonNullable<DocumentosCliente["plan"]>["calculadora"] }) {
+  const [meta, setMeta] = useState(c.metaPacientes);
+  const [costo, setCosto] = useState(c.costoConversacion);
+  const [agenda, setAgenda] = useState(c.pctAgenda);
+  const [inicia, setInicia] = useState(c.pctInicia);
+  const [srv, setSrv] = useState(0);
+  const [ticket, setTicket] = useState(c.servicios[0]?.ticket ?? 0);
+  const tasa = (agenda / 100) * (inicia / 100);
+  const conversaciones = tasa > 0 ? Math.ceil(meta / tasa) : 0;
+  const inversion = conversaciones * costo;
+  const ingresos = meta * ticket;
+  const conActual = Math.floor(c.presupuestoActual / costo);
+  const pacientesActual = Math.floor(conActual * tasa);
+  const mejorAgenda = Math.max(agenda, 25);
+  const convMejor = Math.ceil(meta / ((mejorAgenda / 100) * (inicia / 100)));
+  return (
+    <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr]">
+      <div className="space-y-5 rounded-3xl border border-white/10 bg-white/[0.04] p-6">
+        <div>
+          <p className="text-sm text-white/70">Servicio</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {c.servicios.map((s, k) => (
+              <button key={s.nombre} type="button" onClick={() => { setSrv(k); setTicket(s.ticket); }}
+                className={cn("rounded-full px-3 py-1.5 text-xs font-bold", srv === k ? "bg-[#c6f432] text-[#03101b]" : "bg-white/10")}>{s.nombre}</button>
+            ))}
+          </div>
+        </div>
+        <Campo label="Pacientes nuevos que quieres al mes" valor={meta} set={setMeta} min={5} max={120} step={1} fmt={(n) => String(n)} />
+        <Campo label="Costo por conversación en WhatsApp" valor={costo} set={setCosto} min={2000} max={15000} step={100} fmt={cop} />
+        <Campo label="De cada 100 que escriben, cuántos agendan" valor={agenda} set={setAgenda} min={2} max={60} step={1} fmt={(n) => `${n} %`} />
+        <Campo label="De los que asisten, cuántos empiezan" valor={inicia} set={setInicia} min={10} max={100} step={5} fmt={(n) => `${n} %`} />
+        <Campo label="Valor promedio por paciente (ajústalo)" valor={ticket} set={setTicket} min={50000} max={5000000} step={50000} fmt={cop} />
+        <p className="text-xs leading-relaxed text-white/45">Datos de partida: {c.fuente}</p>
+      </div>
+
+      <div className="space-y-4">
+        <div className="rounded-3xl bg-white p-6 text-[#03101b]">
+          <p className="text-sm font-semibold text-[#0a2642]/60">Para {meta} pacientes nuevos al mes necesitas</p>
+          <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+            {[[conversaciones.toLocaleString("es-CO"), "conversaciones"], [Math.ceil(conversaciones * agenda / 100).toLocaleString("es-CO"), "citas agendadas"], [String(meta), "pacientes"]].map(([n, l], k) => (
+              <div key={l} className="rounded-2xl bg-[#03101b]/[0.05] p-3">
+                <b className="block text-2xl tracking-tight md:text-3xl">{n}</b>
+                <span className="text-xs text-[#0a2642]/60">{l}</span>
+                {k < 2 && <span className="sr-only">→</span>}
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 flex flex-wrap items-end justify-between gap-3 border-t border-[#03101b]/10 pt-4">
+            <div><p className="text-sm text-[#0a2642]/60">Inversión en pauta al mes</p><b className="text-3xl tracking-tight md:text-4xl">{cop(inversion)}</b></div>
+            <div className="text-right"><p className="text-sm text-[#0a2642]/60">Ingresos estimados</p><b className="text-2xl text-[#0a7a3a]">{cop(ingresos)}</b>
+              {inversion > 0 && <p className="text-xs text-[#0a2642]/60">Por cada $1 en pauta: {cop(ingresos / inversion)}</p>}</div>
+          </div>
+        </div>
+        <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-5 text-sm leading-relaxed">
+          <p>📊 <b>Con tu presupuesto actual ({cop(c.presupuestoActual)})</b> llegarían unas <b>{conActual}</b> conversaciones y, con estos porcentajes, unos <b>{pacientesActual} pacientes</b>.</p>
+          {agenda < 25 && (
+            <p className="mt-3">🚀 <b>Lo que más mueve el resultado no es solo invertir más:</b> si mejoramos el seguimiento y de cada 100 que escriben agendan {mejorAgenda} (en vez de {agenda}), solo necesitarías <b>{convMejor} conversaciones</b>, es decir <b>{cop(convMejor * costo)}</b> de pauta.</p>
+          )}
+          <p className="mt-3 text-white/55">Es una estimación: al subir mucho la inversión el costo por conversación suele aumentar, y cada mes la ajustamos con tus números reales.</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------- Página ----------
+const TABS = [
+  { id: "calendario", label: "Calendario", icon: CalendarDays },
+  { id: "guiones", label: "Guiones", icon: Clapperboard },
+  { id: "tareas", label: "Tus tareas", icon: ListChecks },
+  { id: "estrategia", label: "Estrategia", icon: Target },
+  { id: "calculadora", label: "Calculadora", icon: BarChart3 },
+  { id: "ideas", label: "Ideas", icon: Lightbulb },
+] as const;
+
+export function PlanCliente({ slug, nombre, negocio, plan }: { slug: string; nombre: string; negocio: string; plan: NonNullable<DocumentosCliente["plan"]> }) {
+  const [items, setItems] = useState<Item[]>([]);
+  const [marcas, setMarcas] = useState<Record<string, boolean>>({});
+  const [ideas, setIdeas] = useState<Record<string, Idea>>({});
+  const [estado, setEstado] = useState<"cargando" | "ok" | "error">("cargando");
+  const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("calendario");
+  const [aviso, setAviso] = useState("");
+  const [semana, setSemana] = useState(1);
+  const [idea, setIdea] = useState({ texto: "", link: "" });
+
+  useEffect(() => {
+    leerPlan(slug).then((r) => { setItems(r.items); setMarcas(r.marcas); setIdeas(r.ideas); setEstado("ok"); }).catch(() => setEstado("error"));
+  }, [slug]);
+
+  const avisar = (t: string) => { setAviso(t); setTimeout(() => setAviso(""), 2500); };
+  const marcar = async (k: string) => {
+    const v = !marcas[k];
+    setMarcas((m) => ({ ...m, [k]: v }));
+    try { await guardarCampo(slug, "marcas", k, { booleanValue: v }); avisar(v ? "¡Listo! Marcado ✅" : "Desmarcado"); }
+    catch { setMarcas((m) => ({ ...m, [k]: !v })); avisar("No se pudo guardar. Revisa tu conexión."); }
+  };
+  const enviarIdea = async () => {
+    if (idea.texto.trim().length < 4) return;
+    const k = `c${Date.now()}`;
+    const v: Idea = { texto: idea.texto.trim().slice(0, 600), link: idea.link.trim().slice(0, 300), fecha: new Date().toISOString() };
+    try { await guardarCampo(slug, "ideasCliente", k, { stringValue: JSON.stringify(v) }); setIdeas((x) => ({ ...x, [k]: v })); setIdea({ texto: "", link: "" }); avisar("¡Idea enviada! La revisamos en la próxima reunión 💡"); }
+    catch { avisar("No se pudo enviar la idea. Intenta de nuevo."); }
+  };
+
+  const reels = items.filter((i) => i.tipo === "reel");
+  const historias = items.filter((i) => i.tipo === "historia");
+  const tareas = items.filter((i) => i.tipo === "tarea");
+  const banco = items.filter((i) => i.tipo === "idea");
+  const total = reels.length * 2 + historias.length + tareas.length;
+  const hechos = reels.reduce((a, r) => a + (marcas[`${r.id}_grabado`] ? 1 : 0) + (marcas[`${r.id}_publicado`] ? 1 : 0), 0)
+    + historias.filter((h) => marcas[h.id]).length + tareas.filter((t) => marcas[t.id]).length;
+  const pct = total ? Math.round((hechos / total) * 100) : 0;
+  const semanas = [...new Set(reels.map((r) => r.semana))].sort();
+
+  return (
+    <section className="mx-auto max-w-5xl px-4 pb-24 pt-10 md:px-8 md:pt-14">
+      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">{negocio}</p>
+      <div className="mt-3 flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <h1 className="text-4xl font-semibold leading-[1.02] tracking-[-0.04em] md:text-6xl">Tu plan de trabajo</h1>
+          <p className="mt-3 max-w-xl text-lg text-text-secondary">{nombre}, aquí está todo lo del {plan.desde} al {plan.hasta}: qué publicar cada día, tus guiones y por qué lo hacemos. Ve marcando lo que haces ✅</p>
+        </div>
+        <div className="flex items-center gap-4 rounded-3xl border border-white/10 bg-white/[0.04] p-4">
+          <svg viewBox="0 0 120 120" className="h-20 w-20">
+            <circle cx="60" cy="60" r="50" stroke="#ffffff1a" strokeWidth="12" fill="none" />
+            <circle cx="60" cy="60" r="50" stroke="#c6f432" strokeWidth="12" fill="none" strokeLinecap="round" strokeDasharray={`${pct * 3.14} 314`} transform="rotate(-90 60 60)" />
+            <text x="60" y="68" textAnchor="middle" fill="#fff" fontSize="26" fontWeight="700">{pct}%</text>
+          </svg>
+          <div className="text-sm">
+            <p className="font-bold">Tu avance del mes</p>
+            <p className="text-white/60">{hechos} de {total} pasos</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-8 grid grid-cols-3 gap-2 md:gap-3">
+        {[["🎬", reels.length, "reels (3 por semana)"], ["📱", historias.length, "días de historias"], ["✅", tareas.length, "tareas para ti"]].map(([e, n, l]) => (
+          <div key={String(l)} className="rounded-2xl border border-white/10 bg-white/[0.04] p-3 md:p-4">
+            <p className="text-2xl font-semibold md:text-3xl">{e} {n}</p>
+            <p className="text-xs text-white/55 md:text-sm">{l}</p>
+          </div>
+        ))}
+      </div>
+
+      <nav className="sticky top-0 z-10 -mx-4 mt-8 flex gap-1 overflow-x-auto border-b border-white/10 bg-bg-deep/95 px-4 backdrop-blur md:mx-0 md:px-0">
+        {TABS.map((t) => (
+          <button key={t.id} type="button" onClick={() => setTab(t.id)}
+            className={cn("flex items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-3 text-sm font-bold transition-colors", tab === t.id ? "border-[#c6f432] text-white" : "border-transparent text-white/55 hover:text-white")}>
+            <t.icon className="h-4 w-4 text-[#00c2e8]" /> {t.label}
+          </button>
+        ))}
+      </nav>
+
+      <div className="mt-8">
+        {estado === "cargando" && <p className="text-white/60">Cargando tu plan…</p>}
+        {estado === "error" && <p className="rounded-2xl bg-red-500/10 p-4 text-red-200">No pudimos cargar el plan. Recarga la página o escríbenos por WhatsApp.</p>}
+
+        {estado === "ok" && tab === "calendario" && (
+          <>
+            <Calendario items={items} marcas={marcas} marcar={marcar} />
+            <PorQue>
+              <p>Publicar con un calendario fijo le enseña al algoritmo (y a tu público) cuándo esperar tu contenido. Los reels se publican martes, jueves y sábado; las historias van de lunes a sábado.</p>
+              <p>Los reels sirven para que <b>te descubran</b> personas nuevas; las historias, para que <b>quienes ya te siguen confíen y te escriban</b>.</p>
+            </PorQue>
+          </>
+        )}
+
+        {estado === "ok" && tab === "guiones" && (
+          <>
+            <div className="flex flex-wrap gap-2">
+              {semanas.map((s) => (
+                <button key={s} type="button" onClick={() => setSemana(s)} className={cn("rounded-full px-4 py-2 text-sm font-bold", s === semana ? "bg-white text-[#03101b]" : "bg-white/10 text-white/70")}>
+                  Semana {s}
+                </button>
+              ))}
+            </div>
+            <div className="mt-5 space-y-4">
+              {reels.filter((r) => r.semana === semana).map((r) => <ReelCard key={r.id} it={r} marcas={marcas} marcar={marcar} />)}
+            </div>
+            <PorQue>
+              <p>Cada guion tiene un <b>gancho de 3 segundos</b> (lo que se ve, lo que se lee y lo primero que dices), porque en ese tiempo la gente decide si sigue viendo o pasa al siguiente video.</p>
+              <p>Lo que más premian hoy Instagram y TikTok es que <b>vean el video completo</b> y que lo <b>envíen a otra persona</b>. Por eso los videos son cortos (25 a 35 s), numerados (“1, 2, 3”) y cierran con algo como “envíaselo a…”.</p>
+            </PorQue>
+          </>
+        )}
+
+        {estado === "ok" && tab === "tareas" && (
+          <>
+            <div className="space-y-2">{tareas.map((t) => <TareaFila key={t.id} it={t} marcas={marcas} marcar={marcar} />)}</div>
+            <PorQue>
+              <p>Grabar en lotes (6 videos en una mañana) ahorra tiempo y te da material para dos semanas. Las reseñas en Google son lo que más confianza da a quien te busca por primera vez.</p>
+            </PorQue>
+          </>
+        )}
+
+        {estado === "ok" && tab === "estrategia" && (
+          <div className="space-y-8">
+            <div>
+              <h2 className="text-2xl font-semibold">Así llega un paciente nuevo</h2>
+              <div className="mt-4 grid gap-3 md:grid-cols-3">
+                {(["TOFU", "MOFU", "BOFU"] as const).map((e, k) => {
+                  const n = reels.filter((r) => r.embudo === e).length;
+                  return (
+                    <div key={e} className="relative rounded-3xl border border-white/10 bg-white/[0.04] p-5" style={{ marginInline: `${k * 4}%` }}>
+                      <p className="text-xs font-bold uppercase tracking-wider text-[#8fdff0]">Paso {k + 1}</p>
+                      <p className="mt-1 text-xl font-semibold">{EMBUDO[e].nombre}</p>
+                      <p className="text-sm text-white/60">{EMBUDO[e].que}</p>
+                      <p className="mt-3 text-sm"><b>{n}</b> reels este mes</p>
+                    </div>
+                  );
+                })}
+              </div>
+              <PorQue>
+                <p>Nadie agenda con alguien que acaba de conocer. Primero te descubren (videos que interesan a cualquiera), luego te conocen (videos que quitan miedos y dudas) y al final te escriben (invitación clara con precio y WhatsApp).</p>
+                <p>Tu cuenta tenía casi todo en “te descubren” y “te escriben”, y muy poco en el medio. Por eso este mes reforzamos la confianza.</p>
+              </PorQue>
+            </div>
+            <div>
+              <h2 className="text-2xl font-semibold">Los 3 tipos de contenido</h2>
+              <div className="mt-4 grid gap-3 md:grid-cols-3">
+                {Object.entries(PILAR).map(([k, p]) => (
+                  <div key={k} className="rounded-3xl p-5" style={{ background: `${p.color}1f`, border: `1px solid ${p.color}55` }}>
+                    <Badge pilar={k} />
+                    <p className="mt-3 text-sm text-white/80">{p.que}</p>
+                    <p className="mt-3 text-sm"><b>{reels.filter((r) => r.pilar === k).length}</b> reels</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h2 className="text-2xl font-semibold">Lo que el algoritmo premia (y cómo lo usamos)</h2>
+              <div className="mt-4 grid gap-3 md:grid-cols-2">
+                {[
+                  ["⏱️ Que vean el video completo", "Videos cortos, una idea por video, cambios de plano cada 5–7 segundos y numerar (1, 2, 3)."],
+                  ["📤 Que lo envíen a alguien", "Temas que la gente quiere compartir: “envíaselo a quien aprieta los dientes”."],
+                  ["📌 Que lo guarden", "Información útil para después: precios, opciones, cuidados."],
+                  ["💬 Que comenten", "Terminar con una pregunta y responder los comentarios con nuevos videos."],
+                ].map(([t, x]) => (
+                  <div key={t} className="rounded-3xl border border-white/10 bg-white/[0.04] p-5"><p className="font-semibold">{t}</p><p className="mt-1 text-sm text-white/65">{x}</p></div>
+                ))}
+              </div>
+              <PorQue>
+                <p>Instagram ha dicho públicamente que sus señales principales son el tiempo de reproducción, los “me gusta” y los envíos por cada persona alcanzada. Los envíos son los que más ayudan a llegar a gente que todavía no te sigue.</p>
+                <p>Cada semana revisamos tus números (retención a los 3 segundos, envíos y mensajes) y repetimos el formato que mejor funcionó.</p>
+              </PorQue>
+            </div>
+          </div>
+        )}
+
+        {estado === "ok" && tab === "calculadora" && (
+          <>
+            <h2 className="text-2xl font-semibold">¿Cuánto invertir para lograr tu meta?</h2>
+            <p className="mt-2 max-w-2xl text-white/65">Mueve las barras. Partimos de tus números reales de pauta y de lo que nos contaste en el cuestionario.</p>
+            <div className="mt-6"><Calculadora c={plan.calculadora} /></div>
+            <PorQue>
+              <p>La publicidad compra <b>conversaciones</b>, no pacientes. El resultado final depende de cuántas de esas conversaciones agendan y de cuántas citas terminan en tratamiento.</p>
+              <p>Por eso trabajamos dos cosas a la vez: que cada conversación cueste poco (buenos anuncios) y que más personas agenden (respuesta rápida, seguimiento y oferta clara).</p>
+            </PorQue>
+          </>
+        )}
+
+        {estado === "ok" && tab === "ideas" && (
+          <div className="grid gap-6 md:grid-cols-2">
+            <div>
+              <h2 className="text-2xl font-semibold">Banco de ideas</h2>
+              <p className="mt-1 text-sm text-white/60">Ideas listas para los próximos meses.</p>
+              <div className="mt-4 space-y-2">
+                {banco.map((b) => (
+                  <div key={b.id} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                    <div className="flex items-center gap-2"><Badge pilar={b.pilar} /></div>
+                    <p className="mt-2 font-semibold">{b.titulo}</p>
+                    {b.formato && <p className="text-sm text-white/55">{b.formato}</p>}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h2 className="text-2xl font-semibold">¿Tienes una idea? 💡</h2>
+              <p className="mt-1 text-sm text-white/60">Cuéntanos algo que quieras mostrar o pega el enlace de un video que te gustó.</p>
+              <div className="mt-4 space-y-3 rounded-3xl border border-white/10 bg-white/[0.04] p-5">
+                <textarea value={idea.texto} onChange={(e) => setIdea({ ...idea, texto: e.target.value })} rows={4} placeholder="Ej.: Quiero mostrar cómo quedan las coronas de zirconio…"
+                  className="w-full rounded-2xl border border-white/15 bg-transparent p-3 text-sm outline-none focus:border-[#c6f432]" />
+                <input value={idea.link} onChange={(e) => setIdea({ ...idea, link: e.target.value })} placeholder="Enlace de referencia (opcional)"
+                  className="w-full rounded-2xl border border-white/15 bg-transparent p-3 text-sm outline-none focus:border-[#c6f432]" />
+                <button type="button" onClick={enviarIdea} className="rounded-full bg-[#c6f432] px-5 py-2.5 text-sm font-bold text-[#03101b]">Enviar idea</button>
+              </div>
+              {Object.keys(ideas).length > 0 && (
+                <div className="mt-4 space-y-2">
+                  <p className="text-xs font-bold uppercase tracking-wider text-white/45">Tus ideas enviadas</p>
+                  {Object.entries(ideas).sort((a, b) => b[1].fecha.localeCompare(a[1].fecha)).map(([k, v]) => (
+                    <div key={k} className="rounded-2xl bg-white/[0.05] p-3 text-sm">
+                      <p>{v.texto}</p>
+                      {v.link && <a href={v.link} target="_blank" rel="noopener noreferrer" className="mt-1 block truncate text-xs text-[#8fdff0] underline">{v.link}</a>}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="mt-14 flex items-center gap-3 rounded-3xl border border-white/10 bg-white/[0.04] p-5 text-sm text-white/70">
+        <Smartphone className="h-5 w-5 flex-none text-[#00c2e8]" />
+        Lo que marcas aquí le llega a tu equipo de biwov. ¿Dudas? WhatsApp +57 313 312 5157.
+      </div>
+
+      {aviso && <div className="fixed bottom-5 left-1/2 z-50 -translate-x-1/2 rounded-full bg-white px-5 py-3 text-sm font-bold text-[#03101b] shadow-2xl">{aviso}</div>}
+    </section>
+  );
+}

@@ -23,6 +23,20 @@ export interface DocumentosCliente {
   negocio: string;
   fecha: string; // fecha del análisis, texto
   propuestaSlug?: string;
+  /** Plan de contenido y calculadora (página /documentos/<slug>/plan). Los datos del calendario viven en la oficina. */
+  plan?: {
+    desde: string;
+    hasta: string;
+    calculadora: {
+      costoConversacion: number;
+      pctAgenda: number;
+      pctInicia: number;
+      presupuestoActual: number;
+      metaPacientes: number;
+      servicios: { nombre: string; ticket: number }[];
+      fuente: string;
+    };
+  };
   /** Prospecto del panel donde se guardan las respuestas del cuestionario (Historial). */
   prospectoId?: string;
   cuestionario: {
@@ -47,6 +61,24 @@ const ORTODONCIA: DocumentosCliente = {
   fecha: "11 de noviembre de 2026",
   propuestaSlug: "ortodoncia-bw26",
   prospectoId: "6930774c-75c0-4547-8bc0-49cfaae5f3ad",
+  plan: {
+    desde: "24 de noviembre",
+    hasta: "24 de diciembre de 2026",
+    calculadora: {
+      costoConversacion: 4766,
+      pctAgenda: 10,
+      pctInicia: 80,
+      presupuestoActual: 800000,
+      metaPacientes: 60,
+      servicios: [
+        { nombre: "Higiene oral", ticket: 150000 },
+        { nombre: "Ortodoncia", ticket: 1800000 },
+        { nombre: "Coronas en zirconio", ticket: 900000 },
+      ],
+      fuente:
+        "Tu pauta del 12 oct al 10 nov: $142.972 → 30 conversaciones ($4.766 c/u). Tu cuestionario: de esas 30, 3 agendaron (10 %), y de los que asisten, el 80 % empieza. Presupuesto que indicaste: $800.000 al mes.",
+    },
+  },
   cuestionario: {
     intro:
       "Este cuestionario es la base de todo el trabajo. Con tus respuestas terminamos el análisis de tus redes, definimos a quién le vamos a hablar, cuánto y cómo invertir en publicidad, qué contenido vamos a crear y armamos el plan de trabajo de los tres meses. Responde con la mayor claridad posible; si no sabes un dato exacto, un aproximado nos sirve.",
