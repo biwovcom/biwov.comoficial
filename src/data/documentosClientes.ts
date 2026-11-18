@@ -16,6 +16,30 @@ export interface BloqueAnalisis {
   items: string[];
 }
 
+/** Datos REALES de la cuenta de anuncios del cliente para la calculadora (de su auditoría de Meta). */
+export interface CalculadoraMeta {
+  /** Costo por mil impresiones: promedio histórico y rango visto mes a mes. */
+  cpm: number;
+  cpmMin: number;
+  cpmMax: number;
+  /** Conversaciones de WhatsApp por cada impresión (últimos 30 días). */
+  tasaConversacion: number;
+  /** Inversión mensual con la que se midió esa tasa (al subir la inversión, la eficiencia baja). */
+  gastoBase: number;
+  /** De cada 100 conversaciones, cuántas agendan (real). */
+  pctAgenda: number;
+  /** De cada 100 citas, cuántas asisten (supuesto si no se ha medido). */
+  pctAsiste: number;
+  pctAsisteMedido: boolean;
+  /** De cada 100 que asisten, cuántas empiezan. */
+  pctInicia: number;
+  presupuestoActual: number;
+  metaPacientes: number;
+  servicios: { nombre: string; ticket: number; estimado?: boolean }[];
+  datosMeta: { etiqueta: string; valor: string }[];
+  fuente: string;
+}
+
 export interface DocumentosCliente {
   slug: string;
   cliente: string;
@@ -27,15 +51,7 @@ export interface DocumentosCliente {
   plan?: {
     desde: string;
     hasta: string;
-    calculadora: {
-      costoConversacion: number;
-      pctAgenda: number;
-      pctInicia: number;
-      presupuestoActual: number;
-      metaPacientes: number;
-      servicios: { nombre: string; ticket: number }[];
-      fuente: string;
-    };
+    calculadora: CalculadoraMeta;
   };
   /** Prospecto del panel donde se guardan las respuestas del cuestionario (Historial). */
   prospectoId?: string;
@@ -65,18 +81,34 @@ const ORTODONCIA: DocumentosCliente = {
     desde: "24 de noviembre",
     hasta: "24 de diciembre de 2026",
     calculadora: {
-      costoConversacion: 4766,
+      cpm: 6192,
+      cpmMin: 5777,
+      cpmMax: 7308,
+      tasaConversacion: 30 / 21145,
+      gastoBase: 240456,
       pctAgenda: 10,
+      pctAsiste: 70,
+      pctAsisteMedido: false,
       pctInicia: 80,
       presupuestoActual: 800000,
       metaPacientes: 60,
       servicios: [
         { nombre: "Higiene oral", ticket: 150000 },
-        { nombre: "Ortodoncia", ticket: 1800000 },
-        { nombre: "Coronas en zirconio", ticket: 900000 },
+        { nombre: "Ortodoncia", ticket: 1800000, estimado: true },
+        { nombre: "Coronas en zirconio", ticket: 900000, estimado: true },
+      ],
+      datosMeta: [
+        { etiqueta: "Invertido (12 oct – 10 nov)", valor: "$142.972" },
+        { etiqueta: "Impresiones", valor: "21.145" },
+        { etiqueta: "Conversaciones de WhatsApp", valor: "30" },
+        { etiqueta: "Costo por conversación", valor: "$4.766" },
+        { etiqueta: "Mejor anuncio (diastemas)", valor: "$4.378 por conversación" },
+        { etiqueta: "Anuncio de ortodoncia", valor: "$5.831 por conversación" },
+        { etiqueta: "Costo por mil impresiones (histórico)", valor: "$6.192" },
+        { etiqueta: "Invertido en total desde abril 2025", valor: "$860.024" },
       ],
       fuente:
-        "Tu pauta del 12 oct al 10 nov: $142.972 → 30 conversaciones ($4.766 c/u). Tu cuestionario: de esas 30, 3 agendaron (10 %), y de los que asisten, el 80 % empieza. Presupuesto que indicaste: $800.000 al mes.",
+        "Tu cuenta de anuncios de Meta (auditoría del 11 nov 2026) y tu cuestionario (3 de 30 conversaciones agendaron; empieza el 80 % de quienes asisten). La asistencia a la cita todavía no se ha medido: usamos 70 % mientras la medimos.",
     },
   },
   cuestionario: {

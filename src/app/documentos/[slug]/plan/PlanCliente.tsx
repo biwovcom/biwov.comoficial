@@ -22,7 +22,7 @@ type Item = {
   pilar: string; embudo: string; titulo: string; objetivo?: string; formato?: string;
   ganchoVisual?: string; ganchoTexto?: string; ganchoVerbal?: string; escenas?: Escena[];
   cta?: string; caption?: string; palabraClave?: string; duracion?: string; retencion?: string;
-  metrica?: string; notas?: string; frames?: string[]; tema?: string; numero?: number;
+  metrica?: string; notas?: string; frames?: string[]; tema?: string; numero?: number; opcion?: boolean;
 };
 type Idea = { texto: string; link?: string; fecha: string };
 
@@ -106,9 +106,9 @@ function ReelCard({ it, marcas, marcar, abierto }: { it: Item; marcas: Record<st
       <div className="h-1.5" style={{ background: PILAR[it.pilar]?.color }} />
       <div className="p-5">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-white px-2.5 py-0.5 text-[11px] font-extrabold text-[#03101b]">🎬 Reel {it.numero ?? ""}</span>
+          <span className="rounded-full bg-white px-2.5 py-0.5 text-[11px] font-extrabold text-[#03101b]">{it.opcion ? "🔁 Opción" : `⭐ Reel ${it.numero ?? ""}`}</span>
           <Badge pilar={it.pilar} /> <BadgeEmbudo e={it.embudo} />
-          <span className="text-xs text-white/50">{fechaCorta(it.fecha)} · {it.duracion}</span>
+          <span className="text-xs text-white/50">{it.fecha ? fechaCorta(it.fecha) + " · " : ""}{it.duracion}</span>
         </div>
         <h3 className="mt-3 text-xl font-semibold leading-tight">{it.titulo}</h3>
         <p className="mt-1 text-sm text-white/65">{it.objetivo}</p>
@@ -284,75 +284,154 @@ function Calendario({ items, marcas, marcar }: { items: Item[]; marcas: Record<s
   );
 }
 
-// ---------- Calculadora ----------
-function Campo({ label, valor, set, min, max, step, fmt }: { label: string; valor: number; set: (n: number) => void; min: number; max: number; step: number; fmt: (n: number) => string }) {
+// ---------- Calculadora (con los datos reales de Meta del cliente) ----------
+type Calc = NonNullable<DocumentosCliente["plan"]>["calculadora"];
+type Escenario = { nombre: string; nota: string; cpm: number; castigo: number; agenda: number; asiste: number; inicia: number; color: string };
+
+/** Inversión → impresiones (CPM real) → conversaciones (tasa real, que baja al invertir más) → citas → asisten → pacientes. */
+function simular(inv: number, c: Calc, e: Escenario) {
+  const imp = (inv / e.cpm) * 1000;
+  const factor = inv > c.gastoBase ? Math.pow(1 - e.castigo, Math.log2(inv / c.gastoBase)) : 1;
+  const conv = imp * c.tasaConversacion * factor;
+  const citas = conv * (e.agenda / 100);
+  const asisten = citas * (e.asiste / 100);
+  const pacientes = asisten * (e.inicia / 100);
+  return { imp, conv, citas, asisten, pacientes, costoConv: conv ? inv / conv : 0, costoPaciente: pacientes ? inv / pacientes : 0 };
+}
+function inversionPara(meta: number, c: Calc, e: Escenario) {
+  let lo = 20000, hi = 60000000;
+  if (simular(hi, c, e).pacientes < meta) return null;
+  for (let k = 0; k < 60; k++) { const mid = (lo + hi) / 2; if (simular(mid, c, e).pacientes >= meta) hi = mid; else lo = mid; }
+  return Math.ceil(hi / 10000) * 10000;
+}
+
+function Campo({ label, valor, set, min, max, step, fmt, aviso }: { label: string; valor: number; set: (n: number) => void; min: number; max: number; step: number; fmt: (n: number) => string; aviso?: string }) {
   return (
     <label className="block">
-      <span className="flex justify-between text-sm"><span className="text-white/70">{label}</span><b>{fmt(valor)}</b></span>
+      <span className="flex justify-between gap-3 text-sm"><span className="text-white/70">{label}</span><b>{fmt(valor)}</b></span>
       <input type="range" min={min} max={max} step={step} value={valor} onChange={(e) => set(Number(e.target.value))} className="mt-2 w-full accent-[#c6f432]" />
+      {aviso && <span className="mt-1 block text-xs text-[#ffd2a6]">⚠️ {aviso}</span>}
     </label>
   );
 }
 
-function Calculadora({ c }: { c: NonNullable<DocumentosCliente["plan"]>["calculadora"] }) {
+function Calculadora({ c }: { c: Calc }) {
+  const [modo, setModo] = useState<"invierto" | "meta">("invierto");
+  const [inv, setInv] = useState(c.presupuestoActual);
   const [meta, setMeta] = useState(c.metaPacientes);
-  const [costo, setCosto] = useState(c.costoConversacion);
-  const [agenda, setAgenda] = useState(c.pctAgenda);
-  const [inicia, setInicia] = useState(c.pctInicia);
   const [srv, setSrv] = useState(0);
-  const [ticket, setTicket] = useState(c.servicios[0]?.ticket ?? 0);
-  const tasa = (agenda / 100) * (inicia / 100);
-  const conversaciones = tasa > 0 ? Math.ceil(meta / tasa) : 0;
-  const inversion = conversaciones * costo;
-  const ingresos = meta * ticket;
-  const conActual = Math.floor(c.presupuestoActual / costo);
-  const pacientesActual = Math.floor(conActual * tasa);
-  const mejorAgenda = Math.max(agenda, 25);
-  const convMejor = Math.ceil(meta / ((mejorAgenda / 100) * (inicia / 100)));
+  const [agenda, setAgenda] = useState(c.pctAgenda);
+  const [asiste, setAsiste] = useState(c.pctAsiste);
+  const [inicia, setInicia] = useState(c.pctInicia);
+  const [avanzado, setAvanzado] = useState(false);
+  const ticket = c.servicios[srv]?.ticket ?? 0;
+
+  const esc: Escenario[] = [
+    { nombre: "Conservador", nota: "Si los anuncios rinden menos y no mejora el seguimiento", cpm: c.cpmMax, castigo: 0.25, agenda: Math.max(1, agenda * 0.8), asiste: Math.max(10, asiste - 10), inicia: Math.max(10, inicia - 10), color: "#ff9f43" },
+    { nombre: "Lo más probable", nota: "Con tus números reales de hoy", cpm: c.cpm, castigo: 0.15, agenda, asiste, inicia, color: "#00c2e8" },
+    { nombre: "Con mejor seguimiento", nota: "Si respondemos rápido y hacemos seguimiento (agendan el doble)", cpm: c.cpm, castigo: 0.15, agenda: Math.min(60, Math.max(agenda * 2, 20)), asiste: Math.max(asiste, 80), inicia, color: "#c6f432" },
+  ];
+  const prob = simular(inv, c, esc[1]);
+  const pasos = [
+    ["Inversión", cop(inv)], ["Personas que ven el anuncio (impresiones)", Math.round(prob.imp).toLocaleString("es-CO")],
+    ["Te escriben por WhatsApp", Math.round(prob.conv).toLocaleString("es-CO")], ["Agendan cita", prob.citas.toFixed(0)],
+    ["Asisten", prob.asisten.toFixed(0)], ["Empiezan (pacientes)", prob.pacientes.toFixed(0)],
+  ];
+
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr]">
-      <div className="space-y-5 rounded-3xl border border-white/10 bg-white/[0.04] p-6">
-        <div>
-          <p className="text-sm text-white/70">Servicio</p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {c.servicios.map((s, k) => (
-              <button key={s.nombre} type="button" onClick={() => { setSrv(k); setTicket(s.ticket); }}
-                className={cn("rounded-full px-3 py-1.5 text-xs font-bold", srv === k ? "bg-[#c6f432] text-[#03101b]" : "bg-white/10")}>{s.nombre}</button>
-            ))}
-          </div>
-        </div>
-        <Campo label="Pacientes nuevos que quieres al mes" valor={meta} set={setMeta} min={5} max={120} step={1} fmt={(n) => String(n)} />
-        <Campo label="Costo por conversación en WhatsApp" valor={costo} set={setCosto} min={2000} max={15000} step={100} fmt={cop} />
-        <Campo label="De cada 100 que escriben, cuántos agendan" valor={agenda} set={setAgenda} min={2} max={60} step={1} fmt={(n) => `${n} %`} />
-        <Campo label="De los que asisten, cuántos empiezan" valor={inicia} set={setInicia} min={10} max={100} step={5} fmt={(n) => `${n} %`} />
-        <Campo label="Valor promedio por paciente (ajústalo)" valor={ticket} set={setTicket} min={50000} max={5000000} step={50000} fmt={cop} />
-        <p className="text-xs leading-relaxed text-white/45">Datos de partida: {c.fuente}</p>
+    <div className="space-y-6">
+      <div className="flex flex-wrap gap-2">
+        <button type="button" onClick={() => setModo("invierto")} className={cn("rounded-full px-4 py-2 text-sm font-bold", modo === "invierto" ? "bg-white text-[#03101b]" : "bg-white/10")}>Si invierto X, ¿cuántos pacientes?</button>
+        <button type="button" onClick={() => setModo("meta")} className={cn("rounded-full px-4 py-2 text-sm font-bold", modo === "meta" ? "bg-white text-[#03101b]" : "bg-white/10")}>Quiero N pacientes, ¿cuánto invierto?</button>
       </div>
 
-      <div className="space-y-4">
-        <div className="rounded-3xl bg-white p-6 text-[#03101b]">
-          <p className="text-sm font-semibold text-[#0a2642]/60">Para {meta} pacientes nuevos al mes necesitas</p>
-          <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-            {[[conversaciones.toLocaleString("es-CO"), "conversaciones"], [Math.ceil(conversaciones * agenda / 100).toLocaleString("es-CO"), "citas agendadas"], [String(meta), "pacientes"]].map(([n, l], k) => (
-              <div key={l} className="rounded-2xl bg-[#03101b]/[0.05] p-3">
-                <b className="block text-2xl tracking-tight md:text-3xl">{n}</b>
-                <span className="text-xs text-[#0a2642]/60">{l}</span>
-                {k < 2 && <span className="sr-only">→</span>}
-              </div>
-            ))}
+      <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr]">
+        <div className="space-y-5 rounded-3xl border border-white/10 bg-white/[0.04] p-6">
+          {modo === "invierto"
+            ? <Campo label="Inversión en pauta al mes" valor={inv} set={setInv} min={100000} max={6000000} step={50000} fmt={cop} />
+            : <Campo label="Pacientes nuevos que quieres al mes" valor={meta} set={setMeta} min={2} max={120} step={1} fmt={String} />}
+          <div>
+            <p className="text-sm text-white/70">Servicio (para calcular ingresos)</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {c.servicios.map((s, k) => (
+                <button key={s.nombre} type="button" onClick={() => setSrv(k)} className={cn("rounded-full px-3 py-1.5 text-xs font-bold", srv === k ? "bg-[#c6f432] text-[#03101b]" : "bg-white/10")}>
+                  {s.nombre} · {cop(s.ticket)}{s.estimado ? "*" : ""}
+                </button>
+              ))}
+            </div>
+            {c.servicios[srv]?.estimado && <p className="mt-1 text-xs text-white/45">* Valor promedio estimado: lo ajustamos con tus precios reales.</p>}
           </div>
-          <div className="mt-4 flex flex-wrap items-end justify-between gap-3 border-t border-[#03101b]/10 pt-4">
-            <div><p className="text-sm text-[#0a2642]/60">Inversión en pauta al mes</p><b className="text-3xl tracking-tight md:text-4xl">{cop(inversion)}</b></div>
-            <div className="text-right"><p className="text-sm text-[#0a2642]/60">Ingresos estimados</p><b className="text-2xl text-[#0a7a3a]">{cop(ingresos)}</b>
-              {inversion > 0 && <p className="text-xs text-[#0a2642]/60">Por cada $1 en pauta: {cop(ingresos / inversion)}</p>}</div>
+          <div className="rounded-2xl bg-white/[0.05] p-4">
+            <p className="text-xs font-bold uppercase tracking-wider text-[#8fdff0]">Tus datos reales de Meta</p>
+            <ul className="mt-2 space-y-1 text-sm">
+              {c.datosMeta.map((d) => <li key={d.etiqueta} className="flex justify-between gap-3"><span className="text-white/60">{d.etiqueta}</span><b className="text-right">{d.valor}</b></li>)}
+            </ul>
           </div>
-        </div>
-        <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-5 text-sm leading-relaxed">
-          <p>📊 <b>Con tu presupuesto actual ({cop(c.presupuestoActual)})</b> llegarían unas <b>{conActual}</b> conversaciones y, con estos porcentajes, unos <b>{pacientesActual} pacientes</b>.</p>
-          {agenda < 25 && (
-            <p className="mt-3">🚀 <b>Lo que más mueve el resultado no es solo invertir más:</b> si mejoramos el seguimiento y de cada 100 que escriben agendan {mejorAgenda} (en vez de {agenda}), solo necesitarías <b>{convMejor} conversaciones</b>, es decir <b>{cop(convMejor * costo)}</b> de pauta.</p>
+          <button type="button" onClick={() => setAvanzado(!avanzado)} className="text-sm font-bold text-[#8fdff0]">{avanzado ? "▴ Ocultar" : "▾ Simular otros porcentajes"}</button>
+          {avanzado && (
+            <div className="space-y-4">
+              <Campo label="De cada 100 que escriben, agendan" valor={agenda} set={setAgenda} min={2} max={60} step={1} fmt={(n) => `${n} %`} aviso={agenda > c.pctAgenda ? `Tu dato real hoy es ${c.pctAgenda} %` : undefined} />
+              <Campo label="De cada 100 citas, asisten" valor={asiste} set={setAsiste} min={20} max={100} step={5} fmt={(n) => `${n} %`} aviso={!c.pctAsisteMedido ? "Todavía no lo hemos medido" : undefined} />
+              <Campo label="De los que asisten, empiezan" valor={inicia} set={setInicia} min={10} max={100} step={5} fmt={(n) => `${n} %`} aviso={inicia > c.pctInicia ? `Tu dato real hoy es ${c.pctInicia} %` : undefined} />
+            </div>
           )}
-          <p className="mt-3 text-white/55">Es una estimación: al subir mucho la inversión el costo por conversación suele aumentar, y cada mes la ajustamos con tus números reales.</p>
+          <p className="text-xs leading-relaxed text-white/45">{c.fuente}</p>
+        </div>
+
+        <div className="space-y-4">
+          {modo === "invierto" ? (
+            <>
+              <div className="rounded-3xl bg-white p-6 text-[#03101b]">
+                <p className="text-sm font-semibold text-[#0a2642]/60">Con {cop(inv)} al mes, lo más probable es</p>
+                <div className="mt-4 space-y-1.5">
+                  {pasos.map(([l, v], k) => (
+                    <div key={l} className="flex items-center gap-3">
+                      <div className="h-7 rounded-lg" style={{ width: `${100 - k * 13}%`, background: k === pasos.length - 1 ? "#c6f432" : `rgba(0,194,232,${0.85 - k * 0.12})` }} />
+                      <span className="whitespace-nowrap text-sm"><b>{v}</b> <span className="text-[#0a2642]/60">{l.toLowerCase()}</span></span>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-4 text-sm text-[#0a2642]/70">Costo por conversación ≈ <b>{cop(prob.costoConv)}</b> · costo por paciente ≈ <b>{prob.pacientes >= 1 ? cop(prob.costoPaciente) : "—"}</b></p>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-3">
+                {esc.map((e) => {
+                  const r = simular(inv, c, e);
+                  return (
+                    <div key={e.nombre} className="rounded-3xl border border-white/10 bg-white/[0.04] p-4" style={{ borderTop: `4px solid ${e.color}` }}>
+                      <p className="text-xs font-bold uppercase tracking-wider" style={{ color: e.color }}>{e.nombre}</p>
+                      <p className="mt-1 text-3xl font-semibold">{Math.floor(r.pacientes)}</p>
+                      <p className="text-xs text-white/55">pacientes al mes</p>
+                      <p className="mt-2 text-xs text-white/70">≈ {cop(Math.floor(r.pacientes) * ticket)} en ingresos</p>
+                      <p className="mt-2 text-[11px] leading-snug text-white/45">{e.nota}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          ) : (
+            <div className="grid gap-3">
+              {esc.map((e) => {
+                const need = inversionPara(meta, c, e);
+                const r = need ? simular(need, c, e) : null;
+                return (
+                  <div key={e.nombre} className="rounded-3xl border border-white/10 bg-white/[0.04] p-5" style={{ borderLeft: `5px solid ${e.color}` }}>
+                    <p className="text-xs font-bold uppercase tracking-wider" style={{ color: e.color }}>{e.nombre}</p>
+                    <p className="mt-1 text-sm text-white/60">{e.nota}</p>
+                    {need && r ? (
+                      <p className="mt-2 text-lg">Para <b>{meta}</b> pacientes: <b className="text-2xl">{cop(need)}</b> al mes · {Math.round(r.conv)} conversaciones · {cop(r.costoConv)} cada una</p>
+                    ) : (
+                      <p className="mt-2 text-lg">Con solo pauta no es alcanzable en un mes: hace falta sumar referidos, contenido y seguimiento.</p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+          <div className="rounded-3xl border border-[#ff9f43]/30 bg-[#ff9f43]/[0.08] p-5 text-sm leading-relaxed">
+            <p className="font-bold text-[#ffd2a6]">¿Qué está garantizado y qué no?</p>
+            <p className="mt-2 text-white/80">Nadie puede garantizar pacientes: Meta solo garantiza mostrar tus anuncios. Lo que sí controlamos es la calidad de los anuncios y del contenido, la respuesta rápida y el seguimiento. Por eso mostramos un <b>rango</b> y cada semana lo recalculamos con tus números reales.</p>
+            <p className="mt-2 text-white/80">Cuando la inversión sube mucho, cada conversación sale más cara (Meta tiene que mostrar el anuncio a personas menos interesadas). La calculadora ya lo tiene en cuenta.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -399,12 +478,14 @@ export function PlanCliente({ slug, nombre, negocio, plan }: { slug: string; nom
   };
 
   const reels = items.filter((i) => i.tipo === "reel");
+  const principales = reels.filter((r) => !r.opcion);
   const historias = items.filter((i) => i.tipo === "historia");
   const tareas = items.filter((i) => i.tipo === "tarea");
   const banco = items.filter((i) => i.tipo === "idea");
-  const total = reels.length * 2 + historias.length + tareas.length;
-  const hechos = reels.reduce((a, r) => a + (marcas[`${r.id}_grabado`] ? 1 : 0) + (marcas[`${r.id}_publicado`] ? 1 : 0), 0)
-    + historias.filter((h) => marcas[h.id]).length + tareas.filter((t) => marcas[t.id]).length;
+  // Avance: 3 reels por semana (los ⭐ o los que elija de las opciones), historias y tareas
+  const total = principales.length * 2 + historias.length + tareas.length;
+  const hechosReels = Math.min(principales.length * 2, reels.reduce((a, r) => a + (marcas[`${r.id}_grabado`] ? 1 : 0) + (marcas[`${r.id}_publicado`] ? 1 : 0), 0));
+  const hechos = hechosReels + historias.filter((h) => marcas[h.id]).length + tareas.filter((t) => marcas[t.id]).length;
   const pct = total ? Math.round((hechos / total) * 100) : 0;
   const semanas = [...new Set(reels.map((r) => r.semana))].sort();
 
@@ -430,7 +511,7 @@ export function PlanCliente({ slug, nombre, negocio, plan }: { slug: string; nom
       </div>
 
       <div className="mt-8 grid grid-cols-3 gap-2 md:gap-3">
-        {[["🎬", reels.length, "reels (3 por semana)"], ["📱", historias.length, "días de historias"], ["✅", tareas.length, "tareas para ti"]].map(([e, n, l]) => (
+        {[["🎬", reels.length, `guiones (${Math.round(reels.length / Math.max(1, semanas.length))} por semana)`], ["📱", historias.length, "días de historias"], ["✅", tareas.length, "tareas para ti"]].map(([e, n, l]) => (
           <div key={String(l)} className="rounded-2xl border border-white/10 bg-white/[0.04] p-3 md:p-4">
             <p className="text-2xl font-semibold md:text-3xl">{e} {n}</p>
             <p className="text-xs text-white/55 md:text-sm">{l}</p>
@@ -470,8 +551,14 @@ export function PlanCliente({ slug, nombre, negocio, plan }: { slug: string; nom
                 </button>
               ))}
             </div>
-            <div className="mt-5 space-y-4">
-              {reels.filter((r) => r.semana === semana).map((r) => <ReelCard key={r.id} it={r} marcas={marcas} marcar={marcar} />)}
+            <p className="mt-4 text-sm text-white/65">Esta semana hay <b>{reels.filter((r) => r.semana === semana).length} guiones</b>. Publica <b>3</b>: los ⭐ ya están en el calendario; si alguno no te convence, cámbialo por una de las opciones 🔁. Graba varios el mismo día.</p>
+            <h3 className="mt-5 text-sm font-bold uppercase tracking-[0.18em] text-[#c6f432]">⭐ Recomendados (en el calendario)</h3>
+            <div className="mt-3 space-y-4">
+              {reels.filter((r) => r.semana === semana && !r.opcion).map((r) => <ReelCard key={r.id} it={r} marcas={marcas} marcar={marcar} />)}
+            </div>
+            <h3 className="mt-8 text-sm font-bold uppercase tracking-[0.18em] text-[#8fdff0]">🔁 Opciones para cambiar o grabar de más</h3>
+            <div className="mt-3 space-y-4">
+              {reels.filter((r) => r.semana === semana && r.opcion).map((r) => <ReelCard key={r.id} it={r} marcas={marcas} marcar={marcar} />)}
             </div>
             <PorQue>
               <p>Cada guion tiene un <b>gancho de 3 segundos</b> (lo que se ve, lo que se lee y lo primero que dices), porque en ese tiempo la gente decide si sigue viendo o pasa al siguiente video.</p>
