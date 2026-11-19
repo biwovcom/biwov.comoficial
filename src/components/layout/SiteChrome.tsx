@@ -37,7 +37,12 @@ export function SiteChrome({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (sinChrome) return;
     const params = new URLSearchParams(window.location.search);
-    if (params.has("diagnostico") || params.has("agenda")) {
+    // El diagnóstico gratis ahora es el de Instagram (biwov.com/diagnostico-instagram)
+    if (params.has("diagnostico")) {
+      window.location.replace("/diagnostico-instagram");
+      return;
+    }
+    if (params.has("agenda")) {
       open();
     }
   }, [sinChrome, open]);

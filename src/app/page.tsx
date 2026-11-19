@@ -1,7 +1,7 @@
 import { Hero } from "@/components/sections/Hero";
 import { Manifiesto } from "@/components/sections/Manifiesto";
 import { MarcasCarrusel } from "@/components/sections/MarcasCarrusel";
-import { Universos } from "@/components/sections/Universos";
+import { ServiciosSimples } from "@/components/sections/ServiciosSimples";
 import { NeedsPaths } from "@/components/sections/NeedsPaths";
 import { ComoTrabajamos } from "@/components/sections/ComoTrabajamos";
 import { FounderTeaser } from "@/components/sections/FounderTeaser";
@@ -15,7 +15,7 @@ export default function Home() {
       <Hero />
       <Manifiesto />
       <MarcasCarrusel />
-      <Universos />
+      <ServiciosSimples />
       <NeedsPaths />
       <ComoTrabajamos />
       <FounderTeaser />

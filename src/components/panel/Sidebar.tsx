@@ -5,6 +5,10 @@ import Link from "next/link";
 import {
 
   Calculator,
+  Store,
+  LayoutGrid,
+  Flame,
+  Compass,
   Clock,
   CreditCard,
   FileText,
@@ -21,7 +25,11 @@ const LINKS = [
   { href: "/panel/prospectos", label: "Prospectos", icon: Users2 },
   { href: "/panel/prospectos/nuevo", label: "Nuevo prospecto", icon: UserPlus },
   { href: "/panel/propuestas", label: "Propuestas", icon: FileText },
+  { href: "/panel/virales", label: "Reels virales", icon: Flame },
+  { href: "/documentos/biwov-mercado-bw01/mercado", label: "Estudio de mercado biwov", icon: Compass },
   { href: "/panel/cotizaciones", label: "Cotizaciones", icon: Calculator },
+  { href: "/tienda", label: "Tienda (para cotizar)", icon: Store },
+  { href: "/planes", label: "Planes (para cotizar)", icon: LayoutGrid },
   { href: "/panel/compras", label: "Compras de planes", icon: CreditCard },
   { href: "/panel/tiempos", label: "Tiempos", icon: Clock },
 ];

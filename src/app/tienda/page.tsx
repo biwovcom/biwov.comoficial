@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { soloEquipo } from "@/lib/soloEquipo";
 import { TiendaExperiencia } from "@/components/sections/TiendaExperiencia";
 import { PLANES } from "@/data/planes";
 import { EXTRAS_COTIZABLES } from "@/data/extrasCotizables";
@@ -41,9 +42,13 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://biwov.com/tienda",
   },
+  robots: { index: false, follow: false, googleBot: { index: false, follow: false } },
 };
 
-export default function TiendaPage() {
+export const dynamic = "force-dynamic";
+
+export default async function TiendaPage() {
+  await soloEquipo();
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(catalogoJsonLd) }} />

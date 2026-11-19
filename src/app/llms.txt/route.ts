@@ -1,7 +1,3 @@
-import { PLANES_CLIENTES, MESES_MINIMOS } from "@/data/portafolioClientes";
-import { PLANES, DURACION_MINIMA_MESES } from "@/data/planes";
-import { LINEAS } from "@/data/lineas";
-import { EXTRAS_COTIZABLES, CATEGORIAS_POR_LINEA } from "@/data/extrasCotizables";
 import { articulosOrdenados } from "@/data/blog";
 
 /**
@@ -10,27 +6,8 @@ import { articulosOrdenados } from "@/data/blog";
  */
 export const dynamic = "force-static";
 
-const cop = (n: number) => `$${n.toLocaleString("es-CO")} COP`;
 
 export function GET() {
-  const catalogo = LINEAS.map((linea) => {
-    const planes = PLANES.filter((p) => p.linea === linea.id)
-      .map((p) => `- **${p.nombre}** (${cop(p.precioDesde.cop)}/mes): ${p.resumen} ${p.paraQuien}`)
-      .join("\n");
-    const servicios = CATEGORIAS_POR_LINEA[linea.id]
-      .map((cat) => {
-        const items = EXTRAS_COTIZABLES.filter((e) => e.categoria === cat)
-          .map(
-            (e) =>
-              `- ${e.nombre}: ${e.desde ? "desde " : ""}${cop(e.precioCop)}${e.periodicidad === "mensual" ? "/mes" : " (pago único)"}${e.descripcion ? `. ${e.descripcion}` : ""}`,
-          )
-          .join("\n");
-        return `### ${cat}\n\n${items}`;
-      })
-      .join("\n\n");
-    return `## ${linea.numero}. ${linea.nombre} — ${linea.etiqueta}\n\n${linea.promesa}\n\n${[planes, servicios].filter(Boolean).join("\n\n")}`;
-  }).join("\n\n");
-
   const articulos = articulosOrdenados()
     .map((a) => `- [${a.titulo}](https://biwov.com/blog/${a.slug}): ${a.enResumen}`)
     .join("\n");
@@ -54,17 +31,17 @@ export function GET() {
 - Falta de una página web que convierta visitas en contactos y de un CRM que ordene a los clientes.
 - Tareas repetitivas que se pueden automatizar con inteligencia artificial.
 
-## Servicios y precios
+## Servicios
 
-Los planes mensuales tienen un compromiso mínimo de ${DURACION_MINIMA_MESES} meses y se pagan por anticipado. La pauta publicitaria, las licencias y el consumo de las plataformas se pagan aparte.
+- CRM: toda la información de los clientes en un solo lugar y su seguimiento.
+- Chatbot: WhatsApp que responde preguntas frecuentes, filtra curiosos y pasa a los interesados a un asesor.
+- Email marketing: correos automáticos de bienvenida, seguimiento y recompra.
+- Mensajes masivos por WhatsApp: campañas a bases de datos autorizadas.
+- Publicidad y campañas publicitarias en Meta (Facebook e Instagram).
+- Asesoría de marketing: estrategia, planeación y lineamientos.
+- Automatizaciones: herramientas conectadas para que las tareas repetitivas se hagan solas.
 
-${catalogo}
-
-## Asesoría personalizada
-
-- Sesión 1 a 1 de 90 minutos con Kathe, con análisis previo del negocio.
-
-Precios en pesos colombianos; no incluyen IVA ni retenciones. Precios vigentes y en dólares: https://biwov.com/tienda
+Cada servicio se cotiza a la medida por WhatsApp. La pauta publicitaria, las licencias y el consumo de las plataformas se pagan aparte.
 
 ## Blog (guías de marketing digital)
 
@@ -76,18 +53,10 @@ ${articulos}
 - WhatsApp: +57 313 312 5157
 - Instagram: https://www.instagram.com/biwov_/
 
-## Planes estándar para empresarios
-
-${PLANES_CLIENTES.map((p) => `- **${p.nombre}**: ${cop(p.precio)} ${p.unidad}${p.adicional ? ` + ${p.adicional.label} ${cop(p.adicional.precio)}` : ""}. ${p.gancho} (https://biwov.com/planes/${p.slug})`).join("\n")}
-
-Permanencia mínima de ${MESES_MINIMOS} meses en los planes mensuales. Pago mes a mes sin descuento; por adelantado 10% (4 meses) o 20% (anual). Los costos de plataformas (pauta, mensajes de WhatsApp API, tokens de IA y herramientas externas) los paga el cliente directamente.
-
 ## Páginas principales
 
 - https://biwov.com — inicio: servicios, casos de éxito y preguntas frecuentes
-- https://biwov.com/planes — planes estándar para empresarios, en escalera de valor (capacitación, asesoría, agencia completa, campañas, automatización y agentes de IA)
 - https://biwov.com/agencia-ia — biwov Agentes: agencia de marketing con agentes de IA y la memoria de cada marca
-- https://biwov.com/tienda — planes y servicios con precios
 - https://biwov.com/blog — blog de marketing digital
 - https://biwov.com/kathe — perfil de la fundadora
 - https://biwov.com/politica-datos — política de tratamiento de datos

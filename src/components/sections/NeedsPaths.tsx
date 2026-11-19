@@ -9,8 +9,9 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Button } from "@/components/ui/Button";
 import { SITUACIONES_NEGOCIO } from "@/data/queNecesita";
 import { LINEAS, type LineaId } from "@/data/lineas";
-import { useQuoter } from "@/components/quoter/QuoterProvider";
 import { cn } from "@/lib/utils";
+import { linkWhatsApp } from "@/lib/panel/whatsapp";
+import { WHATSAPP_BIWOV } from "@/lib/contacto";
 
 const NOMBRE_CORTO: Record<LineaId, string> = {
   direccion: "Que me guíen",
@@ -21,12 +22,14 @@ const NOMBRE_CORTO: Record<LineaId, string> = {
 };
 
 export function NeedsPaths() {
-  const { open } = useQuoter();
   const router = useRouter();
   const [activo, setActivo] = useState<LineaId>("direccion");
 
   const irAlPlan = () => {
-    router.push(`/tienda#${activo}`);
+    window.open(
+      linkWhatsApp(WHATSAPP_BIWOV, `¡Hola! Quiero cotizar ${NOMBRE_CORTO[activo].toLowerCase()} para mi negocio.`),
+      "_blank",
+    );
   };
 
   const situaciones = SITUACIONES_NEGOCIO.filter((s) => s.linea === activo);
@@ -37,7 +40,7 @@ export function NeedsPaths() {
         <SectionHeading
           eyebrow="Encuentra tu camino"
           title="¿Qué necesita tu negocio hoy?"
-          description="Elige lo que más se parece a tu caso y te llevamos directo a las opciones y precios que te sirven."
+          description="Elige lo que más se parece a tu caso y te armamos una cotización a la medida."
         />
 
         <div className="scrollbar-none mt-10 flex gap-2 overflow-x-auto">
@@ -87,7 +90,7 @@ export function NeedsPaths() {
         </div>
 
         <div className="mt-10 flex">
-          <Button size="lg" onClick={() => open()}>
+          <Button size="lg" onClick={() => router.push("/diagnostico-instagram")}>
             Haz tu diagnóstico gratis
           </Button>
         </div>

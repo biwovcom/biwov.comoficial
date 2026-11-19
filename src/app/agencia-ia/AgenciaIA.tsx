@@ -610,7 +610,7 @@ export function AgenciaIA() {
         </motion.div>
         <p className="mt-8 px-5 text-center text-[#0a2642]/65">
           ¿Prefieres que nuestro equipo lo haga todo por ti?{" "}
-          <Link href="/planes/agencia-completa" className="inline-flex items-center gap-1 font-bold text-[#0a2642] underline underline-offset-4">
+          <Link href="/#servicios" className="inline-flex items-center gap-1 font-bold text-[#0a2642] underline underline-offset-4">
             Mira el plan Agencia Completa <ArrowRight className="h-4 w-4" />
           </Link>
         </p>

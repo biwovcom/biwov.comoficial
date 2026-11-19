@@ -1,22 +1,24 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { PLANES_CLIENTES, planClientePorSlug } from "@/data/portafolioClientes";
+import { planClientePorSlug } from "@/data/portafolioClientes";
 import { DetallePlan } from "./DetallePlan";
+import { soloEquipo } from "@/lib/soloEquipo";
 
-export function generateStaticParams() {
-  return PLANES_CLIENTES.map((p) => ({ slug: p.slug }));
-}
-
-export const dynamicParams = false;
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const plan = planClientePorSlug(slug);
   if (!plan) return {};
-  return { title: `${plan.nombre} | Planes biwov`, description: plan.gancho };
+  return {
+    title: `${plan.nombre} | Planes biwov`,
+    description: plan.gancho,
+    robots: { index: false, follow: false },
+  };
 }
 
 export default async function PlanPage({ params }: { params: Promise<{ slug: string }> }) {
+  await soloEquipo();
   const { slug } = await params;
   const plan = planClientePorSlug(slug);
   if (!plan) notFound();

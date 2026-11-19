@@ -7,7 +7,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
-import { useQuoter } from "@/components/quoter/QuoterProvider";
 import { LINKS_PANEL } from "@/lib/panel/panelConfig";
 import { LogoMark } from "./LogoMark";
 import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
@@ -17,9 +16,7 @@ import { cn } from "@/lib/utils";
 
 const LINKS = [
   { href: "/#servicios", label: "Servicios" },
-  { href: "/planes", label: "Planes" },
   { href: "/agencia-ia", label: "Agencia IA" },
-  { href: "/tienda", label: "Tienda" },
   { href: "/#casos", label: "Casos" },
   { href: "/blog", label: "Blog" },
   { href: "/kathe", label: "Fundadora" },
@@ -28,18 +25,12 @@ const LINKS = [
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuAbierto, setMenuAbierto] = useState(false);
-  const { open } = useQuoter();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  const cerrarYDiagnostico = () => {
-    setMenuAbierto(false);
-    open();
-  };
 
   return (
     <header
@@ -67,13 +58,12 @@ export function Navbar() {
           ))}
         </nav>
         <div className="hidden items-center gap-5 lg:flex">
-          <button
-            type="button"
-            onClick={() => open()}
+          <Link
+            href="/diagnostico-instagram"
             className="text-[15px] font-medium whitespace-nowrap text-white/85 transition-colors hover:text-accent"
           >
             Diagnóstico gratis
-          </button>
+          </Link>
           <a href={PORTAL_CLIENTES} className="text-[15px] font-medium whitespace-nowrap text-white/85 transition-colors hover:text-accent">
             Iniciar sesión
           </a>
@@ -120,9 +110,11 @@ export function Navbar() {
               <a href={PORTAL_CLIENTES} className="rounded-xl px-3 py-3 text-base text-text-secondary transition-colors hover:bg-white/[0.05] hover:text-white">
                 Iniciar sesión (clientes)
               </a>
-              <Button size="md" variant="secondary" className="mt-2 w-full" onClick={cerrarYDiagnostico}>
-                Diagnóstico gratis
-              </Button>
+              <Link href="/diagnostico-instagram" onClick={() => setMenuAbierto(false)} className="mt-2 block">
+                <Button size="md" variant="secondary" className="w-full">
+                  Diagnóstico gratis
+                </Button>
+              </Link>
               <a
                 href={LINKS_PANEL.calendario}
                 target="_blank"

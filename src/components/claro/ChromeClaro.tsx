@@ -13,7 +13,7 @@ export const waBiwov = (mensaje: string) =>
   `https://wa.me/${WHATSAPP_BIWOV.replace(/\D/g, "")}?text=${encodeURIComponent(mensaje)}`;
 
 const LINKS = [
-  { href: "/planes", label: "Planes" },
+  { href: "/#servicios", label: "Servicios" },
   { href: "/agencia-ia", label: "Agencia de agentes IA" },
   { href: "/blog", label: "Blog" },
   { href: "/kathe", label: "Fundadora" },

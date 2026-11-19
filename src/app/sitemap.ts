@@ -1,4 +1,3 @@
-import { PLANES_CLIENTES } from "@/data/portafolioClientes";
 import type { MetadataRoute } from "next";
 import { ARTICULOS } from "@/data/blog";
 
@@ -8,9 +7,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     { url: base, lastModified: hoy, changeFrequency: "weekly", priority: 1 },
-    { url: `${base}/tienda`, lastModified: hoy, changeFrequency: "weekly", priority: 0.9 },
-    { url: `${base}/planes`, lastModified: hoy, changeFrequency: "weekly", priority: 0.95 },
-    ...PLANES_CLIENTES.map((p) => ({ url: `${base}/planes/${p.slug}`, lastModified: hoy, changeFrequency: "monthly" as const, priority: 0.7 })),
     { url: `${base}/agencia-ia`, lastModified: hoy, changeFrequency: "weekly", priority: 0.95 },
     { url: `${base}/marketing-digital-manizales`, lastModified: hoy, changeFrequency: "monthly", priority: 0.9 },
     { url: `${base}/blog`, lastModified: hoy, changeFrequency: "weekly", priority: 0.8 },

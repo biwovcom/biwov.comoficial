@@ -13,7 +13,6 @@ import {
 
 const ECOSISTEMA = [
   { href: "/#servicios", label: "Servicios" },
-  { href: "/tienda", label: "Tienda" },
   { href: "/#casos", label: "Casos" },
   { href: "/blog", label: "Blog" },
   { href: "/marketing-digital-manizales", label: "Marketing digital en Manizales" },

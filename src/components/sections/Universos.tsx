@@ -7,7 +7,6 @@ import type { ReactNode } from "react";
 import { Bot, Camera, Clapperboard, Filter, Megaphone, MessageCircle, UserCheck } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
-import { useQuoter } from "@/components/quoter/QuoterProvider";
 import { PLANES } from "@/data/planes";
 import { NIVELES_PRODUCCION } from "@/data/addOns";
 import { linkWhatsApp } from "@/lib/panel/whatsapp";
@@ -221,7 +220,6 @@ function MediaWeb() {
 }
 
 export function Universos() {
-  const { open } = useQuoter();
   const whatsapp = linkWhatsApp(WHATSAPP_BIWOV, MENSAJE_WHATSAPP_BIWOV);
 
   return (
@@ -238,9 +236,9 @@ export function Universos() {
               <Link href="/tienda#gestion" className={BTN_BLANCO}>
                 Ver planes
               </Link>
-              <button type="button" onClick={() => open()} className={BTN_BORDE}>
+              <Link href="/diagnostico-instagram" className={BTN_BORDE}>
                 Diagnóstico gratis
-              </button>
+              </Link>
             </>
           }
         />

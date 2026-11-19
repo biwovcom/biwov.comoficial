@@ -5,8 +5,6 @@ import { Plus } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
 import { FinalCTA } from "@/components/sections/FinalCTA";
-import { PLANES } from "@/data/planes";
-import { NIVELES_PRODUCCION } from "@/data/addOns";
 import { linkWhatsApp } from "@/lib/panel/whatsapp";
 import { WHATSAPP_BIWOV } from "@/lib/contacto";
 
@@ -39,7 +37,6 @@ export const metadata: Metadata = {
   },
 };
 
-const cop = (n: number) => `$${n.toLocaleString("es-CO")}`;
 
 const SERVICIOS = [
   {
@@ -63,7 +60,8 @@ const SERVICIOS = [
 const PREGUNTAS = [
   {
     pregunta: "¿Cuánto cuesta el marketing digital en Manizales?",
-    respuesta: `En biwov los planes mensuales van desde ${cop(Math.min(...PLANES.map((p) => p.precioDesde.cop)))} COP (dirección estratégica, donde tú ejecutas) hasta ${cop(Math.max(...PLANES.map((p) => p.precioDesde.cop)))} COP (gestión integral, donde lo hacemos todo por ti), y la producción de contenido arranca en ${cop(NIVELES_PRODUCCION[0].precio.cop)} COP. La inversión en pauta se paga aparte, directamente a Meta.`,
+    respuesta:
+      "Depende de lo que necesite tu negocio: campañas, contenido, chatbot, CRM o asesoría. Te armamos una cotización a la medida por WhatsApp. La inversión en pauta se paga aparte, directamente a Meta.",
   },
   {
     pregunta: "¿Trabajan solo con negocios de Manizales?",
@@ -110,7 +108,7 @@ export default function MarketingManizalesPage() {
         ],
         founder: { "@id": "https://biwov.com/kathe#persona" },
         parentOrganization: { "@id": "https://biwov.com/#organizacion" },
-        hasOfferCatalog: { "@type": "OfferCatalog", name: "Planes y servicios", url: "https://biwov.com/tienda" },
+        
       },
       {
         "@type": "FAQPage",
@@ -171,10 +169,10 @@ export default function MarketingManizalesPage() {
               Hablemos de tu negocio
             </a>
             <Link
-              href="/tienda"
+              href="/#servicios"
               className="border-b border-white/70 pb-1 text-base text-white transition-colors hover:border-accent hover:text-accent md:text-lg"
             >
-              Ver precios
+              Ver servicios
             </Link>
           </div>
         </Container>
@@ -202,35 +200,6 @@ export default function MarketingManizalesPage() {
         </Container>
       </section>
 
-      <section className="py-12 md:py-20">
-        <Container>
-          <span className="mb-5 block text-xs font-semibold uppercase tracking-[0.22em] text-accent md:text-sm">
-            Precios publicados
-          </span>
-          <h2 className="max-w-3xl text-4xl font-medium leading-[1.04] text-white sm:text-5xl md:text-6xl">
-            Sabes cuánto inviertes <span className="text-accent">antes de empezar.</span>
-          </h2>
-          <div className="mt-12 grid gap-5 md:grid-cols-3">
-            {PLANES.map((p) => (
-              <Link
-                key={p.id}
-                href={`/tienda#${p.linea}`}
-                className="card-universo group rounded-[1.75rem] p-8 transition-transform duration-500 hover:-translate-y-1"
-              >
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">
-                  {p.linea === "direccion" ? "Tú ejecutas, te dirigimos" : "Lo hacemos por ti"}
-                </p>
-                <h3 className="mt-2 text-3xl font-medium text-white">{p.nombre}</h3>
-                <p className="mt-3 text-base text-white/60">{p.claim}</p>
-                <p className="mt-8 text-3xl font-semibold tracking-tight text-white">
-                  {cop(p.precioDesde.cop)}
-                  <span className="text-base font-normal text-white/50"> COP/mes</span>
-                </p>
-              </Link>
-            ))}
-          </div>
-        </Container>
-      </section>
 
       <section className="py-20 md:py-28">
         <Container className="grid gap-10 md:grid-cols-[0.9fr_1.1fr] md:gap-16">

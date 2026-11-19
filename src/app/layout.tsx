@@ -24,18 +24,6 @@ const organizationJsonLd = {
       areaServed: ["Manizales", "Caldas", "Colombia", "Latinoamérica"],
       telephone: WHATSAPP_BIWOV,
       priceRange: "$$",
-      hasOfferCatalog: {
-        "@type": "OfferCatalog",
-        name: "Planes biwov para empresarios",
-        url: "https://biwov.com/planes",
-        itemListElement: PLANES_CLIENTES.map((p) => ({
-          "@type": "Offer",
-          url: `https://biwov.com/planes/${p.slug}`,
-          price: p.precio,
-          priceCurrency: "COP",
-          itemOffered: { "@type": "Service", name: p.nombre, description: p.gancho },
-        })),
-      },
       knowsLanguage: "es",
       knowsAbout: [
         "Marketing digital",
